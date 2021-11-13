@@ -1,0 +1,171 @@
+.calls {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1 1;
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+}
+
+@media screen and (min-width: 768px) {  
+    .calls {
+        flex-direction: row;
+    }
+}
+
+.calls-list {
+    width: 100%;
+}
+
+.calls-editor {
+    width: 100%;
+}
+
+.pagination {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+}
+
+.pagination li {
+    display: block;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    margin: 0 10px;
+    color: aliceblue;
+}
+
+.pagination li a {
+    width: 30px;
+    height: 30px;
+    display: block;
+}
+
+.pagination li:hover {
+    cursor: pointer;
+    color: rgb(46, 161, 182);
+}
+
+.pagination .pag-active {
+    font-size: 2rem;
+}
+
+.pagination .previous, .pagination .next {
+    width: 20px; 
+}
+
+.calls form {
+    padding-top: 15px;
+    row-gap: 15px;
+    column-gap: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "id time" "location phone" "text text" "officers officers" "report report";
+}
+
+form textarea {
+    grid-area: text;
+    min-height: 150px;
+    max-height: 300px;
+}
+
+form select {
+    width: 223px;
+    height: 100%;
+}
+
+.officers, .report {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 10px;
+}
+
+.officers {
+    grid-area: officers;
+}
+
+.officers p, .report p {
+    margin-right: 20px;
+}
+
+.report {
+    grid-area: report;
+}
+
+.report-controls {
+    display: flex;
+    line-height: 36px;
+    margin: 0;
+}
+
+.officers, .report, .round-link {
+    color: aliceblue;
+    text-decoration: none;
+    align-items: center;
+}
+
+.round-link {
+    background-color: aquamarine;
+    color: rgb(51, 51, 184);
+    padding: 5px;
+    border-radius: 50px;
+}
+
+.round-link:hover {
+    background-color: rgb(46, 161, 182);
+}
+
+.link-delete, .link-save {
+    margin-left: 10px;
+    border-radius: 100%;
+    display: inline-block;
+}
+
+.link-delete:hover, .link-save:hover {
+    cursor: pointer;
+    color: rgb(46, 161, 182);
+}
+
+.calls .table-scroll {
+    display: flex;
+    flex-direction: column;
+}
+
+.calls .call-item {
+    margin: 0;
+    list-style: none;
+    color: aliceblue;
+    display: grid;
+    grid-template-areas: "location . id" "time . ." "phone . edit";
+    align-items: center;
+    padding: 20px;
+    border-bottom: aliceblue 1px solid;
+}
+
+.call-time {
+    grid-area: time;
+}
+
+.call-id {
+    grid-area: id;
+}
+
+.call-phone {
+    grid-area: phone;
+}
+
+.call-location {
+    grid-area: location;
+}
+
+.call-edit {
+    text-decoration: none;
+    grid-area: edit;
+    text-align: center;
+}

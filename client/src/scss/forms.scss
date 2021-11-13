@@ -1,0 +1,114 @@
+@import "colors";
+
+.text-input {
+    width: 200px;
+    height: 40px;
+    border-radius: 5px;
+    border: none;
+    background-color: $main;
+    color: $bright;
+    padding: 0 12px;
+}
+
+form div {
+    margin: 0 auto;
+}
+
+select {
+    width: 223px;
+    height: 40px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+select, textarea {
+    background-color: $main;
+    color: $bright;
+    border: none;
+    padding: 2px;
+    border-radius: 5px;
+}
+
+textarea {
+    padding: 10px;
+}
+
+form {
+    width: 500px;
+    display: grid;
+    padding-top: 15px;
+    row-gap: 15px;
+    column-gap: 15px;
+    margin: 0 auto;
+}
+
+form div {
+    position: relative;
+}
+
+.floating-label {
+  position: absolute;
+  pointer-events: none;
+  color: $bright;
+  left: 20px;
+  top: 10px;
+  transition: 0.2s ease all;
+}
+
+.text-input:focus ~ .floating-label,
+.text-input:not(:focus):valid ~ .floating-label,
+.active-label {
+  top: -9px;
+  bottom: 10px;
+  left: 10px;
+  font-size: 12px;
+  color: $rare;
+}
+
+.datePicker {
+    background-color: $main;
+    padding: 0 0 0 5px;
+    width: 217px;
+    height: 40px;
+    border-radius: 5px;
+    border: none;
+    color: $bright;
+}
+
+.react-datepicker {
+    background-color: $main;
+    border-color: $secondary;
+}
+
+.react-datepicker__header {
+    background-color: $background;
+}
+
+.react-datepicker__day-name, .react-datepicker__current-month {
+    color: $rare;
+}
+
+.react-datepicker__day {
+    color: $bright;
+}
+
+.react-datepicker__day:hover {
+    background-color: $background;
+}
+
+.edit-list {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 10px;
+    line-height: 30px;
+    color: $bright;
+    text-decoration: none;
+    align-items: center;
+}
+
+.link-button {
+    margin-left: 10px;
+}

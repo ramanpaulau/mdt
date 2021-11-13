@@ -1,0 +1,155 @@
+@import "colors";
+
+.calls {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1 1;
+    gap: 5px;
+    width: 100%;
+    height: 100%;
+}
+
+@media screen and (min-width: 768px) {  
+    .calls {
+        flex-direction: row;
+    }
+}
+
+.calls-list {
+    width: 100%;
+}
+
+.calls-editor {
+    width: 100%;
+}
+
+.pagination {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+}
+
+.pagination li {
+    display: block;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    margin: 0 10px;
+    color: $bright;
+}
+
+.pagination li a {
+    width: 30px;
+    height: 30px;
+    display: block;
+}
+
+.pagination li:hover {
+    cursor: pointer;
+    color: $highlight;
+}
+
+.pagination .pag-active {
+    font-size: 2rem;
+    color: $highlight;
+}
+
+.pagination .previous, .pagination .next {
+    width: 20px; 
+}
+
+form textarea {
+    grid-area: text;
+    min-height: 150px;
+    max-height: 300px;
+}
+
+.officers {
+    grid-area: officers;
+}
+
+.officers p, .report p {
+    margin-right: 20px;
+}
+
+.report {
+    grid-area: report;
+}
+
+.report-controls {
+    display: flex;
+    line-height: 36px;
+    margin: 0;
+}
+
+.round-link {
+    color: $bright;
+    text-decoration: none;
+    align-items: center;
+}
+
+.round-link {
+    background-color: $highlight;
+    color: $bright;
+    padding: 5px;
+    border-radius: 20px;
+}
+
+.round-link:hover {
+    background-color: $highlightDark;
+}
+
+.call-time {
+    grid-area: time;
+}
+
+.call-id {
+    grid-area: id;
+}
+
+.call-phone {
+    grid-area: phone;
+}
+
+.call-location {
+    grid-area: location;
+}
+
+
+.calls {
+    .edit-button {
+        grid-area: edit;
+    }
+
+    .title {
+        border-top: none;
+        border-bottom: 1px solid $bright;
+    }
+
+    .call-item {
+        margin: 0;
+        list-style: none;
+        color: $bright;
+        display: grid;
+        grid-template-areas: "location . id" "time . ." "phone . edit";
+        align-items: center;
+        padding: 20px;
+        border-bottom: $bright 1px solid;
+    }
+
+    .table-scroll {
+        display: flex;
+        flex-direction: column;
+    }
+
+    form {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "id time" "location phone" "text text" "officers officers" "report report";
+    }
+
+    .table-scroll div:first-child .floating-label {
+        left: 0;
+    }
+}

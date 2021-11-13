@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  api:
+    depends_on:
+      - db
+    build: ./api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mdt
+    ports:
+      - 8081:8081
+    restart: always
+    
+  db:
+    image: postgres:latest
+    ports:
+        - 5432:5432
+    environment:
+      - POSTGRES_USER=mdt_user
+      - POSTGRES_PASSWORD=mdt_password
+      - POSTGRES_DB=mdt
+    restart: always
+
+  client:
+    build: ./client
+    ports:
+      - 80:80
+    restart: always

@@ -1,0 +1,68 @@
+@import "colors.scss"; 
+
+.citizens {
+    display: grid;
+    grid-template-areas: "list editor" "list info";
+    grid-template-rows: 1fr 2fr;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 5px;
+    grid-column-gap: 5px;
+    height: calc(100vh - 52px);
+
+    .title {
+        border-top: none;
+        border-bottom: 1px solid $bright;
+    }
+    
+    .citizen-list {
+        grid-area: list;
+
+        .citizen {
+            margin: 0;
+            display: grid;
+            grid-template-areas: "regnum fullname edit" "phone phone .";
+            list-style: none;
+            padding: 20px;
+            
+            .regnum {
+                grid-area: regnum;
+            }
+
+            .fullname {
+                grid-area: fullname;
+            }
+
+            .edit-button {
+                grid-area: edit;
+            }
+
+            .phone {
+                grid-area: phone;
+            }
+        }
+    }
+
+    .citizen-editor {
+        grid-area: editor;
+
+        .table-scroll {
+            display: flex;
+            align-items: center;
+        }
+
+        form {
+            padding: 0;
+            grid-template-areas: "name phone" "birth regnum" "state .";
+        }
+    }
+
+    .citizen-info {
+        grid-area: info;
+
+        .edit-list {
+            border: 2px solid $background;
+            margin: 5px;
+            padding: 0 5px;
+        }
+    }
+}
