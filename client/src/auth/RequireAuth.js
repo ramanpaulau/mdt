@@ -1,7 +1,7 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 
-const RequireAuth = (Component) => {
+const RequireAuth = (Component, user) => {
     return class App extends React.Component { 
         constructor(props) {
             super(props);
@@ -18,16 +18,7 @@ const RequireAuth = (Component) => {
                 return;
             }
 
-            /*axios.post("http://localhost:8080/auth/check_token", {
-                token: token
-            })
-            .then((res) => {
-                if (!res.data.user || res.data.user.id !== user.id) {
-                    this.state = {
-                        redirect: '/'
-                    };
-                }
-            });*/
+            user.loadUser();
         }
         
         render() {

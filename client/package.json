@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/plugin-proposal-decorators": "^7.16.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
@@ -15,6 +16,7 @@
     "formik": "^2.2.9",
     "jquery": "^3.6.0",
     "less": "^4.1.2",
+    "mobx": "^6.3.7",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",
     "react-datepicker": "^4.3.0",

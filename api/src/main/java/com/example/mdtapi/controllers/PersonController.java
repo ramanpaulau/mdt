@@ -1,7 +1,7 @@
 package com.example.mdtapi.controllers;
 
-import com.example.mdtapi.models.Employee;
-import com.example.mdtapi.repositories.EmployeeRepository;
+import com.example.mdtapi.models.Person;
+import com.example.mdtapi.repositories.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Controller;
 import java.util.Date;
 
 @Controller
-public class EmployeeController {
+public class PersonController {
 
     @Autowired
-    private EmployeeRepository employeeRepository;
+    private PersonRepository personRepository;
 
     @MessageMapping("/string")
     @SendTo("/api/employee")
-    public Employee test(String name) throws Exception {
-        return new Employee(name, "adasd", "asdasd", new Date(), 15);
+    public Person test(String name) throws Exception {
+        return new Person();
     }
 }

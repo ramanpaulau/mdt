@@ -22,7 +22,7 @@ class State extends React.Component {
     }
 
     componentWillUnmount() {
-        clearInterval(this.timerID);
+        clearInterval(this.intervalID);
         clearTimeout(this.timeoutID);
     }
 
@@ -31,7 +31,7 @@ class State extends React.Component {
             <div className="state">
                 <p>San Andreas Highway Patrol</p>
                 <p className="notification">{ this.state.notification }</p>
-                <p>1-LN-10</p>
+                <p>{this.props.store.regNum}</p>
                 <p>{this.state.time.toLocaleString()}</p>
             </div>
         );

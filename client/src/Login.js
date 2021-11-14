@@ -24,6 +24,7 @@ class Login extends React.Component {
 		this.passwordRef = React.createRef();
 		this.loaderRef = React.createRef();
 		this.authRef = React.createRef();
+		let token = localStorage.getItem('token'); 
 	}
 
 	getIdx = () => {
@@ -41,6 +42,7 @@ class Login extends React.Component {
 		e.key = e.key.toUpperCase();
 		let idx = this.getIdx();
 		this.regNumRefs[idx].current.classList.remove('error');
+		this.regNumRefs[idx].current.value = e.key;
 		if (idx < 3)
 			this.regNumRefs[++idx].current.focus();
 	}
@@ -60,12 +62,17 @@ class Login extends React.Component {
 	}
 
 	processAuth = async (e) => {
-
+		e.preventDefault();
+		this.setState({ authMessage: '' });
+		let error = false;
+		let regNum = this.regNumRefs.map(r => r.current.value).join('');
+		
 		// parse
 		if (this.state.password.length <= 0) {
 			this.passwordRef.current.classList.add('error');
 			this.passwordRef.current.style.animation = 'shake 0.2s linear 1';
 			setTimeout(() => { this.passwordRef.current.style.animation = 'none'; }, 200);
+			error = true;
 		}
 
 		for (let i = 0; i < 4; i++) {
@@ -73,36 +80,35 @@ class Login extends React.Component {
 				this.regNumRefs[i].current.classList.add('error');
 				this.regNumRefs[i].current.style.animation = 'shake 0.2s linear 1';
 				setTimeout(() => { this.regNumRefs[i].current.style.animation = 'none'; }, 200);
+				error = true;
 			}
 		}
-		// end parse
-		this.setState({ authMessage: '' });
 
-		e.preventDefault();
+		if (error)
+			return;
+		// end parse
 
 		this.authRef.current.style.display = 'none';
 		this.loaderRef.current.style.display = 'block';
 
 		await axios.post("http://localhost:8081/login", {
-                tag: 0,
-                password: "admin",
+                regNum: regNum,
+                password: this.state.password,
             })
             .then((res) =>  {
-				console.log(res.data);
-				this.loaderRef.current.style.display = 'none';
-				this.authRef.current.style.display = 'grid';
+				if (!res.data) {
+					this.setState({ authMessage: 'Wrong credentials' });
+					this.loaderRef.current.style.display = 'none';
+					this.authRef.current.style.display = 'grid';
+					return;
+				}
+				
+                if (res.data) {
+                    localStorage.setItem('token', res.data);
+                }
+
+				this.props.history.push("/");
             });
-
-
-		/*if (false) {
-			e.preventDefault();
-			this.setState({ authMessage: 'Wrong credentials' });
-		}
-
-		if (true) {
-			e.preventDefault();
-			this.setState({ authMessage: 'Unable connect to auth server' });
-		}*/
 	}
 
 	render() {

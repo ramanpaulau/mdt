@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faPhone, faIdCardAlt, faCar, faFileAlt, faEye, faWarehouse, faGavel, faLandmark } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faPhone, faIdCardAlt, faCar, faFileAlt, faEye, faWarehouse, faGavel, faLandmark, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 class Header extends React.Component {
     constructor(props) {
@@ -42,6 +42,10 @@ class Header extends React.Component {
     
         menu.classList.toggle("opened");
         this.burgerToggleAnim();
+    };
+
+    signOut = () => {
+      this.props.store.clear();
     };
     
     render() {
@@ -130,6 +134,18 @@ class Header extends React.Component {
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
                                     <FontAwesomeIcon icon={faLandmark} />
+                            </NavLink>
+                        </li>
+                        <li className="nav-li">
+                            <NavLink 
+                                to="/login"
+                                className="nav-a"
+                                activeClassName="active-nav-a"
+                                onClick={() => {
+                                  this.signOut();
+                                  this.navigate();
+                                }}>
+                                    <FontAwesomeIcon icon={faTimes} />
                             </NavLink>
                         </li>
                     </ul>

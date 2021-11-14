@@ -8,11 +8,11 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 
-const CALLS_ON_PAGE = 3;
+const CITIZENS_ON_PAGE = 3;
 
 class Citizens extends React.Component {
 
-    users = [
+    citizens = [
         {id: 1, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive"},
         {id: 2, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "dead"},
         {id: 3, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive"},
@@ -31,8 +31,20 @@ class Citizens extends React.Component {
         { name: "3", value: 3},
         { name: "4", value: 4}
     ];
+    propertyIds = [
+        { name: "1", value: 1},
+        { name: "2", value: 2},
+        { name: "3", value: 3},
+        { name: "4", value: 4}
+    ];
+    transportIds = [
+        { name: "1", value: 1},
+        { name: "2", value: 2},
+        { name: "3", value: 3},
+        { name: "4", value: 4}
+    ];
 
-    emptyUser = {id: "", name: "", surname: "", phone: "", regnum: ""};
+    emptyCitizen = {id: "", name: "", surname: "", phone: "", regnum: ""};
 
     constructor(props) {
         super(props);
@@ -42,45 +54,41 @@ class Citizens extends React.Component {
         if (id === undefined)
             id = 0;
 
-        let selectedUser = (id === 0)?this.emptyUser:this.users[id];
+        let selectedCitizen = (id === 0)?this.emptyCitizen:this.citizens[id];
 
         this.state = {
             data: [],
             offset: 0,
-            selectedUser: selectedUser,
+            selectedCitizen: selectedCitizen,
             birthDate: new Date(),
             pageCount: 0
         };
+
+        console.log("adsasd");
     }
 
-    loadCalls = () => {
+    loadCitizens = () => {
         this.setState({
-            data: this.users.slice(this.state.offset, this.state.offset + CALLS_ON_PAGE),
-            pageCount: Math.ceil(this.users.length / CALLS_ON_PAGE)
+            data: this.citizens.slice(this.state.offset, this.state.offset + CITIZENS_ON_PAGE),
+            pageCount: Math.ceil(this.citizens.length / CITIZENS_ON_PAGE)
         });
       }
 
     componentDidMount = () => {
-        this.loadCalls();
+        this.loadCitizens();
     }
 
     handlePageClick = (data) => {
         let selected = data.selected;
-        let offset = Math.ceil(selected * CALLS_ON_PAGE);
+        let offset = Math.ceil(selected * CITIZENS_ON_PAGE);
     
         this.setState({ offset: offset, selected: selected }, () => {
-          this.loadCalls();
+          this.loadCitizens();
         });
       };
 
-    selectCall = (id) => {
-        this.setState({ selectedUser: this.users[id] });
-    }
-
-    handleTextarea = (event) => {
-        let tmp = this.state.selectedCall;
-        tmp.description = event.target.value;
-        this.setState({ selectCall: tmp });
+    selectCitizen = (id) => {
+        this.setState({ selectedCitizen: this.citizens[id] });
     }
 
     removeLicense = (id) => {
@@ -104,7 +112,7 @@ class Citizens extends React.Component {
                                 <Link 
                                     to={"/citizens/" + o.id}
                                     className="edit-button round-link"
-                                    onClick={() => this.selectCall(o.id)}>
+                                    onClick={() => this.selectCitizen(o.id)}>
                                     View
                                 </Link>
                                 
@@ -137,7 +145,7 @@ class Citizens extends React.Component {
                             <Link 
                             to={"/citizens"} 
                             className="link"
-                            onClick={() => { this.setState({ selectedUser: this.emptyUser }); }}>
+                            onClick={() => { this.setState({ selectCitizen: this.emptyCitizen }); }}>
                                 New
                             </Link>
                         </h3>
@@ -146,17 +154,17 @@ class Citizens extends React.Component {
                     <div className="table-scroll"> 
                         <form>
                             <div>
-                                <input type="text" className="text-input" required value={(this.state.selectedUser.id !== "")?this.state.selectedUser.name + " " + this.state.selectedUser.surname:""} onChange={() => {}} />
+                                <input type="text" className="text-input" required value={(this.state.selectedCitizen.id !== "")?this.state.selectedCitizen.name + " " + this.state.selectedCitizen.surname:""} onChange={() => {}} />
                                 <span className="floating-label">Name</span>
                             </div>
                             
                             <div>
-                                <input type="text" className="text-input" required value={(this.state.selectedUser.id !== "")?this.state.selectedUser.name + " " + this.state.selectedUser.surname:""} onChange={() => {}} />
+                                <input type="text" className="text-input" required value={(this.state.selectedCitizen.id !== "")?this.state.selectedCitizen.name + " " + this.state.selectedCitizen.surname:""} onChange={() => {}} />
                                 <span className="floating-label">Surname</span>
                             </div>
 
                             <div>
-                                <input type="text" className="text-input" required value={this.state.selectedUser.phone} onChange={() => {}} />
+                                <input type="text" className="text-input" required value={this.state.selectedCitizen.phone} onChange={() => {}} />
                                 <span className="floating-label">Phone</span>
                             </div>
 
@@ -166,7 +174,7 @@ class Citizens extends React.Component {
                             </div>
 
                             <div>
-                                <input type="text" className="text-input" required value={this.state.selectedUser.regnum} onChange={() => {}} />
+                                <input type="text" className="text-input" required value={this.state.selectedCitizen.regnum} onChange={() => {}} />
                                 <span className="floating-label">Registration number</span>
                             </div>
 
@@ -212,7 +220,7 @@ class Citizens extends React.Component {
                                 </span>
                             </Link>
                             <div className="report-controls">
-                                <SelectSearch options={this.reportIds} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="Property ID" />
+                                <SelectSearch options={this.propertyIds} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="Property ID" />
                                 <span className="link-button" onClick={(e) => {e.preventDefault(); }}>
                                     <FontAwesomeIcon icon={faSave} />
                                 </span>
@@ -233,7 +241,7 @@ class Citizens extends React.Component {
                                 </span>
                             </Link>
                             <div className="report-controls">
-                                <SelectSearch options={this.reportIds} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="Transport ID" />
+                                <SelectSearch options={this.propertyIds} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="Transport ID" />
                                 <span className="link-button" onClick={(e) => {e.preventDefault(); }}>
                                     <FontAwesomeIcon icon={faSave} />
                                 </span>

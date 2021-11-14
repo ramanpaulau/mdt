@@ -1,6 +1,6 @@
 package com.example.mdtapi.repositories;
 
-import com.example.mdtapi.models.Employee;
+import com.example.mdtapi.models.Person;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -10,8 +10,7 @@ import javax.annotation.PostConstruct;
 import java.util.Collection;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+public interface PersonRepository extends JpaRepository<Person, Long> {
 
-    Employee findByTag(Integer tag);
-
+    Person findByRegNum(String regNum);
 }

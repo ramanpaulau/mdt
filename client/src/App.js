@@ -8,6 +8,7 @@ import State from './State';
 import Calls from './Calls';
 import Citizens from './Citizens';
 import RequireAuth from './auth/RequireAuth';
+import { user } from './auth/User';
 import RequireNotAuth from './auth/RequireNotAuth';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
@@ -44,10 +45,6 @@ class App extends React.Component {
     this.client.activate();*/
   }
 
-  send = () => {
-    this.client.publish({destination: "/ws/string", body: "Ivan"});
-  }
-
   clearNotifications = (name) => {
     this.setState({ [name]: 0 });
   }
@@ -55,19 +52,17 @@ class App extends React.Component {
   render() {
 		return (
       <Switch>
-        <Route exact path="/login" component={Login} />
+        <Route exact path="/login" component={(props) => <Login {...props} store={user} />} />
         <React.Fragment>
         <div className="app">
-          {/*<button onClick={(e) => {e.preventDefault(); this.send();}} />*/}
-          <Header calls={this.state.calls} />
-          <State />
+          <Header calls={this.state.calls} store={user} />
+          <State store={user} />
           <main>
             <Switch>
-              <Route exact path="/" component={Home} />
-              <Route exact path="/calls/:id?" render={(props) => <Calls clearNots={this.clearNotifications} {...props} />} />
-              <Route exact path="/citizens/:id?" render={(props) => <Citizens {...props} />} />
-              <Route exact path="/reqauth" component={RequireAuth((props) => <Citizens {...props} />)} />
-              <Route path="*" component={RequireAuth(() => <Error404 />)} />
+              <Route exact path="/" component={RequireAuth(Home, user)} />
+              <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls)?this.clearNotifications:()=>{}} {...props} />, user)} />
+              <Route exact path="/citizens/:id?" component={RequireAuth((props) => <Citizens {...props} />, user)} />
+              <Route path="*" component={RequireAuth(Error404, user)} />
             </Switch>
           </main>
         </div>

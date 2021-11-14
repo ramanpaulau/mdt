@@ -1,2 +1,0 @@
-DROP TABLE IF EXISTS Employee;
-CREATE TABLE Employee(id serial PRIMARY KEY, name VARCHAR(30), surname VARCHAR(30), tag INTEGER);

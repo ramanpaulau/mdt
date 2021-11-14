@@ -6,8 +6,6 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
 
-        /*this.tag = React.createRef();
-        this.state = { drag: false, id: 0 };*/
         this.state = { bolo: "cars" };
     }
 
@@ -35,34 +33,6 @@ class Home extends React.Component {
         {id: "68JK", name: "A. Smith", incident: "245"}
     ];
 
-/*
-    handleDrag = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.setState({ drag: true, id: 5 });
-
-        const tag = this.tag.current;
-        if (!tag) return;
-        tag.classList.toggle("hidden");
-        tag.style.left = e.clientX + "px";
-        tag.style.top = e.clientY + "px";
-    }
-
-    handleMove = (e) => {
-        e.preventDefault();
-        if (!this.state.drag) return;
-        const tag = this.tag.current;
-        if (!tag) return;
-        tag.style.left = e.clientX + "px";
-        tag.style.top = e.clientY + "px";
-    }
-
-    handleDrop = (e) => {
-        e.preventDefault();
-        this.setState({ drag: false});
-    }
-*/
-
     boloClick = (type) => {
         this.setState({ bolo: type });
     }
@@ -70,7 +40,6 @@ class Home extends React.Component {
     render() {
         return (
             <div className="home" onMouseMove={this.handleMove} onMouseUp={this.handleDrop} >
-                {/*<div ref={this.tag} id="tag" className="hidden"><h1>{this.state.id}</h1></div>*/}
                 <div className="block active-bolo">
                     {(this.state.bolo === "cars") && 
                         <div>
