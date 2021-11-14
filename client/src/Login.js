@@ -24,7 +24,6 @@ class Login extends React.Component {
 		this.passwordRef = React.createRef();
 		this.loaderRef = React.createRef();
 		this.authRef = React.createRef();
-		let token = localStorage.getItem('token'); 
 	}
 
 	getIdx = () => {

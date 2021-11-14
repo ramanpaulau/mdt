@@ -44,7 +44,7 @@ class Citizens extends React.Component {
         { name: "4", value: 4}
     ];
 
-    emptyCitizen = {id: "", name: "", surname: "", phone: "", regnum: ""};
+    emptyCitizen = {regnum: "", name: "", surname: "", state: "", phone: ""};
 
     constructor(props) {
         super(props);
@@ -63,8 +63,6 @@ class Citizens extends React.Component {
             birthDate: new Date(),
             pageCount: 0
         };
-
-        console.log("adsasd");
     }
 
     loadCitizens = () => {
@@ -77,7 +75,7 @@ class Citizens extends React.Component {
     componentDidMount = () => {
         this.loadCitizens();
     }
-
+    
     handlePageClick = (data) => {
         let selected = data.selected;
         let offset = Math.ceil(selected * CITIZENS_ON_PAGE);
@@ -99,6 +97,9 @@ class Citizens extends React.Component {
         return (v) => {
             return this.licenseIds.filter((e) => e.name.toLowerCase().startsWith(v.toLowerCase()));
         };
+    }
+
+    sendRegistration = () => {
     }
 
     render() {
@@ -145,21 +146,21 @@ class Citizens extends React.Component {
                             <Link 
                             to={"/citizens"} 
                             className="link"
-                            onClick={() => { this.setState({ selectCitizen: this.emptyCitizen }); }}>
+                            onClick={() => { this.setState({ selectedCitizen: this.emptyCitizen }); }}>
                                 New
                             </Link>
                         </h3>
-                        <h3>Send</h3>
+                        <h3 onClick={() => { this.sendRegistration() }}>Send</h3>
                     </div>
                     <div className="table-scroll"> 
                         <form>
                             <div>
-                                <input type="text" className="text-input" required value={(this.state.selectedCitizen.id !== "")?this.state.selectedCitizen.name + " " + this.state.selectedCitizen.surname:""} onChange={() => {}} />
+                                <input type="text" className="text-input" required value={this.state.selectedCitizen.name} onChange={() => {}} />
                                 <span className="floating-label">Name</span>
                             </div>
                             
                             <div>
-                                <input type="text" className="text-input" required value={(this.state.selectedCitizen.id !== "")?this.state.selectedCitizen.name + " " + this.state.selectedCitizen.surname:""} onChange={() => {}} />
+                                <input type="text" className="text-input" required value={this.state.selectedCitizen.surname} onChange={() => {}} />
                                 <span className="floating-label">Surname</span>
                             </div>
 
