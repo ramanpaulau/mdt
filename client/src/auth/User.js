@@ -23,13 +23,18 @@ export class User {
 
     loadUser = async () => {
         let token = localStorage.getItem('token');
+        let regNum = localStorage.getItem('regNum');
+        console.log("sdfsdf" + token);
+
+        if (!regNum)
+            return;
 
         if (!token) {
             this.regNum = '';
             return;
         }
 
-        await axios.post("http://localhost:8081/check_token", { regNum: this.regNum, token: token })
+        await axios.post("http://localhost:8081/check_token", { regNum: regNum, token: token })
             .then((res) => {
                 if (res.data) {
                     if (!res.data)
@@ -38,8 +43,7 @@ export class User {
                         this.regNum = res.data.regNum;
                         this.admin = res.data.admin;
                     } else {
-                        console.log(this.regNum);
-                        axios.post("http://localhost:8081/refresh_token", this.regNum, { headers: { 'Content-Type' : 'text/plain' } })
+                        axios.post("http://localhost:8081/refresh_token", regNum, { headers: { 'Content-Type' : 'text/plain' } })
                         .then((res) => {
                             if (!res.data)
                                 this.clear();

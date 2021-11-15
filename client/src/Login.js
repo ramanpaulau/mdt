@@ -104,6 +104,7 @@ class Login extends React.Component {
 				
                 if (res.data) {
                     localStorage.setItem('token', res.data);
+                    localStorage.setItem('regNum', regNum);
                 }
 
 				this.props.history.push("/");
