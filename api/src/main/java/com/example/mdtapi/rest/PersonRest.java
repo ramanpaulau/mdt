@@ -11,10 +11,8 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:${mdt.cors-port}")
 @RestController
 public class PersonRest {
-
 
     @Autowired
     private final PersonRepository personRepository;
