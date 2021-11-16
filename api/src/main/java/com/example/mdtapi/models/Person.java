@@ -28,17 +28,6 @@ public class Person {
 	public Person() {
 	}
 
-	public Person(String regNum, String name, String surname, String password, LocalDate birthdate, String phoneNumber, boolean admin, State state) {
-		this.regNum = regNum;
-		this.name = name;
-		this.surname = surname;
-		this.password = password;
-		this.birthdate = birthdate;
-		this.phoneNumber = phoneNumber;
-		this.admin = admin;
-		this.state = state;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -130,3 +119,5 @@ public class Person {
 				'}';
 	}
 }
+
+

@@ -21,10 +21,11 @@ export class User {
         this.admin = false;
     }
 
+    wsConnect = () => {}
+
     loadUser = async () => {
         let token = localStorage.getItem('token');
         let regNum = localStorage.getItem('regNum');
-        console.log("sdfsdf" + token);
 
         if (!regNum)
             return;
@@ -39,6 +40,8 @@ export class User {
                 if (res.data) {
                     if (!res.data)
                         this.clear();
+                    else
+                        this.wsConnect();
                     if (res.data.expired === false) {
                         this.regNum = res.data.regNum;
                         this.admin = res.data.admin;

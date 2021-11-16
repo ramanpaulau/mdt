@@ -13,17 +13,6 @@ const CITIZENS_ON_PAGE = 3;
 
 class Citizens extends React.Component {
 
-    citizens = [
-        { id: 1, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive" },
-        { id: 2, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "dead" },
-        { id: 3, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive" },
-        { id: 4, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive" },
-        { id: 5, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive" },
-        { id: 6, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive" },
-        { id: 7, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive" },
-        { id: 8, regnum: "32KL", name: "John", surname: "Pike", phone: "438-5217", state: "alive" }
-    ];
-
     states = ["alive", "dead", "missing"];
 
     licenseIds = [
@@ -45,23 +34,15 @@ class Citizens extends React.Component {
         { name: "4", value: 4 }
     ];
 
-    emptyCitizen = { regnum: "", name: "", surname: "", state: "", phone: "", birthdate: new Date() };
+    emptyCitizen = { regNum: "", name: "", surname: "", state: "", phoneNumber: "", birthdate: "" };
 
     constructor(props) {
         super(props);
 
-        let id = this.props.match.params.id;
-
-        if (id === undefined)
-            id = 0;
-
-        let selectedCitizen = (id === 0) ? this.emptyCitizen : this.citizens[id];
-
         this.state = {
-            data: [],
+            pageData: [],
             offset: 0,
-            selectedCitizen: selectedCitizen,
-            birthDate: new Date(),
+            selectedIdx: -1,
             pageCount: 0
         };
 
@@ -69,9 +50,9 @@ class Citizens extends React.Component {
     }
 
     loadCitizens = () => {
-        this.setState({
-            data: this.citizens.slice(this.state.offset, this.state.offset + CITIZENS_ON_PAGE),
-            pageCount: Math.ceil(this.citizens.length / CITIZENS_ON_PAGE)
+        this.setState({ 
+            pageData: this.props.citizens.slice(this.state.offset, this.state.offset + CITIZENS_ON_PAGE),
+            pageCount: Math.ceil(this.props.citizens.length / CITIZENS_ON_PAGE)
         });
     }
 
@@ -83,14 +64,10 @@ class Citizens extends React.Component {
         let selected = data.selected;
         let offset = Math.ceil(selected * CITIZENS_ON_PAGE);
 
-        this.setState({ offset: offset, selected: selected }, () => {
+        this.setState({ offset: offset }, () => {
             this.loadCitizens();
         });
     };
-
-    selectCitizen = (id) => {
-        this.setState({ selectedCitizen: this.citizens[id] });
-    }
 
     removeLicense = (id) => {
         alert(id);
@@ -113,18 +90,18 @@ class Citizens extends React.Component {
                 <div className="block citizen-list">
                     <h3>Citizens</h3>
                     <div className="table-scroll">
-                        {this.state.data.map((o, i) =>
+                        {this.state.pageData.map((o, i) =>
                             <ul className="citizen" key={i} onMouseDown={this.handleDrag}>
                                 <Link
-                                    to={"/citizens/" + o.id}
+                                    to={"/citizens/" + i}
                                     className="edit-button round-link"
-                                    onClick={() => this.selectCitizen(o.id)}>
+                                    onClick={() => this.setState({ selectedIdx: i })}>
                                     View
                                 </Link>
 
-                                <li className="regnum">{o.regnum}</li>
+                                <li className="regnum">{o.regNum}</li>
                                 <li className="fullname">{o.name + " " + o.surname}</li>
-                                <li className="phone">Phone: {o.phone}</li>
+                                <li className="phone">Phone: {o.phoneNumber}</li>
                             </ul>
                         )}
                     </div>
@@ -133,7 +110,7 @@ class Citizens extends React.Component {
                         nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
                         breakLabel="..."
                         breakClassName="break-me"
-                        pageCount={this.state.pageCount}
+                        pageCount={Math.ceil(this.state.pageCount)}
                         pageRangeDisplayed={3}
                         marginPagesDisplayed={1}
                         onPageChange={this.handlePageClick}
@@ -151,7 +128,7 @@ class Citizens extends React.Component {
                             <Link
                                 to={"/citizens"}
                                 className="link"
-                                onClick={() => { this.setState({ selectedCitizen: this.emptyCitizen }); }}>
+                                onClick={() => { this.setState({ selectedCitizen: this.emptyCitizen }); this.props.history.push("/"); }}>
                                 New
                             </Link>
                         </h3>
@@ -159,7 +136,7 @@ class Citizens extends React.Component {
                     </div>
                     <div className="table-scroll">
                         <Formik
-                            initialValues={this.state.selectedCitizen}
+                            initialValues={(this.state.selectedIdx === -1)?this.emptyCitizen:this.props.citizens[this.state.selectedIdx]}
                             enableReinitialize={true}
                             validate={values => {
                                 const errors = {};
@@ -175,16 +152,16 @@ class Citizens extends React.Component {
                                     errors.surname = 'Invalid surname';
                                 }
 
-                                if (!values.phone) {
-                                    errors.phone = 'Required';
-                                } else if (!/^\d{3}-\d{4}$/i.test(values.phone)) {
-                                    errors.phone = 'Invalid phone number';
+                                if (!values.phoneNumber) {
+                                    errors.phoneNumber = 'Required';
+                                } else if (!/^\d{3}-\d{4}$/i.test(values.phoneNumber)) {
+                                    errors.phoneNumber = 'Invalid phone number';
                                 }
 
-                                if (!values.regnum) {
-                                    errors.regnum = 'Required';
-                                } else if (!/^[A-Z0-9]{4}$/i.test(values.regnum)) {
-                                    errors.regnum = 'Invalid registration number';
+                                if (!values.regNum) {
+                                    errors.regNum = 'Required';
+                                } else if (!/^[A-Z0-9]{4}$/i.test(values.regNum)) {
+                                    errors.regNum = 'Invalid registration number';
                                 }
 
                                 if (!values.birthdate) {
@@ -193,13 +170,17 @@ class Citizens extends React.Component {
 
                                 return errors;
                             }}
-                            onSubmit={(values, { setSubmitting }) => {
-                                let tmp = values;
-                                tmp.regnum = values.regnum.toUpperCase();
-                                values = tmp;
+                            onSubmit={(values) => {
                                 setTimeout(() => {
-                                    alert(JSON.stringify(values, null, 2));
-                                    setSubmitting(false);
+                                    let tmp = {
+                                        regNum: values.regNum.toUpperCase(),
+                                        name: values.name,
+                                        surname: values.surname,
+                                        birthdate: values.birthdate,
+                                        phoneNumber: values.phoneNumber,
+                                        state: 1
+                                    };
+                                    this.props.wsClient.publish({ destination: "/api/persons", body: JSON.stringify(tmp) });
                                 }, 400);
                             }}
                         >
@@ -216,8 +197,8 @@ class Citizens extends React.Component {
                                         <span className="floating-label">Surname</span>
                                     </div>
                                     <div>
-                                        <Field className="text-input" type="text" name="phone" />
-                                        <ErrorMessage name="phone" className="error-label" component="div" />
+                                        <Field className="text-input" type="text" name="phoneNumber" />
+                                        <ErrorMessage name="phoneNumber" className="error-label" component="div" />
                                         <span className="floating-label">Phone</span>
                                     </div>
                                     <div>
@@ -226,11 +207,11 @@ class Citizens extends React.Component {
                                         <span className="floating-label active-label">Birth date</span>
                                     </div>
                                     <div>
-                                        <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="regnum" />
-                                        <ErrorMessage name="regnum" className="error-label" component="div" />
+                                        <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="regNum" />
+                                        <ErrorMessage name="regNum" className="error-label" component="div" />
                                         <span className="floating-label">Registration number</span>
                                     </div>
-                                    <button ref={this.sendButton} type="submit" style={{display: "none"}}></button>
+                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
                                 </Form>
                             )}
                         </Formik>

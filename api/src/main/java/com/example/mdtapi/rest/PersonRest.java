@@ -1,6 +1,7 @@
 package com.example.mdtapi.rest;
 
 import com.example.mdtapi.models.Person;
+import com.example.mdtapi.models.PersonView;
 import com.example.mdtapi.repositories.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,8 +26,8 @@ public class PersonRest {
     }
 
     @GetMapping("/persons")
-    public List<Person> all() {
-        return personRepository.findAll();
+    public List<PersonView> all() {
+        return personRepository.findAllProjectedBy();
     }
 
     @PostConstruct

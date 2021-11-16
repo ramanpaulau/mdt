@@ -23,129 +23,130 @@ class Header extends React.Component {
         const menu = this.menu.current;
         const line1 = this.line1.current;
         const line2 = this.line2.current;
-    
+
         if (!menu || !line1 || !line2) return;
-    
+
         if (menu.classList.contains("opened")) {
-          line1.style.transform = "translateY(5px) rotate(45deg)";
-          line2.style.transform = "translateY(-5px) rotate(-45deg)";
+            line1.style.transform = "translateY(5px) rotate(45deg)";
+            line2.style.transform = "translateY(-5px) rotate(-45deg)";
         } else {
-          line1.style.transform = "translateY(0px) rotate(0deg)";
-          line2.style.transform = "translateY(0px) rotate(0deg)";
+            line1.style.transform = "translateY(0px) rotate(0deg)";
+            line2.style.transform = "translateY(0px) rotate(0deg)";
         }
     };
 
     onBurgerClick = () => {
         const menu = this.menu.current;
-    
+
         if (!menu) return;
-    
+
         menu.classList.toggle("opened");
         this.burgerToggleAnim();
     };
 
     signOut = () => {
-      this.props.store.clear();
+        this.props.store.clear();
     };
-    
+
     render() {
-        return(
+        return (
             <header className="header">
                 <nav className="nav" ref={this.menu}>
                     <ul className="nav-ul">
                         <li className="nav-li">
-                            <NavLink 
-                                exact 
+                            <NavLink
+                                exact
                                 to="/"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faGlobe} />
+                                <FontAwesomeIcon icon={faGlobe} />
                             </NavLink>
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/calls"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faPhone} />
+                                <FontAwesomeIcon icon={faPhone} />
                             </NavLink>
                             {this.props.calls ? <div className="notification"><p>{this.props.calls}</p></div> : ""}
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/citizens"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faIdCardAlt} />
+                                <FontAwesomeIcon icon={faIdCardAlt} />
                             </NavLink>
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/cars"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faCar} />
+                                <FontAwesomeIcon icon={faCar} />
                             </NavLink>
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/incidents"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faFileAlt} />
+                                <FontAwesomeIcon icon={faFileAlt} />
                             </NavLink>
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/bolo"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faEye} />
+                                <FontAwesomeIcon icon={faEye} />
                             </NavLink>
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/inventory"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faWarehouse} />
+                                <FontAwesomeIcon icon={faWarehouse} />
                             </NavLink>
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/charge"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faGavel} />
+                                <FontAwesomeIcon icon={faGavel} />
                             </NavLink>
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/departments"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
-                                    <FontAwesomeIcon icon={faLandmark} />
+                                <FontAwesomeIcon icon={faLandmark} />
                             </NavLink>
                         </li>
                         <li className="nav-li">
-                            <NavLink 
+                            <NavLink
                                 to="/login"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={() => {
-                                  this.signOut();
-                                  this.navigate();
+                                    this.props.wsDisconnect();
+                                    this.signOut();
+                                    this.navigate();
                                 }}>
-                                    <FontAwesomeIcon icon={faTimes} />
+                                <FontAwesomeIcon icon={faTimes} />
                             </NavLink>
                         </li>
                     </ul>

@@ -107,6 +107,7 @@ class Login extends React.Component {
                     localStorage.setItem('regNum', regNum);
                 }
 
+				this.props.wsConnect();
 				this.props.history.push("/");
             });
 	}
