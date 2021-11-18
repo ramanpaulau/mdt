@@ -8,12 +8,15 @@ class Login extends React.Component {
 	constructor(props) {
 		super(props);
 
+        let token = this.props.match.params.token;
+
 		this.state = {
 			stompClient: null,
 			regNum: '',
 			password: '',
 			idx: 0,
-			authMessage: ''
+			authMessage: '',
+			token: token
 		};
 
 		this.char1Ref = React.createRef();
@@ -112,13 +115,35 @@ class Login extends React.Component {
             });
 	}
 
+	setPassword = async () => {
+		let regNum = this.regNumRefs.map(r => r.current.value).join('');
+		this.authRef.current.style.display = 'none';
+		this.loaderRef.current.style.display = 'block';
+
+		await axios.post("http://localhost:8081/set_password", {
+                regNum: regNum,
+                password: this.state.password,
+				token: this.state.token
+            })
+            .then((res) =>  {
+				if (!res.data) {
+					this.setState({ authMessage: 'Wrong credentials' });
+					this.loaderRef.current.style.display = 'none';
+					this.authRef.current.style.display = 'grid';
+					return;
+				}
+
+				this.props.history.push("/");
+            });
+	}
+
 	render() {
 		return (
 			<div className="loginContainer">
 				<div className="loader" ref={this.loaderRef} />
 				<div className="wrapper" ref={this.authRef}>
 					<div className="auth-label">
-						<h1>Login</h1>
+						<h1>{(this.state.token)?"Set password":"Login"}</h1>
 					</div>
 					<div className="auth-info">
 						<div className="login">
@@ -131,7 +156,7 @@ class Login extends React.Component {
 						<div className="authMessage">{(this.state.authMessage) ? this.state.authMessage : ""}</div>
 					</div>
 					<div className="auth-arrow">
-						<Link to="/" onClick={this.processAuth}>
+						<Link to="/" onClick={(this.state.token)?this.setPassword:this.processAuth}>
 							&gt;
 						</Link>
 					</div>

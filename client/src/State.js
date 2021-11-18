@@ -13,11 +13,11 @@ class State extends React.Component {
 
     setNotification(text) {
         this.setState({ notification: text });
-        this.intervalID = setTimeout(() => this.setState({ notification: "" }), 7000);
+        this.timeoutID = setTimeout(() => this.setState({ notification: "" }), 7000);
     }
 
     componentDidMount() {
-        this.timeoutID = setInterval(() => this.tick(), 1000);
+        this.intervalID = setInterval(() => this.tick(), 1000);
         this.setNotification("BOLO list has been updated.");
     }
 

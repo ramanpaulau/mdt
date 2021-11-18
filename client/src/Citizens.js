@@ -2,10 +2,12 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimesCircle, faPlus, faSave, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faPlus, faSave, faChevronLeft, faChevronRight, faCopy, faDownload } from '@fortawesome/free-solid-svg-icons';
 import SelectSearch from 'react-select-search';
 import { DatePickerField } from "./DatePickerField";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import axios from 'axios';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -43,14 +45,16 @@ class Citizens extends React.Component {
             pageData: [],
             offset: 0,
             selectedIdx: -1,
-            pageCount: 0
+            pageCount: 0,
+            password: ""
         };
 
+        this.copyLabel = React.createRef();
         this.sendButton = React.createRef();
     }
 
     loadCitizens = () => {
-        this.setState({ 
+        this.setState({
             pageData: this.props.citizens.slice(this.state.offset, this.state.offset + CITIZENS_ON_PAGE),
             pageCount: Math.ceil(this.props.citizens.length / CITIZENS_ON_PAGE)
         });
@@ -58,6 +62,10 @@ class Citizens extends React.Component {
 
     componentDidMount = () => {
         this.loadCitizens();
+    }
+
+    componentWillUnmount = () => {
+        clearTimeout(this.timeoutID);
     }
 
     handlePageClick = (data) => {
@@ -84,6 +92,20 @@ class Citizens extends React.Component {
             this.sendButton.current.click();
     }
 
+    getPassword = async () => {
+        if (this.state.selectedIdx === -1)
+            return;
+        await axios.post("http://localhost:8081/get_password_token", this.props.citizens[this.state.selectedIdx].regNum, { headers: { 'Content-Type': 'text/plain' } })
+            .then((res) => {
+                this.setState({ password: res.data });
+            });
+    }
+
+    onCopy = () => {
+        this.copyLabel.current.classList.add("copied");
+        this.timeoutID = setTimeout(() => this.copyLabel.current.classList.remove("copied"), 3000);
+    }
+
     render() {
         return (
             <div className="citizens">
@@ -95,7 +117,7 @@ class Citizens extends React.Component {
                                 <Link
                                     to={"/citizens/" + i}
                                     className="edit-button round-link"
-                                    onClick={() => this.setState({ selectedIdx: i })}>
+                                    onClick={() => this.setState({ selectedIdx: i, password: "" })}>
                                     View
                                 </Link>
 
@@ -128,7 +150,7 @@ class Citizens extends React.Component {
                             <Link
                                 to={"/citizens"}
                                 className="link"
-                                onClick={() => { this.setState({ selectedCitizen: this.emptyCitizen }); this.props.history.push("/"); }}>
+                                onClick={() => { this.setState({ selectedIdx: -1, password: "" }); this.props.history.push("/"); }}>
                                 New
                             </Link>
                         </h3>
@@ -136,7 +158,7 @@ class Citizens extends React.Component {
                     </div>
                     <div className="table-scroll">
                         <Formik
-                            initialValues={(this.state.selectedIdx === -1)?this.emptyCitizen:this.props.citizens[this.state.selectedIdx]}
+                            initialValues={(this.state.selectedIdx === -1) ? this.emptyCitizen : this.props.citizens[this.state.selectedIdx]}
                             enableReinitialize={true}
                             validate={values => {
                                 const errors = {};
@@ -174,9 +196,9 @@ class Citizens extends React.Component {
                                 setTimeout(() => {
                                     let tmp = {
                                         regNum: values.regNum.toUpperCase(),
-                                        name: values.name,
-                                        surname: values.surname,
-                                        birthdate: values.birthdate,
+                                        name: values.name.charAt(0).toUpperCase() + values.name.slice(1),
+                                        surname: values.surname.charAt(0).toUpperCase() + values.surname.slice(1),
+                                        birthdate: new Date(values.birthdate),
                                         phoneNumber: values.phoneNumber,
                                         state: 1
                                     };
@@ -210,6 +232,14 @@ class Citizens extends React.Component {
                                         <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="regNum" />
                                         <ErrorMessage name="regNum" className="error-label" component="div" />
                                         <span className="floating-label">Registration number</span>
+                                    </div>
+                                    <div className="password-link">
+                                        <input disabled type="text" className="text-input" value={this.state.password} />
+                                        <span className="floating-label active-label">Get password link</span>
+                                        <span onClick={this.getPassword} className="get-label"><FontAwesomeIcon icon={faDownload} /></span>
+                                        <CopyToClipboard text={this.state.password} onCopy={this.onCopy}>
+                                            <span className="copy-label" ref={this.copyLabel}><FontAwesomeIcon icon={faCopy} /></span>
+                                        </CopyToClipboard>
                                     </div>
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
                                 </Form>

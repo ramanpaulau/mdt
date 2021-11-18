@@ -47,13 +47,44 @@
 
         .table-scroll {
             display: flex;
+            flex-direction: column;
+            row-gap: 15px;
             align-items: center;
             overflow: visible;
+            justify-content: center;
         }
 
         form {
             padding: 0;
-            grid-template-areas: "name phone" "birth regnum" "state .";
+            grid-template-areas: "name phone" "birth regnum" "state password";
+        }
+
+        .password-link {
+            height: 40px;
+        }
+        
+        .password-link form {
+            text-align: left;
+        }
+
+        .password-link {
+            grid-area: password;
+
+            .copy-label, .get-label {
+                color: $bright;
+                position: absolute;
+                right: 10px;
+                line-height: 40px;
+                cursor: pointer;
+            }
+
+            .get-label {
+                right: 30px;
+            }
+        }
+
+        .copied {
+            color: $highlight !important;
         }
     }
 
