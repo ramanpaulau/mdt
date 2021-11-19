@@ -49,4 +49,9 @@ public class PersonRest {
 
         personRepository.save(admin);
     }
+
+    @GetMapping("/is_regNum_available/{regNum}")
+    public boolean isRegNumAvailable(@PathVariable String regNum) {
+        return !personRepository.existsByRegNum(regNum);
+    }
 }

@@ -8,7 +8,7 @@ class Login extends React.Component {
 	constructor(props) {
 		super(props);
 
-        let token = this.props.match.params.token;
+		let token = this.props.match.params.token;
 
 		this.state = {
 			stompClient: null,
@@ -63,17 +63,14 @@ class Login extends React.Component {
 		this.setState({ password: this.passwordRef.current.value });
 	}
 
-	processAuth = async (e) => {
-		e.preventDefault();
-		this.setState({ authMessage: '' });
+	parseInput = () => {
 		let error = false;
-		let regNum = this.regNumRefs.map(r => r.current.value).join('');
-		
-		// parse
-		if (this.state.password.length <= 0) {
+
+		if (this.state.password.length < 5) {
 			this.passwordRef.current.classList.add('error');
 			this.passwordRef.current.style.animation = 'shake 0.2s linear 1';
 			setTimeout(() => { this.passwordRef.current.style.animation = 'none'; }, 200);
+			this.setState({ authMessage: 'Password length < 5' });
 			error = true;
 		}
 
@@ -86,55 +83,67 @@ class Login extends React.Component {
 			}
 		}
 
-		if (error)
+		return !error;
+	}
+
+	processAuth = async (e) => {
+		e.preventDefault();
+		this.setState({ authMessage: '' });
+		let regNum = this.regNumRefs.map(r => r.current.value).join('');
+
+		if (!this.parseInput())
 			return;
-		// end parse
 
 		this.authRef.current.style.display = 'none';
 		this.loaderRef.current.style.display = 'block';
 
 		await axios.post("http://localhost:8081/login", {
-                regNum: regNum,
-                password: this.state.password,
-            })
-            .then((res) =>  {
+			regNum: regNum,
+			password: this.state.password,
+		})
+			.then((res) => {
 				if (!res.data) {
 					this.setState({ authMessage: 'Wrong credentials' });
 					this.loaderRef.current.style.display = 'none';
 					this.authRef.current.style.display = 'grid';
 					return;
 				}
-				
-                if (res.data) {
-                    localStorage.setItem('token', res.data);
-                    localStorage.setItem('regNum', regNum);
-                }
+
+				if (res.data) {
+					localStorage.setItem('token', res.data);
+					localStorage.setItem('regNum', regNum);
+				}
 
 				this.props.wsConnect();
 				this.props.history.push("/");
-            });
+			});
 	}
 
-	setPassword = async () => {
+	setPassword = async (e) => {
+		e.preventDefault();
 		let regNum = this.regNumRefs.map(r => r.current.value).join('');
+
+		if (!this.parseInput())
+			return;
+
 		this.authRef.current.style.display = 'none';
 		this.loaderRef.current.style.display = 'block';
 
 		await axios.post("http://localhost:8081/set_password", {
-                regNum: regNum,
-                password: this.state.password,
-				token: this.state.token
-            })
-            .then((res) =>  {
+			regNum: regNum,
+			password: this.state.password,
+			token: this.state.token
+		})
+			.then((res) => {
 				if (!res.data) {
-					this.setState({ authMessage: 'Wrong credentials' });
+					this.setState({ authMessage: 'Something went wrong!' });
 					this.loaderRef.current.style.display = 'none';
 					this.authRef.current.style.display = 'grid';
 					return;
 				}
 
 				this.props.history.push("/");
-            });
+			});
 	}
 
 	render() {
@@ -143,7 +152,7 @@ class Login extends React.Component {
 				<div className="loader" ref={this.loaderRef} />
 				<div className="wrapper" ref={this.authRef}>
 					<div className="auth-label">
-						<h1>{(this.state.token)?"Set password":"Login"}</h1>
+						<h1>{(this.state.token) ? "Set password" : "Login"}</h1>
 					</div>
 					<div className="auth-info">
 						<div className="login">
@@ -156,7 +165,7 @@ class Login extends React.Component {
 						<div className="authMessage">{(this.state.authMessage) ? this.state.authMessage : ""}</div>
 					</div>
 					<div className="auth-arrow">
-						<Link to="/" onClick={(this.state.token)?this.setPassword:this.processAuth}>
+						<Link to="/" onClick={(this.state.token) ? this.setPassword : this.processAuth}>
 							&gt;
 						</Link>
 					</div>

@@ -160,7 +160,7 @@ class Citizens extends React.Component {
                         <Formik
                             initialValues={(this.state.selectedIdx === -1) ? this.emptyCitizen : this.props.citizens[this.state.selectedIdx]}
                             enableReinitialize={true}
-                            validate={values => {
+                            validate={async values => {
                                 const errors = {};
                                 if (!values.name) {
                                     errors.name = 'Required';
@@ -184,6 +184,11 @@ class Citizens extends React.Component {
                                     errors.regNum = 'Required';
                                 } else if (!/^[A-Z0-9]{4}$/i.test(values.regNum)) {
                                     errors.regNum = 'Invalid registration number';
+                                } else {
+                                    await axios.get("http://localhost:8081/is_regNum_available/" + values.regNum.toUpperCase()).then((res) => {
+                                        if (!res.data)
+                                            errors.regNum = 'Occupied';
+                                    });
                                 }
 
                                 if (!values.birthdate) {
@@ -193,17 +198,15 @@ class Citizens extends React.Component {
                                 return errors;
                             }}
                             onSubmit={(values) => {
-                                setTimeout(() => {
-                                    let tmp = {
-                                        regNum: values.regNum.toUpperCase(),
-                                        name: values.name.charAt(0).toUpperCase() + values.name.slice(1),
-                                        surname: values.surname.charAt(0).toUpperCase() + values.surname.slice(1),
-                                        birthdate: new Date(values.birthdate),
-                                        phoneNumber: values.phoneNumber,
-                                        state: 1
-                                    };
-                                    this.props.wsClient.publish({ destination: "/api/persons", body: JSON.stringify(tmp) });
-                                }, 400);
+                                let tmp = {
+                                    regNum: values.regNum.toUpperCase(),
+                                    name: values.name.charAt(0).toUpperCase() + values.name.slice(1),
+                                    surname: values.surname.charAt(0).toUpperCase() + values.surname.slice(1),
+                                    birthdate: new Date(values.birthdate),
+                                    phoneNumber: values.phoneNumber,
+                                    state: 1
+                                };
+                                this.props.wsClient.publish({ destination: "/api/persons", body: JSON.stringify(tmp) });
                             }}
                         >
                             {({ isSubmitting }) => (

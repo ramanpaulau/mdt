@@ -18,7 +18,7 @@ public class PasswordToken {
     @JoinColumn(name = "person_regNum")
     private Person person;
 
-    private Date expiryDate;
+    private final Date expiryDate = new Date(System.currentTimeMillis() + PASSWORD_TOKEN_VALIDITY * 1000);
 
     public PasswordToken() {
     }
@@ -30,5 +30,9 @@ public class PasswordToken {
 
     public String getToken() {
         return token;
+    }
+
+    public boolean isExpired() {
+        return expiryDate.before(new Date());
     }
 }

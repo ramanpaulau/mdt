@@ -96,13 +96,17 @@ public class AuthRest {
         if (token == null)
             return false;
 
+        if (token.isExpired()) {
+            passwordTokenRepository.delete(token);
+            return false;
+        }
+
         if (token.getToken().compareTo(request.getToken()) != 0)
             return false;
 
+        passwordTokenRepository.delete(token);
         person.setPassword(passwordEncoder.encode(request.getPassword()));
-
         personRepository.save(person);
-
         return true;
     }
 }
