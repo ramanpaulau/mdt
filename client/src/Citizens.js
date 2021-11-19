@@ -113,17 +113,16 @@ class Citizens extends React.Component {
                     <h3>Citizens</h3>
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
-                            <ul className="citizen" key={i} onMouseDown={this.handleDrag}>
+                            <ul className="citizen-item" key={i} onMouseDown={this.handleDrag}>
+                                <li className="regnum">{o.regNum}</li>
+                                <li className="fullname">{o.name + " " + o.surname}</li>
+                                <li className="phone">Phone: {o.phoneNumber}</li>
                                 <Link
                                     to={"/citizens/" + i}
                                     className="edit-button round-link"
                                     onClick={() => this.setState({ selectedIdx: i, password: "" })}>
                                     View
                                 </Link>
-
-                                <li className="regnum">{o.regNum}</li>
-                                <li className="fullname">{o.name + " " + o.surname}</li>
-                                <li className="phone">Phone: {o.phoneNumber}</li>
                             </ul>
                         )}
                     </div>
@@ -150,7 +149,7 @@ class Citizens extends React.Component {
                             <Link
                                 to={"/citizens"}
                                 className="link"
-                                onClick={() => { this.setState({ selectedIdx: -1, password: "" }); this.props.history.push("/"); }}>
+                                onClick={() => { this.setState({ selectedIdx: -1, password: "" }); }}>
                                 New
                             </Link>
                         </h3>

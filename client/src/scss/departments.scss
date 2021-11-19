@@ -1,0 +1,62 @@
+.departments {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .department-item {
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .department-list {
+        grid-area: dlist;
+    }
+
+    .department-editor {
+        grid-area: editor;
+
+        .table-scroll {
+            justify-content: center;
+        }
+
+        form {
+            display: grid;
+            grid-template-areas: ". ."  "title title" "desc desc";
+
+            .title-input {
+                grid-area: title;
+            }
+
+            .title-input input {
+                width: 500px;
+            }
+
+            .textarea {
+                grid-area: desc;
+            }
+
+            textarea {
+                resize: none;
+                width: 500px;
+            }
+        }
+    }
+
+    .department-ranks {
+        grid-area: ranks;
+    }
+
+    .department-units {
+        grid-area: units;
+    }
+}
+
+@media screen and (min-width: 768px) {  
+    .departments {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "dlist ranks" "editor units";
+        height: calc(100vh - 52px);
+    }
+}

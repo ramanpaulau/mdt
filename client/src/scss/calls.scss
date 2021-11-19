@@ -5,8 +5,7 @@
     flex-direction: column;
     flex-grow: 1 1;
     gap: 5px;
-    width: 100%;
-    height: 100%;
+    height: calc(100vh - 52px);
 }
 
 @media screen and (min-width: 768px) {  
@@ -24,7 +23,6 @@
 }
 
 .pagination {
-    list-style: none;
     display: flex;
     justify-content: center;
     padding: 0;
@@ -102,47 +100,18 @@ form textarea {
     cursor: pointer;
 }
 
-.call-time {
-    grid-area: time;
-}
-
-.call-id {
-    grid-area: id;
-}
-
-.call-phone {
-    grid-area: phone;
-}
-
-.call-location {
-    grid-area: location;
-}
-
-
 .calls {
-    .edit-button {
-        grid-area: edit;
-    }
-
     .title {
         border-top: none;
         border-bottom: 1px solid $bright;
     }
 
     .call-item {
-        margin: 0;
-        list-style: none;
-        color: $bright;
-        display: grid;
-        grid-template-areas: "location . id" "time . ." "phone . edit";
-        align-items: center;
-        padding: 20px;
-        border-bottom: $bright 1px solid;
-    }
+        grid-template-areas: ". ." ". ." ". edit";
 
-    .table-scroll {
-        display: flex;
-        flex-direction: column;
+        .edit-button {
+            grid-area: edit;
+        }
     }
 
     form {

@@ -10,6 +10,11 @@
 
 .active-bolo {
     grid-area: bolo;
+
+    .title {
+        border-top: 1px solid $bright;
+        border-bottom: none;
+    }
 }
 
 .active-units {
@@ -49,7 +54,6 @@
 }
 
 .table-head, .unit-item, .bolo-item, .home .call-item {
-    list-style: none;
     padding: 0;
     margin: 0;
     line-height: 40px;
@@ -87,6 +91,8 @@
     /* scrollbar for Firefox */
     scrollbar-width: thin;
     scrollbar-color: $main orabge;
+    display: flex;
+    flex-direction: column;
 }
 
 .table-scroll ul:nth-child(odd) {
@@ -125,7 +131,7 @@
     color: $bright;
     display: flex;
     justify-content: space-evenly;
-    border-top: 1px solid $bright;
+    border-bottom: 1px solid $bright;
 }
 
 .title > h3 {

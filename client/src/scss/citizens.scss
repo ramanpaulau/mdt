@@ -1,43 +1,18 @@
 @import "colors.scss"; 
 
 .citizens {
-    display: grid;
-    grid-template-areas: "list editor" "list info";
-    grid-template-rows: 1fr 2fr;
-    grid-template-columns: 1fr 1fr;
-    grid-row-gap: 5px;
-    grid-column-gap: 5px;
-    height: calc(100vh - 52px);
-
-    .title {
-        border-top: none;
-        border-bottom: 1px solid $bright;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     
     .citizen-list {
         grid-area: list;
 
-        .citizen {
-            margin: 0;
-            display: grid;
-            grid-template-areas: "regnum fullname edit" "phone phone .";
-            list-style: none;
-            padding: 20px;
-            
-            .regnum {
-                grid-area: regnum;
-            }
-
-            .fullname {
-                grid-area: fullname;
-            }
+        .citizen-item {
+            grid-template-areas: ". ." ". button";
 
             .edit-button {
-                grid-area: edit;
-            }
-
-            .phone {
-                grid-area: phone;
+                grid-area: button;
             }
         }
     }
@@ -46,8 +21,6 @@
         grid-area: editor;
 
         .table-scroll {
-            display: flex;
-            flex-direction: column;
             row-gap: 15px;
             align-items: center;
             overflow: visible;
@@ -96,5 +69,15 @@
             margin: 5px;
             padding: 0 5px;
         }
+    }
+}
+
+@media screen and (min-width: 768px) {  
+    .citizens {
+        display: grid;
+        grid-template-rows: 1fr 2fr;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "list editor" "list info";
+        height: calc(100vh - 52px);
     }
 }

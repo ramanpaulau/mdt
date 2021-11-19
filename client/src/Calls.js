@@ -133,16 +133,17 @@ class Calls extends React.Component {
                     <div className="table-scroll">
                         {this.state.data.map((o, i) =>
                             <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
+                                <li className="call-location">Location: {o.location}</li>
                                 <li className="call-id">#{o.id}</li>
+                                <li className="call-time">Time: {o.time}</li>
+                                <li></li>
+                                <li className="call-phone">Phone: {o.phone}</li>
                                 <Link
                                     to={"/calls/" + o.id}
                                     className="edit-button round-link"
                                     onClick={() => this.selectCall(o.id)}>
                                     Edit
                                 </Link>
-                                <li className="call-time">Time: {o.time}</li>
-                                <li className="call-location">Location: {o.location}</li>
-                                <li className="call-phone">Phone: {o.phone}</li>
                             </ul>
                         )}
                     </div>

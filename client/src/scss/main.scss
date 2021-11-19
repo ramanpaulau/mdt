@@ -5,6 +5,7 @@
 @import "home.scss";
 @import "citizens.scss";
 @import "selectSearch.scss";
+@import "departments.scss";
 
 body {
     margin: 0;
@@ -36,6 +37,19 @@ body {
   grid-area: content;
 }
 
+ul {
+  list-style: none;
+}
+
+.call-item, .citizen-item, .department-item {
+  margin: 0;
+  padding: 20px;
+  color: $bright;
+  display: grid;
+  align-items: center;
+  border-bottom: $bright 1px solid;
+}
+
 /* Header */
 header {
     height: 100%;
@@ -53,7 +67,6 @@ header {
   
   .nav-ul {
     font-size: 2rem;
-    list-style: none;
     align-items: center;
     text-align: center;
     display: grid;
@@ -106,6 +119,7 @@ header {
     display: flex;
     margin-top: 55px;
     justify-content: center;
+    z-index: 2;
   }
 
 nav .notification {
@@ -170,10 +184,6 @@ nav .notification p {
       grid-area: nav;
       background-color: $secondary;
       border-right: 1px solid $secondary;
-    }
-
-    .nav.opened {
-      margin-top: 0;
     }
   
     .nav-ul {
