@@ -19,10 +19,11 @@ public class PersonRest {
     private final PersonRepository personRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public PersonRest(PersonRepository personRepository) {
+    public PersonRest(PersonRepository personRepository, PasswordEncoder passwordEncoder) {
         this.personRepository = personRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/persons")

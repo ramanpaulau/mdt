@@ -9,8 +9,9 @@ import java.util.List;
 
 @RestController
 public class DepartmentRest {
+
     @Autowired
-    private DepartmentRepository departmentRepository;
+    private final DepartmentRepository departmentRepository;
 
     public DepartmentRest(DepartmentRepository departmentRepository) {
         this.departmentRepository = departmentRepository;

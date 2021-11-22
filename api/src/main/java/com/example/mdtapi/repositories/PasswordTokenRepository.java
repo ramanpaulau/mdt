@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PasswordTokenRepository extends JpaRepository<PasswordToken, Long> {
+public interface PasswordTokenRepository extends JpaRepository<PasswordToken, String> {
 
     PasswordToken findByPerson(Person person);
 

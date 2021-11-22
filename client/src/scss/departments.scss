@@ -1,3 +1,5 @@
+@import "colors";
+
 .departments {
     display: flex;
     flex-direction: column;
@@ -44,6 +46,35 @@
 
     .department-ranks {
         grid-area: ranks;
+
+        .table-scroll {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            left: 15px;
+
+            .rank-form {
+                height: 200px;
+                margin: 15px 15px 0 15px;
+            }
+
+            .rank {
+                background-color: $main;
+                width: 200px;
+                height: 200px;
+                text-align: center;
+                margin: 15px 15px 0 15px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                gap: 10px;
+                padding: 0;
+            }
+
+            .controls button {
+                margin-left: 5px;
+            }
+        }
     }
 
     .department-units {
@@ -54,7 +85,7 @@
 @media screen and (min-width: 768px) {  
     .departments {
         display: grid;
-        grid-template-rows: 1fr 1fr;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
         grid-template-columns: 1fr 1fr;
         grid-template-areas: "dlist ranks" "editor units";
         height: calc(100vh - 52px);
