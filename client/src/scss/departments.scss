@@ -46,39 +46,43 @@
 
     .department-ranks {
         grid-area: ranks;
+    }
 
+    .department-units {
+        grid-area: units;
+    }
+
+    .department-units, .department-ranks {
         .table-scroll {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             left: 15px;
-
-            .rank-form {
-                height: 200px;
-                margin: 15px 15px 0 15px;
-            }
-
-            .rank {
-                background-color: $main;
-                width: 200px;
-                height: 200px;
-                text-align: center;
-                margin: 15px 15px 0 15px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                gap: 10px;
-                padding: 0;
-            }
-
-            .controls button {
-                margin-left: 5px;
-            }
         }
     }
 
-    .department-units {
-        grid-area: units;
+    .table-scroll {
+        .rank-form {
+            height: 200px;
+            margin: 15px 15px 0 15px;
+        }
+
+        .rank {
+            background-color: $main;
+            width: 200px;
+            height: 200px;
+            text-align: center;
+            margin: 15px 15px 0 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+            padding: 0;
+        }
+
+        .controls button {
+            margin-left: 5px;
+        }
     }
 }
 

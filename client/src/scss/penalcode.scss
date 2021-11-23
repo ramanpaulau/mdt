@@ -1,0 +1,41 @@
+@import "colors";
+
+.penal-code {
+    height: calc(100vh - 52px);
+    background-color: $secondary;
+
+    ul {
+        margin: 0;
+        background-color: transparent !important;
+    }
+
+    li {
+        margin-top: 5px;
+    }
+
+    .title {
+        border: none;
+
+        .number {
+            border-radius: 5px;
+            padding: 0 5px;
+            background-color: $background;
+        }
+
+        .delete {
+            margin-left: 5px;
+        }
+    }
+
+    .title:hover {
+        cursor: pointer;
+    }
+
+    span {
+        display: inline;
+    }
+
+    .add:hover {
+        cursor: pointer;
+    }
+}

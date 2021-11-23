@@ -7,6 +7,7 @@ import Header from './Header';
 import State from './State';
 import Calls from './Calls';
 import Citizens from './Citizens';
+import PenalCode from './PenalCode';
 import Departments from './Departments';
 import RequireAuth from './auth/RequireAuth';
 import { user } from './auth/User';
@@ -91,6 +92,7 @@ class App extends React.Component {
                                 <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} />, user)} />
                                 <Route exact path="/departments/:id?" component={RequireAuth((props) => <Departments {...props} />, user)} />
                                 <Route exact path="/citizens/:id?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} citizens={this.state.citizens} />, user)} />
+                                <Route exact path="/penalcode" component={RequireAuth(() => <PenalCode />, user)} />
                                 <Route path="*" component={RequireAuth(Error404, user)} />
                             </Switch>
                         </main>

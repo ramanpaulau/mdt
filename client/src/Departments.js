@@ -12,6 +12,7 @@ class Departments extends React.Component {
 
     emptyDepartment = { shortTitle: "", title: "", description: "", code: -1 };
     emptyRank = { title: "", salary: 0, departmentCode: -1 };
+    emptyUnit = { title: "", abbreviation: "", description: "", departmentCode: -1 };
 
     constructor(props) {
         super(props);
@@ -20,11 +21,14 @@ class Departments extends React.Component {
             depData: [],
             pageData: [],
             ranks: [],
+            units: [],
             selectedRanks: [],
+            selectedUnits: [],
             offset: 0,
             selectedDep: -1,
-            pageCount: 0,
-            selectedRank: -1
+            selectedRank: -1,
+            selectedUnit: -1,
+            pageCount: 0
         };
 
         this.sendButton = React.createRef();
@@ -48,6 +52,15 @@ class Departments extends React.Component {
             });
     }
 
+    loadUnits = async () => {
+        await axios.get("http://localhost:8081/units")
+            .then((res) => {
+                this.setState({
+                    units: res.data
+                });
+            });
+    }
+
     getNextCode = () => {
         let max = 0;
         this.state.depData.forEach(e => max = (e.code > max) ? e.code : max);
@@ -65,9 +78,14 @@ class Departments extends React.Component {
         this.setState({ selectedRanks: (this.state.selectedDep === -1) ? [] : this.state.ranks.filter(e => e.departmentCode === this.state.pageData[this.state.selectedDep].code) });
     }
 
+    getSelectedUnits = () => {
+        this.setState({ selectedUnits: (this.state.selectedDep === -1) ? [] : this.state.units.filter(e => { console.log(e.departmentCode + " - " + this.state.pageData[this.state.selectedDep].code); return e.departmentCode === this.state.pageData[this.state.selectedDep].code; }) });
+    }
+
     componentDidMount = () => {
         this.loadDepartments();
         this.loadRanks();
+        this.loadUnits();
     }
 
     handlePageClick = (data) => {
@@ -86,6 +104,7 @@ class Departments extends React.Component {
 
     isDepChanging = (code) => this.state.depData.filter((e) => e.code === code).length > 0
     isRankChanging = (title) => this.state.selectedRanks.filter((e) => e.title === title).length > 0
+    isRankChanging = (abbreviation) => this.state.selectedUnits.filter((e) => e.abbreviation === abbreviation).length > 0
 
     render() {
         return (
@@ -101,7 +120,7 @@ class Departments extends React.Component {
                                 <Link
                                     to={"/departments/" + i}
                                     className="edit-button round-link"
-                                    onClick={() => this.setState({ selectedDep: i, password: "" }, () => this.getSelectedRanks())}>
+                                    onClick={() => this.setState({ selectedDep: i, password: "" }, () => { this.getSelectedRanks(); this.getSelectedUnits(); })}>
                                     View
                                 </Link>
                             </ul>
@@ -234,7 +253,7 @@ class Departments extends React.Component {
                                     } else if (!/^[A-Za-z ]+$/i.test(values.title)) {
                                         errors.title = 'Only letters allowed';
                                     }
-                                    console.log(parseInt(values.salary));
+
                                     if (!values.salary) {
                                         errors.salary = 'Wrong format';
                                     } else if (parseInt(values.salary) < 0 || 32767 < parseInt(values.salary)) {
@@ -251,10 +270,9 @@ class Departments extends React.Component {
                                         salary: parseInt(values.salary),
                                         departmentCode: this.state.pageData[this.state.selectedDep].code
                                     };
-                                    console.log(tmp);
                                     await axios.post("http://localhost:8081/rank", tmp).then(() => {
-                                        this.setState({ 
-                                            ranks: (!this.isRankChanging(tmp.title)) ? [...this.state.ranks, tmp] : this.state.ranks.map((e) => (e.title === tmp.title) ? tmp : e ),
+                                        this.setState({
+                                            ranks: (!this.isRankChanging(tmp.title)) ? [...this.state.ranks, tmp] : this.state.ranks.map((e) => (e.title === tmp.title) ? tmp : e),
                                             selectedRank: -1
                                         });
                                         this.getSelectedRanks();
@@ -273,7 +291,7 @@ class Departments extends React.Component {
                                             <ErrorMessage name="salary" className="error-label" component="div" />
                                             <span className="floating-label active-label">Salary - $/hour</span>
                                         </div>
-                                        <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus}/></button>
+                                        <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
                                     </Form>
                                 )}
                             </Formik>
@@ -284,7 +302,7 @@ class Departments extends React.Component {
                                 <li>{o.salary} $/hour</li>
                                 <li className="controls">
                                     <button className="round-link" type="submit" onClick={() => this.setState({ selectedRank: i })}>Edit</button>
-                                    <button className="round-link" type="submit" onClick={() => this.setState({ selectedRank: i })}><FontAwesomeIcon icon={faTimesCircle} /></button>
+                                    <button className="round-link" type="submit" onClick={() => {}}><FontAwesomeIcon icon={faTimesCircle} /></button>
                                 </li>
                             </ul>
                         )}
@@ -293,10 +311,87 @@ class Departments extends React.Component {
                 <div className="block department-units">
                     <h3>Units</h3>
                     <div className="table-scroll">
+                        <div className="rank-form">
+                            <Formik
+                                initialValues={
+                                    (this.state.selectedUnit === -1) ? this.emptyUnit : this.state.selectedUnits[this.state.selectedUnit]
+                                }
+                                enableReinitialize={true}
+                                validate={async values => {
+                                    const errors = {};
+                                    /*if (!values.title) {
+                                        errors.title = 'Required';
+                                    } else if (!/^[A-Za-z ]+$/i.test(values.title)) {
+                                        errors.title = 'Only letters allowed';
+                                    }
+                                    console.log(parseInt(values.salary));
+                                    if (!values.salary) {
+                                        errors.salary = 'Wrong format';
+                                    } else if (parseInt(values.salary) < 0 || 32767 < parseInt(values.salary)) {
+                                        errors.salary = 'Must be in range [0, 32767]';
+                                    }*/
 
+                                    return errors;
+                                }}
+                                onSubmit={async (values) => {
+                                    if (this.state.selectedDep === -1)
+                                        return;
+                                    let tmp = {
+                                        title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
+                                        abbreviation: values.abbreviation.toUpperCase(),
+                                        description: values.description,
+                                        departmentCode: this.state.pageData[this.state.selectedDep].code
+                                    };
+                                    await axios.post("http://localhost:8081/unit", tmp).then((res) => {
+                                        if (!res.data.success) {
+                                            console.log("Server error: " + res.data.message);
+                                            return;
+                                        }
+
+                                        this.setState({
+                                            units: (!this.isUnitChanging(tmp.abbreviation)) ? [...this.state.units, tmp] : this.state.units.map((e) => (e.abbreviation === tmp.abbreviation) ? tmp : e),
+                                            selectedUnit: -1
+                                        });
+                                        this.getSelectedUnits();
+                                    })
+                                }}
+                            >
+                                {({ isSubmitting }) => (
+                                    <Form>
+                                        <div>
+                                            <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
+                                            <ErrorMessage name="title" className="error-label" component="div" />
+                                            <span className="floating-label">Title</span>
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="text" name="abbreviation" />
+                                            <ErrorMessage name="abbreviation" className="error-label" component="div" />
+                                            <span className="floating-label active-label">Abbreviation</span>
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="text" name="description" />
+                                            <ErrorMessage name="description" className="error-label" component="div" />
+                                            <span className="floating-label active-label">Description</span>
+                                        </div>
+                                        <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
+                        {this.state.selectedUnits.map((o, i) =>
+                            <ul className="rank" key={i}>
+                                <li>{o.title}</li>
+                                <li>Abbreviation: {o.abbreviation}</li>
+                                <li>{o.abbreviation}</li>
+                                <li className="controls">
+                                    <button className="round-link" type="submit" onClick={() => this.setState({ selectedUnit: i })}>Edit</button>
+                                    <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
+                                </li>
+                            </ul>
+                        )}
                     </div>
                 </div>
-            </div >
+            </div>
         );
     }
 }
