@@ -41,10 +41,15 @@ class Citizens extends React.Component {
     constructor(props) {
         super(props);
 
+        let selectedIdx = -1;
+        if (this.props.match.params.regNum)
+            selectedIdx = this.props.citizens.findIndex(e => e.regNum === this.props.match.params.regNum);
+
         this.state = {
             pageData: [],
             offset: 0,
-            selectedIdx: -1,
+            selectedIdx: selectedIdx,
+            selectedPage: 0,
             pageCount: 0,
             password: ""
         };
@@ -72,7 +77,7 @@ class Citizens extends React.Component {
         let selected = data.selected;
         let offset = Math.ceil(selected * CITIZENS_ON_PAGE);
 
-        this.setState({ offset: offset }, () => {
+        this.setState({ offset: offset, selectedPage: selected }, () => {
             this.loadCitizens();
         });
     };
@@ -118,9 +123,9 @@ class Citizens extends React.Component {
                                 <li className="fullname">{o.name + " " + o.surname}</li>
                                 <li className="phone">Phone: {o.phoneNumber}</li>
                                 <Link
-                                    to={"/citizens/" + i}
+                                    to={"/citizens/" + (o.regNum)}
                                     className="edit-button round-link"
-                                    onClick={() => this.setState({ selectedIdx: i, password: "" })}>
+                                    onClick={() => this.setState({ selectedIdx: i + this.state.selectedPage * CITIZENS_ON_PAGE, password: "" })}>
                                     View
                                 </Link>
                             </ul>

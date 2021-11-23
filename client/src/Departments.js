@@ -18,7 +18,7 @@ class Departments extends React.Component {
         super(props);
 
         this.state = {
-            depData: [],
+            departments: [],
             pageData: [],
             ranks: [],
             units: [],
@@ -26,6 +26,7 @@ class Departments extends React.Component {
             selectedUnits: [],
             offset: 0,
             selectedDep: -1,
+            selectedPage: 0,
             selectedRank: -1,
             selectedUnit: -1,
             pageCount: 0
@@ -37,8 +38,12 @@ class Departments extends React.Component {
     loadDepartments = async () => {
         await axios.get("http://localhost:8081/departments")
             .then((res) => {
+                let selectedIdx = -1;
+                if (this.props.match.params.code)
+                    selectedIdx = res.data.findIndex(d => d.code === parseInt(this.props.match.params.code));
                 this.setState({
-                    depData: res.data
+                    selectedDep: selectedIdx,
+                    departments: res.data
                 }, () => this.getPageData());
             });
     }
@@ -48,7 +53,7 @@ class Departments extends React.Component {
             .then((res) => {
                 this.setState({
                     ranks: res.data
-                });
+                }, () => this.getSelectedRanks());
             });
     }
 
@@ -57,29 +62,29 @@ class Departments extends React.Component {
             .then((res) => {
                 this.setState({
                     units: res.data
-                });
+                }, () => this.getSelectedUnits());
             });
     }
 
     getNextCode = () => {
         let max = 0;
-        this.state.depData.forEach(e => max = (e.code > max) ? e.code : max);
+        this.state.departments.forEach(e => max = (e.code > max) ? e.code : max);
         return max + 1;
     }
 
     getPageData = () => {
         this.setState({
-            pageData: this.state.depData.slice(this.state.offset, this.state.offset + DEPARTMENTS_ON_PAGE),
-            pageCount: Math.ceil(this.state.depData.length / DEPARTMENTS_ON_PAGE)
+            pageData: this.state.departments.slice(this.state.offset, this.state.offset + DEPARTMENTS_ON_PAGE),
+            pageCount: Math.ceil(this.state.departments.length / DEPARTMENTS_ON_PAGE)
         });
     }
 
     getSelectedRanks = () => {
-        this.setState({ selectedRanks: (this.state.selectedDep === -1) ? [] : this.state.ranks.filter(e => e.departmentCode === this.state.pageData[this.state.selectedDep].code) });
+        this.setState({ selectedRanks: (this.state.selectedDep === -1) ? [] : this.state.ranks.filter(e => e.departmentCode === this.state.departments[this.state.selectedDep].code) });
     }
 
     getSelectedUnits = () => {
-        this.setState({ selectedUnits: (this.state.selectedDep === -1) ? [] : this.state.units.filter(e => { console.log(e.departmentCode + " - " + this.state.pageData[this.state.selectedDep].code); return e.departmentCode === this.state.pageData[this.state.selectedDep].code; }) });
+        this.setState({ selectedUnits: (this.state.selectedDep === -1) ? [] : this.state.units.filter(e => e.departmentCode === this.state.pageData[this.state.selectedDep].code) });
     }
 
     componentDidMount = () => {
@@ -92,7 +97,7 @@ class Departments extends React.Component {
         let selected = data.selected;
         let offset = Math.ceil(selected * DEPARTMENTS_ON_PAGE);
 
-        this.setState({ offset: offset }, () => {
+        this.setState({ offset: offset, selectedPage: selected }, () => {
             this.loadDepartments();
         });
     };
@@ -102,9 +107,9 @@ class Departments extends React.Component {
             this.sendButton.current.click();
     }
 
-    isDepChanging = (code) => this.state.depData.filter((e) => e.code === code).length > 0
+    isDepChanging = (code) => this.state.departments.filter((e) => e.code === code).length > 0
     isRankChanging = (title) => this.state.selectedRanks.filter((e) => e.title === title).length > 0
-    isRankChanging = (abbreviation) => this.state.selectedUnits.filter((e) => e.abbreviation === abbreviation).length > 0
+    isUnitChanging = (abbreviation) => this.state.selectedUnits.filter((e) => e.abbreviation === abbreviation).length > 0
 
     render() {
         return (
@@ -118,9 +123,9 @@ class Departments extends React.Component {
                                 <li className="code">Code: {o.code}</li>
                                 <li className="title-value">{o.title}</li>
                                 <Link
-                                    to={"/departments/" + i}
+                                    to={"/departments/" + o.code}
                                     className="edit-button round-link"
-                                    onClick={() => this.setState({ selectedDep: i, password: "" }, () => { this.getSelectedRanks(); this.getSelectedUnits(); })}>
+                                    onClick={() => this.setState({ selectedDep: i + this.state.selectedPage * DEPARTMENTS_ON_PAGE, password: "" }, () => { this.getSelectedRanks(); this.getSelectedUnits(); })}>
                                     View
                                 </Link>
                             </ul>
@@ -158,7 +163,7 @@ class Departments extends React.Component {
                     <div className="table-scroll">
                         <Formik
                             initialValues={
-                                (this.state.selectedDep === -1) ? { ...this.emptyDepartment, code: this.getNextCode() } : this.state.pageData[this.state.selectedDep]
+                                (this.state.selectedDep === -1) ? { ...this.emptyDepartment, code: this.getNextCode() } : (this.state.departments[this.state.selectedDep])?this.state.departments[this.state.selectedDep]:{ ...this.emptyDepartment, code: this.getNextCode() }
                             }
                             enableReinitialize={true}
                             validate={async values => {
@@ -167,9 +172,9 @@ class Departments extends React.Component {
                                     errors.shortTitle = 'Required';
                                 } else if (!/^[A-Za-z]{4,}$/i.test(values.shortTitle)) {
                                     errors.shortTitle = 'Only letters and length > 4';
-                                } else if (this.state.depData.filter((e) => e.shortTitle === values.shortTitle || e.code === values.code).length > 1) {
+                                } else if (this.state.departments.filter((e) => e.shortTitle === values.shortTitle || e.code === values.code).length > 1) {
                                     errors.shortTitle = 'Occupied';
-                                } else if (!this.isDepChanging(values.code) && this.state.depData.filter((e) => e.shortTitle === values.shortTitle).length > 0) {
+                                } else if (!this.isDepChanging(values.code) && this.state.departments.filter((e) => e.shortTitle === values.shortTitle).length > 0) {
                                     errors.shortTitle = 'Occupied';
                                 }
 
@@ -200,10 +205,10 @@ class Departments extends React.Component {
                                 };
                                 await axios.post("http://localhost:8081/department/", tmp).then(() => {
                                     if (!this.isDepChanging(tmp.code))
-                                        this.setState({ depData: [...this.state.depData, tmp] });
+                                        this.setState({ departments: [...this.state.departments, tmp] });
                                     else
                                         this.setState({
-                                            depData: this.state.depData.map((e) => (e.code === tmp.code) ? tmp : e)
+                                            departments: this.state.departments.map((e) => (e.code === tmp.code) ? tmp : e)
                                         });
                                     this.getPageData();
                                 })
@@ -382,7 +387,7 @@ class Departments extends React.Component {
                             <ul className="rank" key={i}>
                                 <li>{o.title}</li>
                                 <li>Abbreviation: {o.abbreviation}</li>
-                                <li>{o.abbreviation}</li>
+                                <li>{o.description}</li>
                                 <li className="controls">
                                     <button className="round-link" type="submit" onClick={() => this.setState({ selectedUnit: i })}>Edit</button>
                                     <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
