@@ -8,6 +8,7 @@ import State from './State';
 import Calls from './Calls';
 import Citizens from './Citizens';
 import PenalCode from './PenalCode';
+import Employees from './Employees';
 import Departments from './Departments';
 import RequireAuth from './auth/RequireAuth';
 import { user } from './auth/User';
@@ -24,7 +25,8 @@ class App extends React.Component {
 
         this.state = {
             calls: 5,
-            citizens: []
+            citizens: [],
+            isLoading: true
         }
     }
 
@@ -37,7 +39,8 @@ class App extends React.Component {
                     c.birthdate = new Date(c.birthdate); return c;
                 });
                 this.setState({
-                    citizens: res.data
+                    citizens: res.data,
+                    isLoading: false
                 });
             });
     }
@@ -79,6 +82,8 @@ class App extends React.Component {
     }
 
     render() {
+        if (this.state.isLoading)
+            return (<div></div>)
         return (
             <Switch>
                 <Route exact path="/login/:token?" component={RequireNotAuth((props) => <Login {...props} store={user} wsConnect={this.wsConnect} />)} />
@@ -90,8 +95,9 @@ class App extends React.Component {
                             <Switch>
                                 <Route exact path="/" component={RequireAuth(Home, user)} />
                                 <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} />, user)} />
-                                <Route exact path="/departments/:id?" component={RequireAuth((props) => <Departments {...props} />, user)} />
-                                <Route exact path="/citizens/:id?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} citizens={this.state.citizens} />, user)} />
+                                <Route exact path="/employees/:id?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} />, user)} />
+                                <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} />, user)} />
+                                <Route exact path="/citizens/:regNum?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/penalcode" component={RequireAuth(() => <PenalCode />, user)} />
                                 <Route path="*" component={RequireAuth(Error404, user)} />
                             </Switch>
