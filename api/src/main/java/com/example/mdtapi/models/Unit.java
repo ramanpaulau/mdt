@@ -13,25 +13,13 @@ public class Unit {
     @JoinColumn(name = "department_code")
     private Department department;
 
-    @Column(name = "department_code", insertable = false, updatable = false)
-    private Integer departmentCode;
-
     public Unit() {
     }
 
-    public Unit(String abbreviation, String title, String description, Integer departmentCode) {
+    public Unit(String abbreviation, String title, String description) {
         this.abbreviation = abbreviation;
         this.title = title;
         this.description = description;
-        this.departmentCode = departmentCode;
-    }
-
-    public Unit(String abbreviation, String title, String description, Department department, Integer departmentCode) {
-        this.abbreviation = abbreviation;
-        this.title = title;
-        this.description = description;
-        this.department = department;
-        this.departmentCode = departmentCode;
     }
 
     public String getAbbreviation() {
@@ -58,30 +46,11 @@ public class Unit {
         this.description = description;
     }
 
-    public Department getDepartment() {
-        return department;
+    public Integer getDepartment() {
+        return (department == null) ? -1 : department.getCode();
     }
 
     public void setDepartment(Department department) {
         this.department = department;
-    }
-
-    public Integer getDepartmentCode() {
-        return departmentCode;
-    }
-
-    public void setDepartmentCode(Integer departmentCode) {
-        this.departmentCode = departmentCode;
-    }
-
-    @Override
-    public String toString() {
-        return "Unit{" +
-                "abbreviation='" + abbreviation + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", department=" + department +
-                ", departmentCode=" + departmentCode +
-                '}';
     }
 }

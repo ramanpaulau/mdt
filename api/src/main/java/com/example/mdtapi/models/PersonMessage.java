@@ -59,16 +59,4 @@ public class PersonMessage {
     public void setState(Person.State state) {
         this.state = state;
     }
-
-    @Override
-    public String toString() {
-        return "PersonMessage{" +
-                "regNum='" + regNum + '\'' +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", birthdate=" + birthdate +
-                ", state=" + state +
-                '}';
-    }
 }

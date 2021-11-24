@@ -11,8 +11,8 @@ const DEPARTMENTS_ON_PAGE = 5;
 class Departments extends React.Component {
 
     emptyDepartment = { shortTitle: "", title: "", description: "", code: -1 };
-    emptyRank = { title: "", salary: 0, departmentCode: -1 };
-    emptyUnit = { title: "", abbreviation: "", description: "", departmentCode: -1 };
+    emptyRank = { title: "", salary: 0, department: -1 };
+    emptyUnit = { title: "", abbreviation: "", description: "", department: -1 };
 
     constructor(props) {
         super(props);
@@ -38,6 +38,7 @@ class Departments extends React.Component {
     loadDepartments = async () => {
         await axios.get("http://localhost:8081/departments")
             .then((res) => {
+                console.log(res.data);
                 let selectedIdx = -1;
                 if (this.props.match.params.code)
                     selectedIdx = res.data.findIndex(d => d.code === parseInt(this.props.match.params.code));
@@ -51,6 +52,7 @@ class Departments extends React.Component {
     loadRanks = async () => {
         await axios.get("http://localhost:8081/ranks")
             .then((res) => {
+                console.log(res.data);
                 this.setState({
                     ranks: res.data
                 }, () => this.getSelectedRanks());
@@ -60,6 +62,7 @@ class Departments extends React.Component {
     loadUnits = async () => {
         await axios.get("http://localhost:8081/units")
             .then((res) => {
+                console.log(res.data);
                 this.setState({
                     units: res.data
                 }, () => this.getSelectedUnits());
@@ -80,11 +83,11 @@ class Departments extends React.Component {
     }
 
     getSelectedRanks = () => {
-        this.setState({ selectedRanks: (this.state.selectedDep === -1) ? [] : this.state.ranks.filter(e => e.departmentCode === this.state.departments[this.state.selectedDep].code) });
+        this.setState({ selectedRanks: (this.state.selectedDep === -1) ? [] : this.state.ranks.filter(e => e.department === this.state.departments[this.state.selectedDep].code) });
     }
 
     getSelectedUnits = () => {
-        this.setState({ selectedUnits: (this.state.selectedDep === -1) ? [] : this.state.units.filter(e => e.departmentCode === this.state.pageData[this.state.selectedDep].code) });
+        this.setState({ selectedUnits: (this.state.selectedDep === -1) ? [] : this.state.units.filter(e => e.department === this.state.pageData[this.state.selectedDep].code) });
     }
 
     componentDidMount = () => {
@@ -163,7 +166,7 @@ class Departments extends React.Component {
                     <div className="table-scroll">
                         <Formik
                             initialValues={
-                                (this.state.selectedDep === -1) ? { ...this.emptyDepartment, code: this.getNextCode() } : (this.state.departments[this.state.selectedDep])?this.state.departments[this.state.selectedDep]:{ ...this.emptyDepartment, code: this.getNextCode() }
+                                (this.state.selectedDep === -1) ? { ...this.emptyDepartment, code: this.getNextCode() } : (this.state.departments[this.state.selectedDep]) ? this.state.departments[this.state.selectedDep] : { ...this.emptyDepartment, code: this.getNextCode() }
                             }
                             enableReinitialize={true}
                             validate={async values => {
@@ -273,15 +276,21 @@ class Departments extends React.Component {
                                     let tmp = {
                                         title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
                                         salary: parseInt(values.salary),
-                                        departmentCode: this.state.pageData[this.state.selectedDep].code
+                                        department: this.state.pageData[this.state.selectedDep].code
                                     };
-                                    await axios.post("http://localhost:8081/rank", tmp).then(() => {
-                                        this.setState({
-                                            ranks: (!this.isRankChanging(tmp.title)) ? [...this.state.ranks, tmp] : this.state.ranks.map((e) => (e.title === tmp.title) ? tmp : e),
-                                            selectedRank: -1
-                                        });
-                                        this.getSelectedRanks();
-                                    })
+                                    await axios.post("http://localhost:8081/rank",
+                                        JSON.stringify(tmp),
+                                        { headers: { 'Content-Type': 'text/plain' } }).then((res) => {
+                                            if (!res.data.success)
+                                                console.log(res.data.message);
+                                            else {
+                                                this.setState({
+                                                    ranks: (!this.isRankChanging(tmp.title)) ? [...this.state.ranks, tmp] : this.state.ranks.map((e) => (e.title === tmp.title) ? tmp : e),
+                                                    selectedRank: -1
+                                                });
+                                                this.getSelectedRanks();
+                                            }
+                                        })
                                 }}
                             >
                                 {({ isSubmitting }) => (
@@ -307,7 +316,7 @@ class Departments extends React.Component {
                                 <li>{o.salary} $/hour</li>
                                 <li className="controls">
                                     <button className="round-link" type="submit" onClick={() => this.setState({ selectedRank: i })}>Edit</button>
-                                    <button className="round-link" type="submit" onClick={() => {}}><FontAwesomeIcon icon={faTimesCircle} /></button>
+                                    <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
                                 </li>
                             </ul>
                         )}
@@ -345,7 +354,7 @@ class Departments extends React.Component {
                                         title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
                                         abbreviation: values.abbreviation.toUpperCase(),
                                         description: values.description,
-                                        departmentCode: this.state.pageData[this.state.selectedDep].code
+                                        department: this.state.pageData[this.state.selectedDep].code
                                     };
                                     await axios.post("http://localhost:8081/unit", tmp).then((res) => {
                                         if (!res.data.success) {

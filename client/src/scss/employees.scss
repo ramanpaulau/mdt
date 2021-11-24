@@ -1,0 +1,59 @@
+.employees {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .title-select {
+        > h3, > div {
+            width: 50%;
+        }
+
+        select {
+            height: 25px;
+            width: 100%;
+        }
+    }
+
+    .employee-list {
+        grid-area: list;
+    }
+
+    .employee-editor {
+        grid-area: editor;
+
+        form {
+        }
+    }
+
+    .employee-work-hours {
+        grid-area: hours;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .employees {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "list editor" "list hours";
+        height: calc(100vh - 52px);
+
+        .employee-editor {    
+            form {
+                flex-direction: column;
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    .employees {
+        .employee-editor {    
+            form {
+                display: flex;
+                flex-direction: row;
+            }
+        }
+    }
+}
+

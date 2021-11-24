@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faPhone, faIdCardAlt, faCar, faFileAlt, faEye, faWarehouse, faGavel, faLandmark, faTimes, faList } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faPhone, faIdCardAlt, faCar, faFileAlt, faEye, faWarehouse, faGavel, faLandmark, faTimes, faList, faUserTie } from '@fortawesome/free-solid-svg-icons';
 
 class Header extends React.Component {
     constructor(props) {
@@ -102,24 +102,6 @@ class Header extends React.Component {
                         </li>
                         <li className="nav-li">
                             <NavLink
-                                to="/bolo"
-                                className="nav-a"
-                                activeClassName="active-nav-a"
-                                onClick={this.navigate}>
-                                <FontAwesomeIcon icon={faEye} />
-                            </NavLink>
-                        </li>
-                        <li className="nav-li">
-                            <NavLink
-                                to="/inventory"
-                                className="nav-a"
-                                activeClassName="active-nav-a"
-                                onClick={this.navigate}>
-                                <FontAwesomeIcon icon={faWarehouse} />
-                            </NavLink>
-                        </li>
-                        <li className="nav-li">
-                            <NavLink
                                 to="/charge"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
@@ -129,11 +111,38 @@ class Header extends React.Component {
                         </li>
                         <li className="nav-li">
                             <NavLink
+                                to="/bolo"
+                                className="nav-a"
+                                activeClassName="active-nav-a"
+                                onClick={this.navigate}>
+                                <FontAwesomeIcon icon={faEye} />
+                            </NavLink>
+                        </li>
+                        <li className="nav-li">
+                            <NavLink
                                 to="/departments"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>
                                 <FontAwesomeIcon icon={faLandmark} />
+                            </NavLink>
+                        </li>
+                        <li className="nav-li">
+                            <NavLink
+                                to="/employees"
+                                className="nav-a"
+                                activeClassName="active-nav-a"
+                                onClick={this.navigate}>
+                                <FontAwesomeIcon icon={faUserTie} />
+                            </NavLink>
+                        </li>
+                        <li className="nav-li">
+                            <NavLink
+                                to="/inventory"
+                                className="nav-a"
+                                activeClassName="active-nav-a"
+                                onClick={this.navigate}>
+                                <FontAwesomeIcon icon={faWarehouse} />
                             </NavLink>
                         </li>
                         <li className="nav-li">

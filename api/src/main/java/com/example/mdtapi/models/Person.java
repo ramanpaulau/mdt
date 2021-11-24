@@ -103,20 +103,6 @@ public class Person {
 	public void setState(State state) {
 		this.state = state;
 	}
-
-	@Override
-	public String toString() {
-		return "Person{" +
-				"regNum='" + regNum + '\'' +
-				", name='" + name + '\'' +
-				", surname='" + surname + '\'' +
-				", password='" + password + '\'' +
-				", birthdate=" + birthdate +
-				", phoneNumber='" + phoneNumber + '\'' +
-				", admin=" + admin +
-				", state=" + state +
-				'}';
-	}
 }
 
 

@@ -33,22 +33,37 @@ public class PersonRest {
 
     @PostConstruct
     public void init() {
-        if (personRepository.findByRegNum("0000") != null)
-            return;
+        Person person = new Person();
+        person.setRegNum("0000");
+        person.setName("Admin");
+        person.setSurname("Admin");
+        person.setPassword(passwordEncoder.encode("admin"));
+        person.setBirthdate(LocalDate.of( 1970 , Month.JANUARY, 23 ));
+        person.setPhoneNumber("145-1234");
+        person.setAdmin(true);
+        person.setState(Person.State.ALIVE);
+        personRepository.save(person);
 
-        Person admin = new Person();
-        admin.setRegNum("0000");
-        admin.setName("Admin");
-        admin.setSurname("Admin");
-        admin.setPassword(passwordEncoder.encode("admin"));
-        admin.setBirthdate(LocalDate.of( 1970 , Month.JANUARY, 1 ));
-        admin.setPhoneNumber("145-1234");
-        admin.setAdmin(true);
-        admin.setState(Person.State.ALIVE);
+        person = new Person();
+        person.setRegNum("1LS4");
+        person.setName("Hugo");
+        person.setSurname("Bassett");
+        person.setPassword(passwordEncoder.encode("hugo"));
+        person.setBirthdate(LocalDate.of( 1988 , Month.AUGUST, 17 ));
+        person.setPhoneNumber("054-1775");
+        person.setAdmin(false);
+        person.setState(Person.State.ALIVE);
+        personRepository.save(person);
 
-        System.out.println(admin);
-
-        personRepository.save(admin);
+        person.setRegNum("28HJ");
+        person.setName("Skye");
+        person.setSurname("Hahn");
+        person.setPassword(passwordEncoder.encode("skye"));
+        person.setBirthdate(LocalDate.of( 1973 , Month.MAY, 9 ));
+        person.setPhoneNumber("979-2521");
+        person.setAdmin(false);
+        person.setState(Person.State.ALIVE);
+        personRepository.save(person);
     }
 
     @GetMapping("/is_regNum_available/{regNum}")

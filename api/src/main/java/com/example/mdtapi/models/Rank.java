@@ -1,7 +1,5 @@
 package com.example.mdtapi.models;
 
-import org.springframework.stereotype.Component;
-
 import javax.persistence.*;
 
 @Entity
@@ -14,9 +12,6 @@ public class Rank {
     @JoinColumn(name = "department_code")
     private Department department;
 
-    @Column(name = "department_code", insertable = false, updatable = false)
-    private Integer departmentCode;
-
     public Rank() {
     }
 
@@ -24,7 +19,6 @@ public class Rank {
         this.title = title;
         this.salary = salary;
         this.department = department;
-        this.departmentCode = department.getCode();
     }
 
     public String getTitle() {
@@ -43,19 +37,11 @@ public class Rank {
         this.salary = salary;
     }
 
-    public Department getDepartment() {
-        return department;
+    public Integer getDepartment() {
+        return (department == null) ? -1 : department.getCode();
     }
 
     public void setDepartment(Department department) {
         this.department = department;
-    }
-
-    public Integer getDepartmentCode() {
-        return departmentCode;
-    }
-
-    public void setDepartmentCode(Integer departmentCode) {
-        this.departmentCode = departmentCode;
     }
 }

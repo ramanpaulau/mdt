@@ -1,17 +1,22 @@
 package com.example.mdtapi.models;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"shortTitle"})})
 public class Department {
-    private @Id Integer code;
+    private @Id @GeneratedValue Integer code;
     private String shortTitle;
     private String title;
     private String description;
+
+    @OneToOne(targetEntity = Person.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "person_regNum")
+    private Person leader;
+
+    @OneToOne(targetEntity = Unit.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "unit_abbreviation")
+    private Unit unit;
 
     public Department() {
     }
@@ -55,13 +60,19 @@ public class Department {
         this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return "Department{" +
-                "code=" + code +
-                ", shortTitle='" + shortTitle + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+    public String getLeader() {
+        return (leader == null) ? "" : leader.getRegNum();
+    }
+
+    public void setLeader(Person leader) {
+        this.leader = leader;
+    }
+
+    public String getUnit() {
+        return (unit == null) ? "" : unit.getAbbreviation();
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 }

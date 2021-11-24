@@ -4,7 +4,9 @@ import com.example.mdtapi.models.Department;
 import com.example.mdtapi.models.Rank;
 import com.example.mdtapi.repositories.DepartmentRepository;
 import com.example.mdtapi.repositories.RankRepository;
-import com.example.mdtapi.utils.InsertRankBody;
+import com.example.mdtapi.utils.ResponseMessage;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,13 +35,34 @@ public class RankRest {
     }
 
     @PostMapping("/rank")
-    public void insert(@RequestBody InsertRankBody rank) {
-        System.out.println(rank);
-        Department department = departmentRepository.findByCode(rank.getDepartmentCode());
-        if (department == null)
-            return;
+    public ResponseMessage insert(@RequestBody String request) {
+        ResponseMessage res = new ResponseMessage();
 
-        Rank newRank = new Rank(rank.getTitle(), rank.getSalary(), department);
-        rankRepository.save(newRank);
+        short salary;
+        String title;
+        int departmentCode;
+        JSONObject subchapter = new JSONObject(request);
+        try {
+            salary = (short) subchapter.getInt("salary");
+            departmentCode = subchapter.getInt("department");
+            if (salary < 0 || departmentCode < 0)
+                throw new JSONException("Negative value");
+            title = subchapter.getString("title");
+        } catch (JSONException ignored) {
+            res.setSuccess(false);
+            res.setMessage("Wrong json format");
+            return res;
+        }
+
+        Department department = departmentRepository.findByCode(departmentCode);
+        if (department == null) {
+            res.setSuccess(false);
+            res.setMessage("Department don't exist");
+            return res;
+        }
+
+        Rank rank = new Rank(title, salary, department);
+        rankRepository.save(rank);
+        return res;
     }
 }

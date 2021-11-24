@@ -5,6 +5,8 @@ import com.example.mdtapi.models.Unit;
 import com.example.mdtapi.repositories.DepartmentRepository;
 import com.example.mdtapi.repositories.UnitRepository;
 import com.example.mdtapi.utils.ResponseMessage;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,16 +35,33 @@ public class UnitRest {
     }
 
     @PostMapping("/unit")
-    public ResponseMessage insert(@RequestBody Unit unit) {
+    public ResponseMessage insert(@RequestBody String request) {
         ResponseMessage res = new ResponseMessage();
 
-        Department department = departmentRepository.findByCode(unit.getDepartmentCode());
+        String title, abbreviation, description;
+        int departmentCode;
+        JSONObject subchapter = new JSONObject(request);
+        try {
+            departmentCode = subchapter.getInt("department");
+            if (departmentCode < 0)
+                throw new JSONException("Negative value");
+            title = subchapter.getString("title");
+            abbreviation = subchapter.getString("abbreviation");
+            description = subchapter.getString("description");
+        } catch (JSONException ignored) {
+            res.setSuccess(false);
+            res.setMessage("Wrong json format");
+            return res;
+        }
 
+        Department department = departmentRepository.findByCode(departmentCode);
         if (department == null) {
             res.setSuccess(false);
             res.setMessage("Wrong department");
+            return res;
         }
 
+        Unit unit = new Unit(abbreviation, title, description);
         unit.setDepartment(department);
         unitRepository.save(unit);
         return res;

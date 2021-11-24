@@ -35,8 +35,6 @@ export class User {
             return;
         }
 
-        console.log(token);
-        console.log(regNum);
         await axios.post("http://localhost:8081/check_token", { regNum: regNum, token: token })
             .then((res) => {
                 if (res.data) {
