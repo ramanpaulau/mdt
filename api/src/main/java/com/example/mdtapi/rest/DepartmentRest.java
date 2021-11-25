@@ -27,7 +27,7 @@ public class DepartmentRest {
 
     @GetMapping("/departments")
     public List<Department> all() {
-        return departmentRepository.findAll();
+        return departmentRepository.findAllByOrderByCodeAsc();
     }
 
     @PostMapping ("/department")

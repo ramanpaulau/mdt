@@ -40,7 +40,7 @@ public class EmployeeRest {
 
     @GetMapping("/employees")
     private List<Employee> all() {
-        return employeeRepository.findAll();
+        return employeeRepository.findAllByOrderByTagAsc();
     }
 
     @PostMapping("/employee")

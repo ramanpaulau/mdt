@@ -10,4 +10,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     boolean existsByTagAndDepartmentCode(Integer tag, Integer departmentCode);
 
     Employee findByPerson(Person person);
+
+    List<Employee> findAllByOrderByTagAsc();
 }

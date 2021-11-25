@@ -2,6 +2,7 @@
 
 @import "forms.scss";
 @import "calls.scss";
+@import "inventory.scss";
 @import "employees.scss";
 @import "home.scss";
 @import "citizens.scss";
@@ -43,7 +44,7 @@ ul {
   list-style: none;
 }
 
-.call-item, .citizen-item, .department-item {
+.call-item, .citizen-item, .department-item, .employee-item, .inventory-item, .history-item {
   margin: 0;
   padding: 20px;
   color: $bright;

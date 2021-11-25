@@ -2,10 +2,12 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Select from 'react-select'
+import SelectSearch from 'react-select-search';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimesCircle, faPlus, faSave } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
-const customStyles = {
+export const customStyles = {
     container: (provided) => ({
         ...provided,
         width: "250px"
@@ -58,10 +60,11 @@ class Employees extends React.Component {
             departments: [],
             employees: [],
             ranks: [],
-            department: -1,
+            department: null,
             selectedRank: null,
-            selectedPerson: null,
+            selectedCitizens: null,
             tag: 0,
+            isLoading: true
         }
 
         this.sendButton = React.createRef();
@@ -73,11 +76,22 @@ class Employees extends React.Component {
             axios.get("http://localhost:8081/employees"),
             axios.get("http://localhost:8081/ranks")])
             .then(axios.spread((firstResponse, secondResponse, thirdResponse) => {
+                let departmentCode, tag = 0, dep, emp;
+                let marking = this.props.match.params.marking;
+                if (marking && /^[1-9]-[1-9][0-9]?$/i.test(marking)) {
+                    [departmentCode, tag] = marking.split('-').map(Number);
+                    dep = firstResponse.data.find(d => d.code === departmentCode);
+                    emp = secondResponse.data.find(e => e.tag === tag && e.department === departmentCode)
+                }
                 this.setState({
                     departments: firstResponse.data,
-                    department: (firstResponse.data[0]) ? firstResponse.data[0].code : -1,
+                    department: (dep) ? { value: dep.code, label: dep.shortTitle } : null,
                     employees: secondResponse.data,
                     ranks: thirdResponse.data,
+                    isLoading: false
+                }, () => {
+                    if (emp)
+                        this.handleView(emp);
                 })
             }))
             .catch(error => console.log(error));
@@ -93,10 +107,10 @@ class Employees extends React.Component {
 
     addEmployee = () => {
         let tmp = {
-            regNum: this.state.selectedPerson.value,
+            regNum: this.state.selectedCitizens.value,
             rank: this.state.selectedRank.value,
             tag: this.state.tag,
-            department: this.state.department
+            department: this.state.department.value
         };
         axios.post("http://localhost:8081/employee",
             JSON.stringify(tmp),
@@ -110,18 +124,39 @@ class Employees extends React.Component {
     }
 
     clearForm = () => {
-        this.setState({ selectedPerson: null, selectedRank: null, tag: 0 }, () => console.log(this.state.tag));
+        this.setState({ selectedCitizens: null, selectedRank: null, tag: 0 });
+    }
+
+    handleView = (e) => {
+        let c = this.props.citizens.find(c => c.regNum === e.person);
+        let r = this.state.ranks.find(r => r.title === e.rank && r.department === e.department);
+        this.setState({
+            selectedCitizens: {
+                value: c.regNum,
+                label: c.regNum + " / " + c.name + " " + c.surname
+            },
+            selectedRank: {
+                value: r.title,
+                label: r.title
+            },
+            tag: e.tag
+        })
+    }
+
+    optionsSearch = () => {
+        return (v) => {
+            return this.licenseIds.filter((e) => e.name.toLowerCase().startsWith(v.toLowerCase()));
+        };
     }
 
     render() {
-        console.log(this.state.employees);
-        let filteredRanks = [];
-        if (this.state.department !== -1)
-            filteredRanks = this.state.ranks.filter(r => r.department === this.state.department)
 
+        let filteredRanks = [];
         let filteredEmployees = [];
-        if (this.state.department !== -1)
-            filteredEmployees = this.state.employees.filter(e => e.department === this.state.department)
+        if (this.state.department) {
+            filteredRanks = this.state.ranks.filter(r => r.department === this.state.department.value)
+            filteredEmployees = this.state.employees.filter(e => e.department === this.state.department.value)
+        }
 
         return (
             <div className="employees">
@@ -129,17 +164,39 @@ class Employees extends React.Component {
                     <div className="title title-select">
                         <h3>Employees</h3>
                         <div>
-                            <select onChange={(e) => { this.setState({ department: parseInt(e.target.value) }); this.clearForm(); }} value={this.state.department}>
-                                {this.state.departments.map(d =>
-                                    <option key={d.code} value={d.code}>{d.shortTitle}</option>
-                                )}
-                            </select>
+                            <Link
+                                style={{ textDecoration: 'none' }}
+                                to={"/employees"}>
+                                <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
+                                    options={this.state.departments.map(d => (
+                                        {
+                                            value: d.code,
+                                            label: d.shortTitle
+                                        })
+                                    )}
+                                    value={this.state.department}
+                                    onChange={(e) => { this.setState({ department: e }); this.clearForm() }}
+                                    placeholder="Department"
+                                    noOptionsMessage={() => "Department not found"} />
+                            </Link>
                         </div>
                     </div>
                     <div className="table-scroll">
-                        {filteredEmployees.map(e =>
-                            <ul key={e.tag}>
-                                <li>{this.state.department}-{e.tag}</li>
+                        {filteredEmployees.map((e, i) =>
+                            <ul key={e.tag} className="employee-item">
+                                <li>{this.state.department.value}-{e.tag}</li>
+                                <li>{e.rank}</li>
+                                <Link
+                                    to={"/citizens/" + e.person}
+                                    className="edit-button round-link">
+                                    <li>{e.person}</li>
+                                </Link>
+                                <Link
+                                    to={"/employees/" + this.state.department.value + "-" + e.tag}
+                                    onClick={() => this.handleView(e)}
+                                    className="edit-button round-link">
+                                    <li>View</li>
+                                </Link>
                             </ul>
                         )}
                     </div>
@@ -168,8 +225,8 @@ class Employees extends React.Component {
                                                     label: c.regNum + " / " + c.name + " " + c.surname
                                                 })
                                             )}
-                                            value={this.state.selectedPerson}
-                                            onChange={(e) => this.setState({ selectedPerson: e })}
+                                            value={this.state.selectedCitizens}
+                                            onChange={(e) => this.setState({ selectedCitizens: e })}
                                             placeholder="Person"
                                             noOptionsMessage={() => "Citizen not found"} />
                                         <span className="floating-label active-label">Person</span>
@@ -194,6 +251,34 @@ class Employees extends React.Component {
                                         <span className="floating-label active-label">Tag</span>
                                     </div>
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                    <div className="edit-list licenses">
+                                        <p className="text-label">Cvalifications: </p>
+                                        <Link
+                                            to={"/license?id=3"}
+                                            className="round-link">
+                                            AFT
+                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                                <FontAwesomeIcon icon={faTimesCircle} />
+                                            </span>
+                                        </Link>
+                                        <div className="report-controls">
+                                            {/*<SelectSearch options={[]} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="License" />*/}
+                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                                <FontAwesomeIcon icon={faSave} />
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="edit-list incidents">
+                                        <p className="text-label">Incidents: </p>
+                                        <Link
+                                            to={"/license?id=3"}
+                                            className="round-link">
+                                            #225
+                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                                <FontAwesomeIcon icon={faTimesCircle} />
+                                            </span>
+                                        </Link>
+                                    </div>
                                 </Form>
                             )}
                         </Formik>

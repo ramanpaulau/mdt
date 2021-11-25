@@ -1,0 +1,96 @@
+.inventory {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .inventory-list {
+        grid-area: list;
+
+        .title-select {
+            > h3,
+            > div {
+                width: 50%;
+            }
+
+            select {
+                height: 25px;
+                width: 100%;
+            }
+        }
+
+        .inventory-item {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+
+            .amount-input { 
+                display: flex;
+                align-items: center;
+
+                form {
+                    padding: 0;
+                    margin: 0 5px;
+                }
+            }
+
+            li {
+                flex: 1;
+            }
+
+            .text-input {
+                width: 50px;
+            }
+            
+            .green {
+                color: $highlight;
+            }
+
+            .red {
+                color: $error;
+            }
+
+            .green:hover, .red:hover {
+                cursor: pointer;
+            }
+        }
+
+        .inventory-item:nth-child(2n+1) {
+            .text-input {
+                background-color: $secondary;
+            }
+        }
+    }
+
+    .inventory-editor {
+        grid-area: editor;
+
+        .table-scroll {
+            justify-content: center;
+        }
+
+        textarea {
+            resize: none;
+            width: 500px;
+        }
+    }
+
+    .inventory-history {
+        grid-area: history;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .inventory {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 3fr);
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "list editor" "list history";
+        height: calc(100vh - 52px);
+
+        .inventory-editor {
+            form {
+                flex-direction: column;
+            }
+        }
+    }
+}

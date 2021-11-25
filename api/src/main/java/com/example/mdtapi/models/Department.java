@@ -5,7 +5,7 @@ import javax.persistence.*;
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"shortTitle"})})
 public class Department {
-    private @Id @GeneratedValue Integer code;
+    private @Id Integer code;
     private String shortTitle;
     private String title;
     private String description;
