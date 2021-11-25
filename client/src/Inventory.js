@@ -6,8 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronCircleDown, faChevronCircleUp, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import ReactPaginate from 'react-paginate';
 import axios from 'axios';
+import { user } from './auth/User';
 import { customStyles } from './Employees';
-import { useSelect } from "react-select-search";
+
+const HISTORY_ON_PAGE = 6;
 
 class Inventory extends React.Component {
 
@@ -17,10 +19,14 @@ class Inventory extends React.Component {
         this.state = {
             departments: [],
             inventory: [],
-            pageData: [1, 2, 3],
+            history: [],
+            pageData: [],
             description: "",
             department: 0,
-            amount: 0
+            amount: 0,
+            offset: 0,
+            selectedPage: 0,
+            pageCount: 0
         }
 
         this.sendButton = React.createRef();
@@ -29,6 +35,7 @@ class Inventory extends React.Component {
     componentDidMount = async () => {
         this.loadDepartments();
         this.loadInventory();
+        this.loadHistory();
     }
 
     loadDepartments = async () => {
@@ -47,20 +54,59 @@ class Inventory extends React.Component {
         });
     }
 
+    clearForm = async () => {
+    }
+
     sendItem = () => {
         if (this.sendButton.current)
             this.sendButton.current.click();
     }
 
-    proceedAction = (description, amount, action) => {
+    loadHistory = async () => {
+        await axios.get("http://localhost:8081/history").then(res => {
+            this.setState({
+                history: res.data
+            }, () => this.getPageData());
+        });
+    }
+
+    getPageData = () => {
+        this.setState({
+            pageData: this.state.history.slice(this.state.offset, this.state.offset + HISTORY_ON_PAGE),
+            pageCount: Math.ceil(this.state.history.length / HISTORY_ON_PAGE)
+        });
+    }
+
+    proceedAction = async (description, amount, action) => {
         if (!amount)
             return;
-        console.log(description, amount, action);
+
+        let tmp = {
+            employee: user.employee.id,
+            description: description,
+            amount: amount,
+            action: action,
+            department: this.state.department
+        }
+
+        console.log(tmp);
+        
+        await axios.post("http://localhost:8081/history", tmp).then(res => {
+            if (!res.data.success)
+                console.log(res.data.message);
+            else
+                this.loadHistory();
+        });
     }
 
-    sendToHistory = () => {
+    handlePageClick = (data) => {
+        let selected = data.selected;
+        let offset = Math.ceil(selected * HISTORY_ON_PAGE);
 
-    }
+        this.setState({ offset: offset, selectedPage: selected }, () => {
+            this.loadCitizens();
+        });
+    };
 
     render() {
         let filteredInventory = this.state.inventory.filter(e => e.department === this.state.department);
@@ -88,7 +134,17 @@ class Inventory extends React.Component {
                             <ul key={i} className="inventory-item">
                                 <li>{e.description}</li>
                                 <li>{e.amount}</li>
-                                <SelectAmount callback={(amount, action) => this.proceedAction(e.description, amount, action)} max={e.amount} />
+                                <SelectAmount callback={(amount, action) => {
+                                    let newInventory = [...this.state.inventory];
+                                    let selected = {...this.state.inventory[i]};
+                                    selected.amount = (action)? selected.amount + amount : selected.amount - amount;
+                                    if (selected.amount > 0)
+                                        newInventory[i] = selected;
+                                    else
+                                        newInventory = this.state.inventory.slice(0, i).concat(this.state.inventory.slice(i + 1));
+                                    this.setState({ inventory: newInventory });
+                                    this.proceedAction(e.description, amount, action);
+                                }} max={e.amount} />
                             </ul>
                         )}
                     </div>
@@ -162,10 +218,11 @@ class Inventory extends React.Component {
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
                             <ul className="history-item" key={i} onMouseDown={this.handleDrag}>
-                                <li>Descriptions</li>
-                                <li>Count</li>
-                                <li>Date</li>
-                                <li>Action</li>
+                                <li>{(new Date(o.date)).toLocaleString()}</li>
+                                <li>{o.description}</li>
+                                <li>{o.amount}</li>
+                                <li>{(o.action)?<FontAwesomeIcon className="green" icon={faChevronCircleUp} />:<FontAwesomeIcon className="red" icon={faChevronCircleDown} />}</li>
+                                <li>{o.employee}</li>
                             </ul>
                         )}
                     </div>
@@ -201,9 +258,13 @@ class SelectAmount extends React.Component {
     }
 
     result = (action) => {
-        if (this.state.amount > this.props.max || this.state.amount < 0)
+        let amount = this.state.amount;
+        if (amount < 0)
             return;
-        this.props.callback(this.state.amount, action);
+        if (!action && amount > this.props.max) {
+            amount = this.props.max;
+        }
+        this.props.callback(amount, action);
     }
 
     render() {
@@ -217,8 +278,6 @@ class SelectAmount extends React.Component {
 
                         if (!values.amount) {
                             errors.amount = 'Required';
-                        } else if (parseInt(values.amount) > this.props.max) {
-                            errors.amount = 'Big';
                         } else if (parseInt(values.amount) < 0) {
                             errors.amount = 'Negative';
                         }

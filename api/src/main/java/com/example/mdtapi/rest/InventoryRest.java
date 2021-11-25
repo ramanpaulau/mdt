@@ -1,8 +1,10 @@
 package com.example.mdtapi.rest;
 
 import com.example.mdtapi.models.Department;
+import com.example.mdtapi.models.History;
 import com.example.mdtapi.models.Inventory;
 import com.example.mdtapi.repositories.DepartmentRepository;
+import com.example.mdtapi.repositories.HistoryRepository;
 import com.example.mdtapi.repositories.InventoryRepository;
 import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;

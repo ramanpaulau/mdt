@@ -14,6 +14,14 @@ public class ResponseMessage {
         this.message = message;
     }
 
+    public static ResponseMessage NotImplemented() {
+        return new ResponseMessage(false, "Not implemented");
+    }
+
+    public static ResponseMessage OKMessage() {
+        return new ResponseMessage();
+    }
+
     public boolean getSuccess() {
         return success;
     }

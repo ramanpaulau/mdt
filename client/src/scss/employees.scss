@@ -40,7 +40,7 @@
 @media screen and (min-width: 768px) {
     .employees {
         display: grid;
-        grid-template-rows: minmax(0, 1fr) minmax(0, 2fr);
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
         grid-template-columns: 1fr 1fr;
         grid-template-areas: "list editor" "list hours";
         height: calc(100vh - 52px);

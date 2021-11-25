@@ -1,7 +1,10 @@
 package com.example.mdtapi.rest;
 
+import com.example.mdtapi.models.Employee;
 import com.example.mdtapi.models.PasswordToken;
 import com.example.mdtapi.models.Person;
+import com.example.mdtapi.repositories.DepartmentRepository;
+import com.example.mdtapi.repositories.EmployeeRepository;
 import com.example.mdtapi.repositories.PasswordTokenRepository;
 import com.example.mdtapi.repositories.PersonRepository;
 import com.example.mdtapi.utils.*;
@@ -26,9 +29,17 @@ public class AuthRest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public AuthRest(PersonRepository personRepository, PasswordTokenRepository passwordTokenRepository) {
+    @Autowired
+    private final EmployeeRepository employeeRepository;
+
+    @Autowired
+    private final DepartmentRepository departmentRepository;
+
+    public AuthRest(PersonRepository personRepository, PasswordTokenRepository passwordTokenRepository, EmployeeRepository employeeRepository, DepartmentRepository departmentRepository) {
         this.personRepository = personRepository;
         this.passwordTokenRepository = passwordTokenRepository;
+        this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
     }
 
     @PostMapping("/login")
@@ -108,5 +119,14 @@ public class AuthRest {
         person.setPassword(passwordEncoder.encode(request.getPassword()));
         personRepository.save(person);
         return true;
+    }
+
+    @GetMapping("/get_employee_info/{regNum}")
+    public Employee employeeInfo(@PathVariable String regNum) {
+        Person person = personRepository.findByRegNum(regNum);
+        if (person == null)
+            return null;
+
+        return employeeRepository.findByPerson(person);
     }
 }

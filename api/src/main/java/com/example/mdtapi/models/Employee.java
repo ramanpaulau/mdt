@@ -18,19 +18,22 @@ public class Employee {
     @JoinColumn(name = "rank_title")
     private Rank rank;
 
+    private Integer tag;
+
+    @Transient
     private boolean leader;
 
-    private Integer tag;
+    @Transient
+    private String marking;
 
     public Employee() {
     }
 
-    public Employee(Integer id, Person person, Department department, Rank rank, boolean leader, Integer tag) {
+    public Employee(Integer id, Person person, Department department, Rank rank, Integer tag) {
         this.id = id;
         this.person = person;
         this.department = department;
         this.rank = rank;
-        this.leader = leader;
         this.tag = tag;
     }
 
@@ -66,19 +69,19 @@ public class Employee {
         this.rank = rank;
     }
 
-    public boolean isLeader() {
-        return leader;
-    }
-
-    public void setLeader(boolean leader) {
-        this.leader = leader;
-    }
-
     public Integer getTag() {
         return tag;
     }
 
     public void setTag(Integer tag) {
         this.tag = tag;
+    }
+
+    public boolean isLeader() {
+        return leader;
+    }
+
+    public String getMarking() {
+        return department.getCode() + department.getUnit() + "-" + getTag();
     }
 }

@@ -4,11 +4,13 @@ import axios from 'axios';
 export class User {
     regNum = '';
     admin = false;
+    employee = {};
 
     constructor() {
         makeObservable(this,
             {
                 regNum: observable,
+                employee: observable,
                 clear: action,
                 loadUser: action
             }
@@ -54,6 +56,9 @@ export class User {
                                 localStorage.setItem('token', res.data);
                         });
                     }
+                    axios.get("http://localhost:8081/get_employee_info/" + res.data.regNum).then(res => {
+                        this.employee = res.data;
+                    });
                 } else {
                     this.clear();
                 }

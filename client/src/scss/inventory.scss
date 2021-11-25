@@ -40,14 +40,6 @@
             .text-input {
                 width: 50px;
             }
-            
-            .green {
-                color: $highlight;
-            }
-
-            .red {
-                color: $error;
-            }
 
             .green:hover, .red:hover {
                 cursor: pointer;
@@ -59,6 +51,14 @@
                 background-color: $secondary;
             }
         }
+    }
+            
+    .green {
+        color: $highlight;
+    }
+
+    .red {
+        color: $error;
     }
 
     .inventory-editor {
@@ -76,6 +76,12 @@
 
     .inventory-history {
         grid-area: history;
+
+        .history-item {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
     }
 }
 
