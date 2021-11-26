@@ -1,6 +1,8 @@
 package com.example.mdtapi.models;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Employee {
@@ -17,6 +19,14 @@ public class Employee {
     @ManyToOne(targetEntity = Rank.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "rank_title")
     private Rank rank;
+
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(
+            name = "employee_qualification",
+            joinColumns = { @JoinColumn(name = "qualification_id") },
+            inverseJoinColumns = { @JoinColumn(name = "employee_id") }
+    )
+    private Set<Qualification> qualifications = new HashSet<>();
 
     private Integer tag;
 

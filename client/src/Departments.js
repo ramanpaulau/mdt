@@ -38,7 +38,6 @@ class Departments extends React.Component {
     loadDepartments = async () => {
         await axios.get("http://localhost:8081/departments")
             .then((res) => {
-                console.log(res.data);
                 let selectedIdx = -1;
                 if (this.props.match.params.code)
                     selectedIdx = res.data.findIndex(d => d.code === parseInt(this.props.match.params.code));
@@ -52,7 +51,6 @@ class Departments extends React.Component {
     loadRanks = async () => {
         await axios.get("http://localhost:8081/ranks")
             .then((res) => {
-                console.log(res.data);
                 this.setState({
                     ranks: res.data
                 }, () => this.getSelectedRanks());
@@ -62,7 +60,6 @@ class Departments extends React.Component {
     loadUnits = async () => {
         await axios.get("http://localhost:8081/units")
             .then((res) => {
-                console.log(res.data);
                 this.setState({
                     units: res.data
                 }, () => this.getSelectedUnits());
@@ -151,260 +148,266 @@ class Departments extends React.Component {
                         hrefAllControls
                     />
                 </div>
-                <div className="block department-editor">
-                    <div className="title">
-                        <h3>
-                            <Link
-                                to={"/departments"}
-                                className="link"
-                                onClick={() => { this.setState({ selectedDep: -1 }, () => this.getSelectedRanks()); }}>
-                                New
-                            </Link>
-                        </h3>
-                        <h3 onClick={() => { this.sendDepartment() }}>Send</h3>
-                    </div>
-                    <div className="table-scroll">
-                        <Formik
-                            initialValues={
-                                (this.state.selectedDep === -1) ? { ...this.emptyDepartment, code: this.getNextCode() } : (this.state.departments[this.state.selectedDep]) ? this.state.departments[this.state.selectedDep] : { ...this.emptyDepartment, code: this.getNextCode() }
-                            }
-                            enableReinitialize={true}
-                            validate={async values => {
-                                const errors = {};
-                                if (!values.shortTitle) {
-                                    errors.shortTitle = 'Required';
-                                } else if (!/^[A-Za-z]{4,}$/i.test(values.shortTitle)) {
-                                    errors.shortTitle = 'Only letters and length > 4';
-                                } else if (this.state.departments.filter((e) => e.shortTitle === values.shortTitle || e.code === values.code).length > 1) {
-                                    errors.shortTitle = 'Occupied';
-                                } else if (!this.isDepChanging(values.code) && this.state.departments.filter((e) => e.shortTitle === values.shortTitle).length > 0) {
-                                    errors.shortTitle = 'Occupied';
-                                }
-
-                                if (!values.title) {
-                                    errors.title = 'Required';
-                                } else if (!/^[A-Za-z ]+$/i.test(values.title)) {
-                                    errors.title = 'Only letters allowed';
-                                }
-
-                                if (!values.description) {
-                                    errors.description = 'Required';
-                                }
-
-                                if (!values.code) {
-                                    errors.code = 'Wrong format';
-                                } else if (parseInt(values.code) < 0) {
-                                    errors.code = 'Must be positive';
-                                }
-
-                                return errors;
-                            }}
-                            onSubmit={async (values) => {
-                                let tmp = {
-                                    shortTitle: values.shortTitle.toUpperCase(),
-                                    title: values.title.toUpperCase(),
-                                    description: values.description,
-                                    code: values.code
-                                };
-                                await axios.post("http://localhost:8081/department/", tmp).then(() => {
-                                    if (!this.isDepChanging(tmp.code))
-                                        this.setState({ departments: [...this.state.departments, tmp] });
-                                    else
-                                        this.setState({
-                                            departments: this.state.departments.map((e) => (e.code === tmp.code) ? tmp : e)
-                                        });
-                                    this.getPageData();
-                                })
-                            }}
-                        >
-                            {({ isSubmitting }) => (
-                                <Form>
-                                    <div>
-                                        <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="shortTitle" />
-                                        <ErrorMessage name="shortTitle" className="error-label" component="div" />
-                                        <span className="floating-label">Short title</span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="number" name="code" />
-                                        <ErrorMessage name="code" className="error-label" component="div" />
-                                        <span className="floating-label active-label">Code</span>
-                                    </div>
-                                    <div className="title-input">
-                                        <Field className="text-input" type="text" name="title" />
-                                        <ErrorMessage name="title" className="error-label" component="div" />
-                                        <span className="floating-label">Title</span>
-                                    </div>
-                                    <div className="textarea">
-                                        <Field className="text-input" type="text" as="textarea" name="description" />
-                                        <ErrorMessage name="description" className="error-label" component="div" />
-                                        <span className="floating-label">Description</span>
-                                    </div>
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                </Form>
-                            )}
-                        </Formik>
-                    </div>
-                </div>
-                <div className="block department-ranks">
-                    <h3>Ranks</h3>
-                    <div className="table-scroll">
-                        <div className="rank-form">
+                {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                    <div className="block department-editor">
+                        <div className="title">
+                            <h3>
+                                <Link
+                                    to={"/departments"}
+                                    className="link"
+                                    onClick={() => { this.setState({ selectedDep: -1 }, () => this.getSelectedRanks()); }}>
+                                    New
+                                </Link>
+                            </h3>
+                            <h3 onClick={() => { this.sendDepartment() }}>Send</h3>
+                        </div>
+                        <div className="table-scroll">
                             <Formik
                                 initialValues={
-                                    (this.state.selectedRank === -1) ? this.emptyRank : this.state.selectedRanks[this.state.selectedRank]
+                                    (this.state.selectedDep === -1) ? { ...this.emptyDepartment, code: this.getNextCode() } : (this.state.departments[this.state.selectedDep]) ? this.state.departments[this.state.selectedDep] : { ...this.emptyDepartment, code: this.getNextCode() }
                                 }
                                 enableReinitialize={true}
                                 validate={async values => {
                                     const errors = {};
+                                    if (!values.shortTitle) {
+                                        errors.shortTitle = 'Required';
+                                    } else if (!/^[A-Za-z]{4,}$/i.test(values.shortTitle)) {
+                                        errors.shortTitle = 'Only letters and length > 4';
+                                    } else if (this.state.departments.filter((e) => e.shortTitle === values.shortTitle || e.code === values.code).length > 1) {
+                                        errors.shortTitle = 'Occupied';
+                                    } else if (!this.isDepChanging(values.code) && this.state.departments.filter((e) => e.shortTitle === values.shortTitle).length > 0) {
+                                        errors.shortTitle = 'Occupied';
+                                    }
+
                                     if (!values.title) {
                                         errors.title = 'Required';
                                     } else if (!/^[A-Za-z ]+$/i.test(values.title)) {
                                         errors.title = 'Only letters allowed';
                                     }
 
-                                    if (!values.salary) {
-                                        errors.salary = 'Wrong format';
-                                    } else if (parseInt(values.salary) < 0 || 32767 < parseInt(values.salary)) {
-                                        errors.salary = 'Must be in range [0, 32767]';
+                                    if (!values.description) {
+                                        errors.description = 'Required';
+                                    }
+
+                                    if (!values.code) {
+                                        errors.code = 'Wrong format';
+                                    } else if (parseInt(values.code) < 0) {
+                                        errors.code = 'Must be positive';
                                     }
 
                                     return errors;
                                 }}
                                 onSubmit={async (values) => {
-                                    if (this.state.selectedDep === -1)
-                                        return;
                                     let tmp = {
-                                        title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
-                                        salary: parseInt(values.salary),
-                                        department: this.state.pageData[this.state.selectedDep].code
-                                    };
-                                    await axios.post("http://localhost:8081/rank",
-                                        JSON.stringify(tmp),
-                                        { headers: { 'Content-Type': 'text/plain' } }).then((res) => {
-                                            if (!res.data.success)
-                                                console.log(res.data.message);
-                                            else {
-                                                this.setState({
-                                                    ranks: (!this.isRankChanging(tmp.title)) ? [...this.state.ranks, tmp] : this.state.ranks.map((e) => (e.title === tmp.title) ? tmp : e),
-                                                    selectedRank: -1
-                                                });
-                                                this.getSelectedRanks();
-                                            }
-                                        })
-                                }}
-                            >
-                                {({ isSubmitting }) => (
-                                    <Form>
-                                        <div>
-                                            <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
-                                            <ErrorMessage name="title" className="error-label" component="div" />
-                                            <span className="floating-label">Title</span>
-                                        </div>
-                                        <div>
-                                            <Field className="text-input" type="number" name="salary" />
-                                            <ErrorMessage name="salary" className="error-label" component="div" />
-                                            <span className="floating-label active-label">Salary - $/hour</span>
-                                        </div>
-                                        <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
-                                    </Form>
-                                )}
-                            </Formik>
-                        </div>
-                        {this.state.selectedRanks.map((o, i) =>
-                            <ul className="rank" key={i}>
-                                <li>{o.title}</li>
-                                <li>{o.salary} $/hour</li>
-                                <li className="controls">
-                                    <button className="round-link" type="submit" onClick={() => this.setState({ selectedRank: i })}>Edit</button>
-                                    <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
-                                </li>
-                            </ul>
-                        )}
-                    </div>
-                </div>
-                <div className="block department-units">
-                    <h3>Units</h3>
-                    <div className="table-scroll">
-                        <div className="rank-form">
-                            <Formik
-                                initialValues={
-                                    (this.state.selectedUnit === -1) ? this.emptyUnit : this.state.selectedUnits[this.state.selectedUnit]
-                                }
-                                enableReinitialize={true}
-                                validate={async values => {
-                                    const errors = {};
-                                    /*if (!values.title) {
-                                        errors.title = 'Required';
-                                    } else if (!/^[A-Za-z ]+$/i.test(values.title)) {
-                                        errors.title = 'Only letters allowed';
-                                    }
-                                    console.log(parseInt(values.salary));
-                                    if (!values.salary) {
-                                        errors.salary = 'Wrong format';
-                                    } else if (parseInt(values.salary) < 0 || 32767 < parseInt(values.salary)) {
-                                        errors.salary = 'Must be in range [0, 32767]';
-                                    }*/
-
-                                    return errors;
-                                }}
-                                onSubmit={async (values) => {
-                                    if (this.state.selectedDep === -1)
-                                        return;
-                                    let tmp = {
-                                        title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
-                                        abbreviation: values.abbreviation.toUpperCase(),
+                                        shortTitle: values.shortTitle.toUpperCase(),
+                                        title: values.title.toUpperCase(),
                                         description: values.description,
-                                        department: this.state.pageData[this.state.selectedDep].code
+                                        code: values.code
                                     };
-                                    await axios.post("http://localhost:8081/unit", tmp).then((res) => {
-                                        if (!res.data.success) {
-                                            console.log("Server error: " + res.data.message);
-                                            return;
-                                        }
-
-                                        this.setState({
-                                            units: (!this.isUnitChanging(tmp.abbreviation)) ? [...this.state.units, tmp] : this.state.units.map((e) => (e.abbreviation === tmp.abbreviation) ? tmp : e),
-                                            selectedUnit: -1
-                                        });
-                                        this.getSelectedUnits();
+                                    await axios.post("http://localhost:8081/department/", tmp).then(() => {
+                                        if (!this.isDepChanging(tmp.code))
+                                            this.setState({ departments: [...this.state.departments, tmp] });
+                                        else
+                                            this.setState({
+                                                departments: this.state.departments.map((e) => (e.code === tmp.code) ? tmp : e)
+                                            });
+                                        this.getPageData();
                                     })
                                 }}
                             >
                                 {({ isSubmitting }) => (
                                     <Form>
                                         <div>
-                                            <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
+                                            <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="shortTitle" />
+                                            <ErrorMessage name="shortTitle" className="error-label" component="div" />
+                                            <span className="floating-label">Short title</span>
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="number" name="code" />
+                                            <ErrorMessage name="code" className="error-label" component="div" />
+                                            <span className="floating-label active-label">Code</span>
+                                        </div>
+                                        <div className="title-input">
+                                            <Field className="text-input" type="text" name="title" />
                                             <ErrorMessage name="title" className="error-label" component="div" />
                                             <span className="floating-label">Title</span>
                                         </div>
-                                        <div>
-                                            <Field className="text-input" type="text" name="abbreviation" />
-                                            <ErrorMessage name="abbreviation" className="error-label" component="div" />
-                                            <span className="floating-label active-label">Abbreviation</span>
-                                        </div>
-                                        <div>
-                                            <Field className="text-input" type="text" name="description" />
+                                        <div className="textarea">
+                                            <Field className="text-input" type="text" as="textarea" name="description" />
                                             <ErrorMessage name="description" className="error-label" component="div" />
-                                            <span className="floating-label active-label">Description</span>
+                                            <span className="floating-label">Description</span>
                                         </div>
-                                        <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
+                                        <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
                                     </Form>
                                 )}
                             </Formik>
                         </div>
-                        {this.state.selectedUnits.map((o, i) =>
-                            <ul className="rank" key={i}>
-                                <li>{o.title}</li>
-                                <li>Abbreviation: {o.abbreviation}</li>
-                                <li>{o.description}</li>
-                                <li className="controls">
-                                    <button className="round-link" type="submit" onClick={() => this.setState({ selectedUnit: i })}>Edit</button>
-                                    <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
-                                </li>
-                            </ul>
-                        )}
                     </div>
-                </div>
+                    : ""}
+                {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                    <div className="block department-ranks">
+                        <h3>Ranks</h3>
+                        <div className="table-scroll">
+                            <div className="rank-form">
+                                <Formik
+                                    initialValues={
+                                        (this.state.selectedRank === -1) ? this.emptyRank : this.state.selectedRanks[this.state.selectedRank]
+                                    }
+                                    enableReinitialize={true}
+                                    validate={async values => {
+                                        const errors = {};
+                                        if (!values.title) {
+                                            errors.title = 'Required';
+                                        } else if (!/^[A-Za-z ]+$/i.test(values.title)) {
+                                            errors.title = 'Only letters allowed';
+                                        }
+
+                                        if (!values.salary) {
+                                            errors.salary = 'Wrong format';
+                                        } else if (parseInt(values.salary) < 0 || 32767 < parseInt(values.salary)) {
+                                            errors.salary = 'Must be in range [0, 32767]';
+                                        }
+
+                                        return errors;
+                                    }}
+                                    onSubmit={async (values) => {
+                                        if (this.state.selectedDep === -1)
+                                            return;
+                                        let tmp = {
+                                            title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
+                                            salary: parseInt(values.salary),
+                                            department: this.state.pageData[this.state.selectedDep].code
+                                        };
+                                        await axios.post("http://localhost:8081/rank",
+                                            JSON.stringify(tmp),
+                                            { headers: { 'Content-Type': 'text/plain' } }).then((res) => {
+                                                if (!res.data.success)
+                                                    console.log(res.data.message);
+                                                else {
+                                                    this.setState({
+                                                        ranks: (!this.isRankChanging(tmp.title)) ? [...this.state.ranks, tmp] : this.state.ranks.map((e) => (e.title === tmp.title) ? tmp : e),
+                                                        selectedRank: -1
+                                                    });
+                                                    this.getSelectedRanks();
+                                                }
+                                            })
+                                    }}
+                                >
+                                    {({ isSubmitting }) => (
+                                        <Form>
+                                            <div>
+                                                <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
+                                                <ErrorMessage name="title" className="error-label" component="div" />
+                                                <span className="floating-label">Title</span>
+                                            </div>
+                                            <div>
+                                                <Field className="text-input" type="number" name="salary" />
+                                                <ErrorMessage name="salary" className="error-label" component="div" />
+                                                <span className="floating-label active-label">Salary - $/hour</span>
+                                            </div>
+                                            <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
+                                        </Form>
+                                    )}
+                                </Formik>
+                            </div>
+                            {this.state.selectedRanks.map((o, i) =>
+                                <ul className="rank" key={i}>
+                                    <li>{o.title}</li>
+                                    <li>{o.salary} $/hour</li>
+                                    <li className="controls">
+                                        <button className="round-link" type="submit" onClick={() => this.setState({ selectedRank: i })}>Edit</button>
+                                        <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
+                                    </li>
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+                    : ""}
+                {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                    <div className="block department-units">
+                        <h3>Units</h3>
+                        <div className="table-scroll">
+                            <div className="rank-form">
+                                <Formik
+                                    initialValues={
+                                        (this.state.selectedUnit === -1) ? this.emptyUnit : this.state.selectedUnits[this.state.selectedUnit]
+                                    }
+                                    enableReinitialize={true}
+                                    validate={async values => {
+                                        const errors = {};
+                                        /*if (!values.title) {
+                                            errors.title = 'Required';
+                                        } else if (!/^[A-Za-z ]+$/i.test(values.title)) {
+                                            errors.title = 'Only letters allowed';
+                                        }
+                                        console.log(parseInt(values.salary));
+                                        if (!values.salary) {
+                                            errors.salary = 'Wrong format';
+                                        } else if (parseInt(values.salary) < 0 || 32767 < parseInt(values.salary)) {
+                                            errors.salary = 'Must be in range [0, 32767]';
+                                        }*/
+
+                                        return errors;
+                                    }}
+                                    onSubmit={async (values) => {
+                                        if (this.state.selectedDep === -1)
+                                            return;
+                                        let tmp = {
+                                            title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
+                                            abbreviation: values.abbreviation.toUpperCase(),
+                                            description: values.description,
+                                            department: this.state.pageData[this.state.selectedDep].code
+                                        };
+                                        await axios.post("http://localhost:8081/unit", tmp).then((res) => {
+                                            if (!res.data.success) {
+                                                console.log("Server error: " + res.data.message);
+                                                return;
+                                            }
+
+                                            this.setState({
+                                                units: (!this.isUnitChanging(tmp.abbreviation)) ? [...this.state.units, tmp] : this.state.units.map((e) => (e.abbreviation === tmp.abbreviation) ? tmp : e),
+                                                selectedUnit: -1
+                                            });
+                                            this.getSelectedUnits();
+                                        })
+                                    }}
+                                >
+                                    {({ isSubmitting }) => (
+                                        <Form>
+                                            <div>
+                                                <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
+                                                <ErrorMessage name="title" className="error-label" component="div" />
+                                                <span className="floating-label">Title</span>
+                                            </div>
+                                            <div>
+                                                <Field className="text-input" type="text" name="abbreviation" />
+                                                <ErrorMessage name="abbreviation" className="error-label" component="div" />
+                                                <span className="floating-label active-label">Abbreviation</span>
+                                            </div>
+                                            <div>
+                                                <Field className="text-input" type="text" name="description" />
+                                                <ErrorMessage name="description" className="error-label" component="div" />
+                                                <span className="floating-label active-label">Description</span>
+                                            </div>
+                                            <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
+                                        </Form>
+                                    )}
+                                </Formik>
+                            </div>
+                            {this.state.selectedUnits.map((o, i) =>
+                                <ul className="rank" key={i}>
+                                    <li>{o.title}</li>
+                                    <li>Abbreviation: {o.abbreviation}</li>
+                                    <li>{o.description}</li>
+                                    <li className="controls">
+                                        <button className="round-link" type="submit" onClick={() => this.setState({ selectedUnit: i })}>Edit</button>
+                                        <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
+                                    </li>
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+                    : ""}
             </div>
         );
     }

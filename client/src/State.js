@@ -1,4 +1,5 @@
 import React from 'react';
+import { observer } from "mobx-react";
 
 class State extends React.Component {
     constructor(props) {
@@ -38,4 +39,4 @@ class State extends React.Component {
     }
 }
 
-export default State;
+export default observer(State);

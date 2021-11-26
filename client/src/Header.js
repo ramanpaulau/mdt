@@ -1,7 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faPhone, faIdCardAlt, faCar, faFileAlt, faEye, faWarehouse, faGavel, faLandmark, faTimes, faList, faUserTie } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faPhone, faIdCardAlt, faCar, faFileAlt, faEye, faWarehouse, faGavel, faLandmark, faTimes, faList, faUserTie, faStamp } from '@fortawesome/free-solid-svg-icons';
+import { observer } from "mobx-react";
 
 class Header extends React.Component {
     constructor(props) {
@@ -53,16 +54,18 @@ class Header extends React.Component {
             <header className="header">
                 <nav className="nav" ref={this.menu}>
                     <ul className="nav-ul">
-                        <li className="nav-li">
-                            <NavLink
-                                exact
-                                to="/"
-                                className="nav-a"
-                                activeClassName="active-nav-a"
-                                onClick={this.navigate}>
-                                <FontAwesomeIcon icon={faGlobe} />
-                            </NavLink>
-                        </li>
+                        {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                            <li className="nav-li">
+                                <NavLink
+                                    exact
+                                    to="/"
+                                    className="nav-a"
+                                    activeClassName="active-nav-a"
+                                    onClick={this.navigate}>
+                                    <FontAwesomeIcon icon={faGlobe} />
+                                </NavLink>
+                            </li>
+                            : ""}
                         <li className="nav-li">
                             <NavLink
                                 to="/calls"
@@ -73,15 +76,29 @@ class Header extends React.Component {
                             </NavLink>
                             {this.props.calls ? <div className="notification"><p>{this.props.calls}</p></div> : ""}
                         </li>
-                        <li className="nav-li">
-                            <NavLink
-                                to="/citizens"
-                                className="nav-a"
-                                activeClassName="active-nav-a"
-                                onClick={this.navigate}>
-                                <FontAwesomeIcon icon={faIdCardAlt} />
-                            </NavLink>
-                        </li>
+                        {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                            <li className="nav-li">
+                                <NavLink
+                                    to="/citizens"
+                                    className="nav-a"
+                                    activeClassName="active-nav-a"
+                                    onClick={this.navigate}>
+                                    <FontAwesomeIcon icon={faIdCardAlt} />
+                                </NavLink>
+                            </li>
+                            : ""}
+                        {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                            <li className="nav-li">
+                                <NavLink
+                                    exact
+                                    to="/licenses"
+                                    className="nav-a"
+                                    activeClassName="active-nav-a"
+                                    onClick={this.navigate}>
+                                    <FontAwesomeIcon icon={faStamp} />
+                                </NavLink>
+                            </li>
+                            : ""}
                         <li className="nav-li">
                             <NavLink
                                 to="/cars"
@@ -91,33 +108,39 @@ class Header extends React.Component {
                                 <FontAwesomeIcon icon={faCar} />
                             </NavLink>
                         </li>
-                        <li className="nav-li">
-                            <NavLink
-                                to="/incidents"
-                                className="nav-a"
-                                activeClassName="active-nav-a"
-                                onClick={this.navigate}>
-                                <FontAwesomeIcon icon={faFileAlt} />
-                            </NavLink>
-                        </li>
-                        <li className="nav-li">
-                            <NavLink
-                                to="/charge"
-                                className="nav-a"
-                                activeClassName="active-nav-a"
-                                onClick={this.navigate}>
-                                <FontAwesomeIcon icon={faGavel} />
-                            </NavLink>
-                        </li>
-                        <li className="nav-li">
-                            <NavLink
-                                to="/bolo"
-                                className="nav-a"
-                                activeClassName="active-nav-a"
-                                onClick={this.navigate}>
-                                <FontAwesomeIcon icon={faEye} />
-                            </NavLink>
-                        </li>
+                        {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                            <li className="nav-li">
+                                <NavLink
+                                    to="/incidents"
+                                    className="nav-a"
+                                    activeClassName="active-nav-a"
+                                    onClick={this.navigate}>
+                                    <FontAwesomeIcon icon={faFileAlt} />
+                                </NavLink>
+                            </li>
+                            : ""}
+                        {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                            <li className="nav-li">
+                                <NavLink
+                                    to="/charge"
+                                    className="nav-a"
+                                    activeClassName="active-nav-a"
+                                    onClick={this.navigate}>
+                                    <FontAwesomeIcon icon={faGavel} />
+                                </NavLink>
+                            </li>
+                            : ""}
+                        {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                            <li className="nav-li">
+                                <NavLink
+                                    to="/bolo"
+                                    className="nav-a"
+                                    activeClassName="active-nav-a"
+                                    onClick={this.navigate}>
+                                    <FontAwesomeIcon icon={faEye} />
+                                </NavLink>
+                            </li>
+                            : ""}
                         <li className="nav-li">
                             <NavLink
                                 to="/departments"
@@ -136,15 +159,17 @@ class Header extends React.Component {
                                 <FontAwesomeIcon icon={faUserTie} />
                             </NavLink>
                         </li>
-                        <li className="nav-li">
-                            <NavLink
-                                to="/inventory"
-                                className="nav-a"
-                                activeClassName="active-nav-a"
-                                onClick={this.navigate}>
-                                <FontAwesomeIcon icon={faWarehouse} />
-                            </NavLink>
-                        </li>
+                        {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                            <li className="nav-li">
+                                <NavLink
+                                    to="/inventory"
+                                    className="nav-a"
+                                    activeClassName="active-nav-a"
+                                    onClick={this.navigate}>
+                                    <FontAwesomeIcon icon={faWarehouse} />
+                                </NavLink>
+                            </li>
+                            : ""}
                         <li className="nav-li">
                             <NavLink
                                 to="/penalcode"
@@ -178,4 +203,4 @@ class Header extends React.Component {
     }
 }
 
-export default Header;
+export default observer(Header);

@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle, faPlus, faSave, faChevronLeft, faChevronRight, faCopy, faDownload } from '@fortawesome/free-solid-svg-icons';
+import Select from 'react-select'
 import SelectSearch from 'react-select-search';
 import { DatePickerField } from "./DatePickerField";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from 'axios';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { customStyles } from "./Employees";
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -47,6 +49,8 @@ class Citizens extends React.Component {
 
         this.state = {
             pageData: [],
+            licenses: [],
+            license: {},
             offset: 0,
             selectedIdx: selectedIdx,
             selectedPage: 0,
@@ -65,8 +69,17 @@ class Citizens extends React.Component {
         });
     }
 
+    loadLicenses = async () => {
+        await axios.get("http://localhost:8081/licenses").then(res => {
+            this.setState({
+                licenses: res.data
+            });
+        });
+    }
+
     componentDidMount = () => {
         this.loadCitizens();
+        this.loadLicenses();
     }
 
     componentWillUnmount = () => {
@@ -259,22 +272,26 @@ class Citizens extends React.Component {
                         <div className="edit-list licenses">
                             <p className="text-label">Licenses: </p>
                             <Link
-                                to={"/license?id=3"}
+                                to={"/licenses"}
                                 className="round-link">
                                 #3
                                 <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
                                     <FontAwesomeIcon icon={faTimesCircle} />
                                 </span>
                             </Link>
-                            <div className="report-controls">
-                                <SelectSearch options={this.licenseIds} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="License ID" />
-                                <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                    <FontAwesomeIcon icon={faSave} />
-                                </span>
-                                <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                    <FontAwesomeIcon icon={faPlus} />
-                                </span>
-                            </div>
+                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
+                                options={this.state.licenses.map(l => (
+                                    {
+                                        value: l.id,
+                                        label: l.name
+                                    })
+                                )}
+                                onChange={(e) => { this.setState({ license: e.value }) }}
+                                placeholder="License"
+                                noOptionsMessage={() => "License not found"} />
+                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                <FontAwesomeIcon icon={faPlus} />
+                            </span>
                         </div>
 
                         <div className="edit-list property">
@@ -344,7 +361,7 @@ class Citizens extends React.Component {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 }

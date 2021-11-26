@@ -15,7 +15,8 @@ export const customStyles = {
     control: (provided) => ({
         ...provided,
         backgroundColor: "#3676F5",
-        border: "none"
+        border: "none",
+        lineHeight: "30px"
     }),
     placeholder: (provided) => ({
         ...provided,
@@ -29,7 +30,8 @@ export const customStyles = {
         ...provided,
         color: "#FFFFFF",
         backgroundColor: "#3676F5",
-        border: "none"
+        border: "none",
+        zIndex: 2
     }),
     input: (provided) => ({
         ...provided,
@@ -58,6 +60,7 @@ class Employees extends React.Component {
 
         this.state = {
             departments: [],
+            qualifications: [],
             employees: [],
             ranks: [],
             department: null,
@@ -102,6 +105,14 @@ class Employees extends React.Component {
             this.setState({
                 employees: res.data
             })
+        });
+    }
+
+    loadQualification = async () => {
+        await axios.get("http://localhost:8081/qualifications").then(res => {
+            this.setState({
+                qualifications: res.data
+            });
         });
     }
 
@@ -251,23 +262,32 @@ class Employees extends React.Component {
                                         <span className="floating-label active-label">Tag</span>
                                     </div>
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+
                                     <div className="edit-list licenses">
-                                        <p className="text-label">Cvalifications: </p>
+                                        <p className="text-label">Qualifications: </p>
                                         <Link
-                                            to={"/license?id=3"}
+                                            to={"/licenses"}
                                             className="round-link">
                                             AFT
                                             <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
-                                        <div className="report-controls">
-                                            {/*<SelectSearch options={[]} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="License" />*/}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                                <FontAwesomeIcon icon={faSave} />
-                                            </span>
-                                        </div>
+                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
+                                            options={this.state.qualifications.map(l => (
+                                                {
+                                                    value: l.id,
+                                                    label: l.name
+                                                })
+                                            )}
+                                            onChange={(e) => { this.setState({ license: e.value }) }}
+                                            placeholder="Qualification"
+                                            noOptionsMessage={() => "Qualification not found"} />
+                                        <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                            <FontAwesomeIcon icon={faPlus} />
+                                        </span>
                                     </div>
+
                                     <div className="edit-list incidents">
                                         <p className="text-label">Incidents: </p>
                                         <Link

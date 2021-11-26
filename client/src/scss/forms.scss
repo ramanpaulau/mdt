@@ -116,12 +116,17 @@ form div {
     display: flex;
     flex-wrap: wrap;
     column-gap: 10px;
-    line-height: 30px;
+    line-height: 48px;
     color: $bright;
     text-decoration: none;
     align-items: center;
-}
 
-.link-button {
-    margin-left: 10px;
+    .link-button {
+        margin-left: 10px;
+        line-height: 30px;
+    }
+
+    .round-link {
+        line-height: 30px;
+    }
 }

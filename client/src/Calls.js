@@ -128,42 +128,44 @@ class Calls extends React.Component {
     render() {
         return (
             <div className="calls">
-                <div className="block calls-list">
-                    <h3>ACTIVE CALLS</h3>
-                    <div className="table-scroll">
-                        {this.state.data.map((o, i) =>
-                            <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
-                                <li className="call-location">Location: {o.location}</li>
-                                <li className="call-id">#{o.id}</li>
-                                <li className="call-time">Time: {o.time}</li>
-                                <li></li>
-                                <li className="call-phone">Phone: {o.phone}</li>
-                                <Link
-                                    to={"/calls/" + o.id}
-                                    className="edit-button round-link"
-                                    onClick={() => this.selectCall(o.id)}>
-                                    Edit
-                                </Link>
-                            </ul>
-                        )}
+                {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                    <div className="block calls-list">
+                        <h3>ACTIVE CALLS</h3>
+                        <div className="table-scroll">
+                            {this.state.data.map((o, i) =>
+                                <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
+                                    <li className="call-location">Location: {o.location}</li>
+                                    <li className="call-id">#{o.id}</li>
+                                    <li className="call-time">Time: {o.time}</li>
+                                    <li></li>
+                                    <li className="call-phone">Phone: {o.phone}</li>
+                                    <Link
+                                        to={"/calls/" + o.id}
+                                        className="edit-button round-link"
+                                        onClick={() => this.selectCall(o.id)}>
+                                        Edit
+                                    </Link>
+                                </ul>
+                            )}
+                        </div>
+                        <ReactPaginate
+                            previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
+                            nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
+                            breakLabel="..."
+                            breakClassName="break-me"
+                            pageCount={this.state.pageCount}
+                            pageRangeDisplayed={3}
+                            marginPagesDisplayed={1}
+                            onPageChange={this.handlePageClick}
+                            containerClassName="pagination"
+                            pageClassName="pag-link"
+                            activeLinkClassName="pag-active"
+                            previousLinkClassName="pag-previous"
+                            nextLinkClassName="pag-next"
+                            hrefAllControls
+                        />
                     </div>
-                    <ReactPaginate
-                        previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
-                        nextLabel={<FontAwesomeIcon icon={faChevronRight} />}
-                        breakLabel="..."
-                        breakClassName="break-me"
-                        pageCount={this.state.pageCount}
-                        pageRangeDisplayed={3}
-                        marginPagesDisplayed={1}
-                        onPageChange={this.handlePageClick}
-                        containerClassName="pagination"
-                        pageClassName="pag-link"
-                        activeLinkClassName="pag-active"
-                        previousLinkClassName="pag-previous"
-                        nextLinkClassName="pag-next"
-                        hrefAllControls
-                    />
-                </div>
+                    : ""}
                 <div className="block calls-editor">
                     <div className="title">
                         <h3>

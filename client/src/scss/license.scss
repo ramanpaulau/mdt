@@ -1,0 +1,46 @@
+.license {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    
+    .license-list {
+        grid-area: list;
+
+        .license-add {
+            background-color: $secondary;
+        }
+
+        ul form {
+            margin: 0;
+            display: grid;
+            grid-template-areas: "name ." "description button";
+
+            .name {
+                grid-area: name;
+            }
+
+            .description {
+                grid-area: description;
+            }
+
+            .type {
+                text-align: center;
+            }
+
+            .button {
+                grid-area: button;
+                text-align: center;}
+        }
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .license {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 3fr);
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "list ." "list .";
+        height: calc(100vh - 52px);
+    }
+}

@@ -1,14 +1,14 @@
 package com.example.mdtapi.models;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "Person")
 public class Person {
 
 	public enum State {
@@ -23,6 +23,14 @@ public class Person {
 	private String phoneNumber;
 	private boolean admin;
 	private State state;
+
+	@ManyToMany(cascade = { CascadeType.ALL })
+	@JoinTable(
+			name = "person_license",
+			joinColumns = { @JoinColumn(name = "license_id") },
+			inverseJoinColumns = { @JoinColumn(name = "person_regNum") }
+	)
+	private Set<License> licenses = new HashSet<>();
 
 	public Person() {
 	}

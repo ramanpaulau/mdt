@@ -22,6 +22,10 @@
 
     .employee-list {
         grid-area: list;
+
+        .title {
+            line-height: 43px;
+        }
     }
 
     .employee-editor {

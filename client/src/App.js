@@ -19,6 +19,7 @@ import axios from 'axios';
 import { Client } from '@stomp/stompjs';
 
 import './scss/main.scss';
+import Licenses from './Licenses';
 
 class App extends React.Component {
     constructor(props) {
@@ -61,7 +62,7 @@ class App extends React.Component {
             },
 
             debug: (str) => {
-                console.log(new Date(), str);
+                //console.log(new Date(), str);
             }
         });
 
@@ -95,9 +96,10 @@ class App extends React.Component {
                         <main>
                             <Switch>
                                 <Route exact path="/" component={RequireAuth(Home, user)} />
-                                <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} />, user)} />
+                                <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} store={user} />, user)} />
+                                <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} />, user)} />
                                 <Route exact path="/employees/:marking?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} />, user)} />
-                                <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} />, user)} />
+                                <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} store={user} />, user)} />
                                 <Route exact path="/citizens/:regNum?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/inventory" component={RequireAuth(() => <Inventory />, user)} />
                                 <Route exact path="/penalcode" component={RequireAuth(() => <PenalCode />, user)} />
