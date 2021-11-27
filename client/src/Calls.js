@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle, faPlus, faSave, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { observer } from "mobx-react";
 import SelectSearch from 'react-select-search';
 
 const CALLS_ON_PAGE = 20;
@@ -247,4 +248,4 @@ class Calls extends React.Component {
     }
 }
 
-export default Calls;
+export default observer(Calls);

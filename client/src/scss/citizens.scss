@@ -10,6 +10,7 @@
 
         .citizen-item {
             grid-template-areas: ". ." ". button";
+            grid-auto-columns: 1fr;
 
             .edit-button {
                 grid-area: button;

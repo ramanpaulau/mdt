@@ -11,6 +11,7 @@
         .car-item {
             display: grid;
             grid-template-areas: "vin name button" "plate price button";
+            grid-auto-columns: 1fr;
 
             .edit-button {
                 grid-area: button;

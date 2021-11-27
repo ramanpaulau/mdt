@@ -20,6 +20,12 @@
 
 .calls-editor {
     width: 100%;
+
+    .edit-list {
+        border: 2px solid $background;
+        margin: 5px;
+        padding: 0 5px;
+    }
 }
 
 .pagination {
@@ -109,6 +115,7 @@ form textarea {
 
     .call-item {
         grid-template-areas: ". ." ". ." ". edit";
+        grid-auto-columns: 1fr;
 
         .edit-button {
             grid-area: edit;

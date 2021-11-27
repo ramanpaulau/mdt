@@ -10,6 +10,7 @@
         .incident-item {
             display: grid;
             grid-template-areas: "id name location" "supervisor datetime button";
+            grid-auto-columns: 1fr;
         }
     }
 
