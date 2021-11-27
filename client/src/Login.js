@@ -8,15 +8,14 @@ class Login extends React.Component {
 	constructor(props) {
 		super(props);
 
-		let token = this.props.match.params.token;
-
 		this.state = {
 			stompClient: null,
 			regNum: '',
 			password: '',
 			idx: 0,
 			authMessage: '',
-			token: token
+			token: '',
+			passwordRecovery: false
 		};
 
 		this.char1Ref = React.createRef();
@@ -152,7 +151,7 @@ class Login extends React.Component {
 				<div className="loader" ref={this.loaderRef} />
 				<div className="wrapper" ref={this.authRef}>
 					<div className="auth-label">
-						<h1>{(this.state.token) ? "Set password" : "Login"}</h1>
+						<h1>{(this.state.passwordRecovery) ? "Set password" : "Login"}</h1>
 					</div>
 					<div className="auth-info">
 						<div className="login">
@@ -161,14 +160,16 @@ class Login extends React.Component {
 							<input ref={this.char3Ref} className="loginChar" onKeyDown={this.removeChar} onKeyPress={this.addChar} type="text" maxLength="1" />
 							<input ref={this.char4Ref} className="loginChar" onKeyDown={this.removeChar} onKeyPress={this.addChar} type="text" maxLength="1" />
 						</div>
-						<input ref={this.passwordRef} className="password" type="password" onKeyUp={this.getPassword} />
+						<input ref={this.passwordRef} className="password" type="password" placeholder="Password" onKeyUp={this.getPassword} />
+						{(this.state.passwordRecovery)?<input value={this.state.token} onChange={e => this.setState({ token: e.target.value })} className="password" placeholder="Token" type="text" />:""}
 						<div className="authMessage">{(this.state.authMessage) ? this.state.authMessage : ""}</div>
 					</div>
 					<div className="auth-arrow">
-						<Link to="/" onClick={(this.state.token) ? this.setPassword : this.processAuth}>
+						<Link to="/" onClick={(this.state.passwordRecovery) ? this.setPassword : this.processAuth}>
 							&gt;
 						</Link>
 					</div>
+					{(this.state.passwordRecovery)?<Link to="/login" className="type" onClick={() => this.setState({ passwordRecovery: false })}>Login</Link>:<Link to="/login" className="type" onClick={() => this.setState({ passwordRecovery: true })}>Password recovery</Link>}
 				</div>
 			</div>
 		);

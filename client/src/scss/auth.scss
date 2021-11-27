@@ -25,7 +25,8 @@
     justify-content: space-between;
 }
 
-.password, .loginChar {
+.password,
+.loginChar {
     line-height: 30px;
     font-size: 2em;
     color: $rare;
@@ -51,10 +52,10 @@
 @keyframes spin {
     0% {
         transform: rotate(0deg);
-   }
+    }
     100% {
         transform: rotate(360deg);
-   }
+    }
 }
 
 .error {
@@ -86,6 +87,11 @@
     .wrapper {
         display: grid;
         grid-template-areas: "label label" "info arrow" "link .";
+
+        .type {
+            color: $bright;
+            text-decoration: none;
+        }
     }
 
     .auth-label {
@@ -110,8 +116,9 @@
         justify-content: center;
         grid-area: arrow;
     }
-    
-    .auth-arrow a, .auth-link a {
+
+    .auth-arrow a,
+    .auth-link a {
         text-decoration: none;
         color: $rare;
     }

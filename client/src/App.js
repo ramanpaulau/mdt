@@ -88,7 +88,7 @@ class App extends React.Component {
             return (<div></div>)
         return (
             <Switch>
-                <Route exact path="/login/:token?" component={RequireNotAuth((props) => <Login {...props} store={user} wsConnect={this.wsConnect} />)} />
+                <Route exact path="/login" component={RequireNotAuth((props) => <Login {...props} store={user} wsConnect={this.wsConnect} />)} />
                 <React.Fragment>
                     <div className="app">
                         <Header calls={this.state.calls} store={user} wsDisconnect={this.wsDisconnect} />
