@@ -27,7 +27,7 @@ public class QualificationRest {
 
     @PostMapping("/qualification")
     public ResponseMessage insert(@RequestBody String request) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         String name, description;
         JSONObject subchapter = new JSONObject(request);

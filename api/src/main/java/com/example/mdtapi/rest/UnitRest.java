@@ -36,7 +36,7 @@ public class UnitRest {
 
     @PostMapping("/unit")
     public ResponseMessage insert(@RequestBody String request) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         String title, abbreviation, description;
         int departmentCode;

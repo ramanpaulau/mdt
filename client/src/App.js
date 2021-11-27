@@ -6,6 +6,7 @@ import Error404 from './404';
 import Header from './Header';
 import State from './State';
 import Calls from './Calls';
+import Vehicles from './Vehicles';
 import Citizens from './Citizens';
 import PenalCode from './PenalCode';
 import Employees from './Employees';
@@ -97,6 +98,7 @@ class App extends React.Component {
                             <Switch>
                                 <Route exact path="/" component={RequireAuth(Home, user)} />
                                 <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} store={user} />, user)} />
+                                <Route exact path="/vehicles/:regNum?" component={RequireAuth((props) => <Vehicles {...props} store={user} />, user)} />
                                 <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} />, user)} />
                                 <Route exact path="/employees/:marking?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} store={user} />, user)} />

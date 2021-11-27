@@ -47,7 +47,7 @@ public class EmployeeRest {
 
     @PostMapping("/employee")
     private ResponseMessage insert(@RequestBody String request) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
         
         int tag, departmentCode;
         String regNum, rankTitle;

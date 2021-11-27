@@ -4,7 +4,6 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "History")
 public class History {
     private @Id Date date = new Date();
     private String description;

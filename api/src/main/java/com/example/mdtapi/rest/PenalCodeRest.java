@@ -103,7 +103,7 @@ public class PenalCodeRest {
 
     @PostMapping("/penal-code/chapter")
     public ResponseMessage insertChapter(@RequestBody String title) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
         try {
@@ -130,7 +130,7 @@ public class PenalCodeRest {
 
     @PostMapping("/penal-code/subchapter")
     public ResponseMessage insertSubchapter(@RequestBody String request) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         int chapter;
         String title;
@@ -175,7 +175,7 @@ public class PenalCodeRest {
 
     @PostMapping("/penal-code/law")
     public ResponseMessage insertLaw(@RequestBody String request) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         int chapter, subchapter, fine, detention;
         String text;
@@ -226,7 +226,7 @@ public class PenalCodeRest {
 
     @DeleteMapping("/penal-code/chapter/{chapter}")
     private ResponseMessage deleteChapter(@PathVariable Integer chapter) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         if (chapter < 1) {
             res.setSuccess(false);
@@ -260,7 +260,7 @@ public class PenalCodeRest {
 
     @DeleteMapping("/penal-code/subchapter/{chapter}/{subchapter}")
     private ResponseMessage deleteSubchapter(@PathVariable Integer chapter, @PathVariable Integer subchapter) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         if (chapter < 1 || subchapter < 1) {
             res.setSuccess(false);
@@ -294,7 +294,7 @@ public class PenalCodeRest {
 
     @DeleteMapping("/penal-code/law/{chapter}/{subchapter}/{law}")
     private ResponseMessage deleteLaw(@PathVariable Integer chapter, @PathVariable Integer subchapter, @PathVariable Integer law) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         if (chapter < 1 || subchapter < 1 || law < 1) {
             res.setSuccess(false);

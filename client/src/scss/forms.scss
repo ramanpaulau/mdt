@@ -67,6 +67,7 @@ form div {
 
 .text-input:focus ~ .floating-label,
 .text-input:not(:focus):valid ~ .floating-label,
+.text-input:disabled ~ .floating-label,
 .active-label {
   top: -9px;
   bottom: 10px;

@@ -101,7 +101,7 @@ class Header extends React.Component {
                             : ""}
                         <li className="nav-li">
                             <NavLink
-                                to="/cars"
+                                to="/vehicles"
                                 className="nav-a"
                                 activeClassName="active-nav-a"
                                 onClick={this.navigate}>

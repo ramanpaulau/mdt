@@ -38,7 +38,7 @@ public class InventoryRest {
 
     @PostMapping("/inventory/record")
     public ResponseMessage insert(@RequestBody String request) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         int amount, departmentCode;
         String description;

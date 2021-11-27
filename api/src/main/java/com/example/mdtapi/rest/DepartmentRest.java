@@ -44,7 +44,7 @@ public class DepartmentRest {
 
     @PostMapping("/department/unit")
     public ResponseMessage getMainUnit(@PathVariable String request) {
-        ResponseMessage res = new ResponseMessage(false, "Not Implemented");
+        ResponseMessage res = ResponseMessage.NotImplemented();
         return res;
     }
 

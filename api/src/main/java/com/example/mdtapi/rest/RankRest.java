@@ -36,7 +36,7 @@ public class RankRest {
 
     @PostMapping("/rank")
     public ResponseMessage insert(@RequestBody String request) {
-        ResponseMessage res = new ResponseMessage();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         short salary;
         String title;

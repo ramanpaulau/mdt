@@ -48,23 +48,5 @@
         grid-template-columns: 1fr 1fr;
         grid-template-areas: "list editor" "list hours";
         height: calc(100vh - 52px);
-
-        .employee-editor {    
-            form {
-                flex-direction: column;
-            }
-        }
     }
 }
-
-@media screen and (min-width: 1600px) {
-    .employees {
-        .employee-editor {    
-            form {
-                display: flex;
-                flex-direction: row;
-            }
-        }
-    }
-}
-

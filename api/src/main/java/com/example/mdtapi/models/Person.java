@@ -2,7 +2,6 @@ package com.example.mdtapi.models;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -31,6 +30,10 @@ public class Person {
 			inverseJoinColumns = { @JoinColumn(name = "person_regNum") }
 	)
 	private Set<License> licenses = new HashSet<>();
+
+	@OneToMany(targetEntity = Vehicle.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "vehicle_owner")
+	private Set<Vehicle> vehicles;
 
 	public Person() {
 	}
@@ -110,6 +113,22 @@ public class Person {
 
 	public void setState(State state) {
 		this.state = state;
+	}
+
+	public Set<License> getLicenses() {
+		return licenses;
+	}
+
+	public void setLicenses(Set<License> licenses) {
+		this.licenses = licenses;
+	}
+
+	public Set<Vehicle> getVehicles() {
+		return vehicles;
+	}
+
+	public void setVehicles(Set<Vehicle> vehicles) {
+		this.vehicles = vehicles;
 	}
 }
 
