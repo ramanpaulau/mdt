@@ -7,6 +7,9 @@ import Header from './Header';
 import State from './State';
 import Calls from './Calls';
 import Vehicles from './Vehicles';
+import Bolo from './Bolo';
+import Incidents from './Incidents';
+import Indictments from './Indictments';
 import Citizens from './Citizens';
 import PenalCode from './PenalCode';
 import Employees from './Employees';
@@ -100,6 +103,9 @@ class App extends React.Component {
                                 <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} store={user} />, user)} />
                                 <Route exact path="/vehicles/:regNum?" component={RequireAuth((props) => <Vehicles {...props} store={user} />, user)} />
                                 <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} />, user)} />
+                                <Route exact path="/bolo" component={RequireAuth((props) => <Bolo {...props} />, user)} />
+                                <Route exact path="/incidents/:id?" component={RequireAuth((props) => <Incidents {...props} store={user} />, user)} />
+                                <Route exact path="/indictments" component={RequireAuth((props) => <Indictments {...props} />, user)} />
                                 <Route exact path="/employees/:marking?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} store={user} />, user)} />
                                 <Route exact path="/citizens/:regNum?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />

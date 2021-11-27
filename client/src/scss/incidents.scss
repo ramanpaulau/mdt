@@ -1,0 +1,77 @@
+.incidents {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .incident-list {
+        width: 100%;
+        grid-area: list;
+
+        .incident-item {
+            display: grid;
+            grid-template-areas: "id name location" "supervisor datetime button";
+        }
+    }
+
+    .incident-editor {
+        width: 100%;
+        
+        .incident-id {
+            color: $bright;
+        }
+
+        .table-scroll {
+            justify-content: center;
+        }
+
+        form {
+            display: grid;
+            grid-template-areas: ". ."  ". ." ". ." "details details";
+        
+            .textarea {
+                grid-area: details;
+                width: 100%;
+
+                textarea {
+                    resize: none;
+                    width: 100%;
+                    padding: 0 12px;
+                }
+            }
+        }
+    }
+
+    .incident-info {
+        .edit-list {
+            border: 2px solid $background;
+            margin: 5px;
+            padding: 0 5px;
+        }
+    }
+
+    .form-control {
+        background-color: $main;
+        border: none;
+        color: $bright;
+        height: 40px;
+        width: 200px;
+        border-radius: 5px;
+        padding: 0 12px;
+    }
+
+    .rdtPicker {
+        background-color: $main !important;
+        border: none;
+        color: $bright;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .incidents {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "list editor" "list info";
+        height: calc(100vh - 52px);
+    }
+}

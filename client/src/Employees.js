@@ -287,7 +287,7 @@ class Employees extends React.Component {
                                         </span>
                                     </div>
 
-                                    <div className="edit-list incidents">
+                                    <div className="edit-list related-incidents">
                                         <p className="text-label">Incidents: </p>
                                         <Link
                                             to={"/license?id=3"}

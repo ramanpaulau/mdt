@@ -122,7 +122,7 @@ class Header extends React.Component {
                         {((this.props.store.employeeId) || (this.props.store.admin)) ?
                             <li className="nav-li">
                                 <NavLink
-                                    to="/charge"
+                                    to="/indictments"
                                     className="nav-a"
                                     activeClassName="active-nav-a"
                                     onClick={this.navigate}>

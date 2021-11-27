@@ -2,9 +2,8 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimesCircle, faPlus, faSave, faChevronLeft, faChevronRight, faCopy, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faPlus, faChevronLeft, faChevronRight, faCopy, faDownload } from '@fortawesome/free-solid-svg-icons';
 import Select from 'react-select'
-import SelectSearch from 'react-select-search';
 import { DatePickerField } from "./DatePickerField";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from 'axios';
@@ -313,6 +312,9 @@ class Citizens extends React.Component {
                     </div>
                 </div>
                 <div className="block citizen-info">
+                    <div className="title">
+                        <h3 style={{ borderRight: "none" }}>Citizen info</h3>
+                    </div>
                     {(this.state.selectedIdx === -1) ? "" :
                         <div className="table-scroll">
                             <div className="edit-list licenses">
@@ -388,10 +390,10 @@ class Citizens extends React.Component {
                                 </span>
                             </div>
 
-                            <div className="edit-list incidents">
+                            <div className="edit-list related-incidents">
                                 <p className="text-label">Related incidents: </p>
                                 <Link
-                                    to={"/incident?id=3"}
+                                    to={"/incidents/3"}
                                     className="round-link">
                                     #3
                                     <span className="link-button" onClick={(e) => { e.preventDefault(); }}>

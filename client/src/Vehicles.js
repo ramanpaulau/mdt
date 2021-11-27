@@ -75,7 +75,7 @@ class Vehicles extends React.Component {
         return (
             <div className="cars">
                 <div className="block car-list">
-                    <h3>Cars</h3>
+                    <h3>Vehicles</h3>
                     <div className="table-scroll">
                         {this.state.pageData.map((c, i) =>
                             <ul className="car-item" key={i} onMouseDown={this.handleDrag}>
