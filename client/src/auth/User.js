@@ -13,6 +13,7 @@ export class User {
                 regNum: observable,
                 employee: observable,
                 employeeId: observable,
+                admin: observable,
                 clear: action,
                 loadUser: action
             }
@@ -60,7 +61,6 @@ export class User {
                                     localStorage.setItem('token', res.data);
                             });
                     }
-                    console.log(res.data.regNum);
                     axios.get("http://localhost:8081/get_employee_info/" + res.data.regNum).then(action("getEmployee", res => {
                         if (res.data)
                             this.employeeId = res.data.id;
