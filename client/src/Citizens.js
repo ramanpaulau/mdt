@@ -80,7 +80,8 @@ class Citizens extends React.Component {
     }
 
     loadVehicles = async () => {
-        await axios.get("http://localhost:8081/vehicles/plateNum").then(res => {
+        await axios.get("http://localhost:8081/vehicles/free").then(res => {
+            console.log(res.data);
             this.setState({
                 vehicle: res.data
             });
@@ -161,6 +162,8 @@ class Citizens extends React.Component {
         await axios.post("http://localhost:8081/person/vehicle", tmp).then(res => {
             if (!res.data.success)
                 console.log(res.data.message);
+            this.getCitizenVehicles();
+            this.loadVehicles();
         });
     }
 
@@ -317,7 +320,7 @@ class Citizens extends React.Component {
                                 <Link
                                     to={"/licenses"}
                                     className="round-link">
-                                    #3
+                                    Driving
                                     <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
                                         <FontAwesomeIcon icon={faTimesCircle} />
                                     </span>
@@ -380,7 +383,7 @@ class Citizens extends React.Component {
                                     onChange={(e) => { this.setState({ plateNum: e.value }) }}
                                     placeholder="Vehicles"
                                     noOptionsMessage={() => "Not found"} />
-                                <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerVehicle() }}>
+                                <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerVehicle(); }}>
                                     <FontAwesomeIcon icon={faPlus} />
                                 </span>
                             </div>

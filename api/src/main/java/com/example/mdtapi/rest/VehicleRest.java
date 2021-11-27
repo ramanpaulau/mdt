@@ -23,6 +23,11 @@ public class VehicleRest {
         return vehicleRepository.findAll();
     }
 
+    @GetMapping("/vehicles/free")
+    public List<Vehicle> allFree() {
+        return vehicleRepository.findByVehicleOwnerNull();
+    }
+
     @GetMapping("/vehicles/plateNum")
     public List<VehiclePlateNumbers> allByPlateNum() {
         return vehicleRepository.findAllProjectedBy();
