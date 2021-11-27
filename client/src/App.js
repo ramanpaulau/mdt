@@ -100,7 +100,7 @@ class App extends React.Component {
                                 <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} />, user)} />
                                 <Route exact path="/employees/:marking?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} store={user} />, user)} />
-                                <Route exact path="/citizens/:regNum?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} citizens={this.state.citizens} />, user)} />
+                                <Route exact path="/citizens/:regNum?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/inventory" component={RequireAuth(() => <Inventory />, user)} />
                                 <Route exact path="/penalcode" component={RequireAuth(() => <PenalCode />, user)} />
                                 <Route path="*" component={RequireAuth(Error404, user)} />

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useReducer } from "react";
 import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -113,9 +113,16 @@ class Citizens extends React.Component {
     getPassword = async () => {
         if (this.state.selectedIdx === -1)
             return;
-        await axios.post("http://localhost:8081/get_password_token", this.props.citizens[this.state.selectedIdx].regNum, { headers: { 'Content-Type': 'text/plain' } })
+        let tmp = {
+            customer: this.props.store.regNum,
+            target: this.props.citizens[this.state.selectedIdx].regNum
+        }
+        await axios.post("http://localhost:8081/get_password_token", tmp)
             .then((res) => {
-                this.setState({ password: res.data });
+                if (res.data.success)
+                    this.setState({ password: res.data.message });
+                else
+                    console.log(res.data.message);
             });
     }
 

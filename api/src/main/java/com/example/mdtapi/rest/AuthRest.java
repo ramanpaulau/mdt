@@ -1,6 +1,7 @@
 package com.example.mdtapi.rest;
 
 import com.example.mdtapi.models.Employee;
+import com.example.mdtapi.models.License;
 import com.example.mdtapi.models.PasswordToken;
 import com.example.mdtapi.models.Person;
 import com.example.mdtapi.repositories.DepartmentRepository;
@@ -8,6 +9,8 @@ import com.example.mdtapi.repositories.EmployeeRepository;
 import com.example.mdtapi.repositories.PasswordTokenRepository;
 import com.example.mdtapi.repositories.PersonRepository;
 import com.example.mdtapi.utils.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -80,8 +83,8 @@ public class AuthRest {
     }
 
     @PostMapping("/get_password_token")
-    public String passwordToken(@RequestBody String regNum) {
-        Person person = personRepository.findByRegNum(regNum);
+    public ResponseMessage passwordToken(@RequestBody String request) {
+        /*Person person = personRepository.findByRegNum(regNum);
 
         if (person == null)
             return "";
@@ -94,7 +97,45 @@ public class AuthRest {
         String uuid = UUID.randomUUID().toString();
         PasswordToken pToken = new PasswordToken(uuid, person);
         passwordTokenRepository.save(pToken);
-        return uuid;
+        return uuid;*/
+        ResponseMessage res = new ResponseMessage();
+
+        String customer, target;
+        JSONObject subchapter = new JSONObject(request);
+        try {
+            customer = subchapter.getString("customer");
+            target = subchapter.getString("target");
+        } catch (JSONException ignored) {
+            res.setSuccess(false);
+            res.setMessage("Wrong json format");
+            return res;
+        }
+        Person checkPerson = personRepository.findByRegNum(customer);
+        if (!checkPerson.isAdmin()) {
+            res.setSuccess(false);
+            res.setMessage("Not admin");
+            return res;
+        }
+
+        Person person = personRepository.findByRegNum(target);
+
+        if (person == null) {
+            res.setSuccess(false);
+            res.setMessage("Person not found");
+            return res;
+        }
+
+        PasswordToken token = passwordTokenRepository.findByPerson(person);
+        if (token != null) {
+            res.setMessage(token.getToken());
+            return res;
+        }
+
+        String uuid = UUID.randomUUID().toString();
+        PasswordToken pToken = new PasswordToken(uuid, person);
+        passwordTokenRepository.save(pToken);
+        res.setMessage(uuid);
+        return res;
     }
 
     @PostMapping("/set_password")
