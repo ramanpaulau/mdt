@@ -38,7 +38,7 @@ class AddChapter extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="chapter">
                 <FontAwesomeIcon icon={faPlus} onClick={this.handleOpenModal} />
                 <ReactModal
                     isOpen={this.state.showModal}
@@ -74,7 +74,9 @@ class AddChapter extends React.Component {
                             </Form>
                         )}
                     </Formik>
-                    <FontAwesomeIcon className="close" icon={faTimesCircle} onClick={this.handleCloseModal} />
+                    <div className="close-modal">
+                        <FontAwesomeIcon className="close" icon={faTimesCircle} onClick={this.handleCloseModal} />
+                    </div>
                 </ReactModal>
             </div>
         );

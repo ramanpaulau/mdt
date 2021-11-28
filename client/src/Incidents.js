@@ -26,8 +26,7 @@ class Incidents extends React.Component {
             offset: 0,
             selectedIdx: -1,
             selectedPage: 0,
-            pageCount: 0,
-            password: ""
+            pageCount: 0
         };
 
         this.sendButton = React.createRef();
@@ -290,7 +289,7 @@ class Incidents extends React.Component {
                                     </span>
                                 </div>
 
-                                <div className="edit-list indictments">
+                                <div className="edit-list indictment-list">
                                     <p className="text-label">Indictments: </p>
                                     {[].map(v =>
                                         <Link key={v.vin}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGlobe, faPhone, faIdCardAlt, faCar, faFileAlt, faEye, faWarehouse, faGavel, faLandmark, faTimes, faList, faUserTie, faStamp } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faPhone, faIdCardAlt, faCar, faCoins, faFileAlt, faEye, faWarehouse, faGavel, faLandmark, faTimes, faList, faUserTie, faStamp } from '@fortawesome/free-solid-svg-icons';
 import { observer } from "mobx-react";
 
 class Header extends React.Component {
@@ -130,6 +130,15 @@ class Header extends React.Component {
                                 </NavLink>
                             </li>
                             : ""}
+                        <li className="nav-li">
+                            <NavLink
+                                to="/fines"
+                                className="nav-a"
+                                activeClassName="active-nav-a"
+                                onClick={this.navigate}>
+                                <FontAwesomeIcon icon={faCoins} />
+                            </NavLink>
+                        </li>
                         {((this.props.store.employeeId) || (this.props.store.admin)) ?
                             <li className="nav-li">
                                 <NavLink

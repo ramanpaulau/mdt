@@ -65,6 +65,10 @@
         border: none;
         color: $bright;
     }
+    
+    .rdtDay:hover, .rdtTimeToggle:hover, .rdtPicker th:hover, .rdtBtn:hover {
+        background-color: $secondary !important;
+    }
 }
 
 @media screen and (min-width: 768px) {

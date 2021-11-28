@@ -5,6 +5,7 @@
 @import "inventory.scss";
 @import "license.scss";
 @import "incidents.scss";
+@import "indictments.scss";
 @import "employees.scss";
 @import "home.scss";
 @import "citizens.scss";
@@ -262,4 +263,13 @@ nav .notification p {
 .title .link {
   display: block;
   width: 100%;
+}
+
+.close-modal {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.close-modal .close:hover {
+  cursor: pointer;
 }

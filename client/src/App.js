@@ -5,6 +5,7 @@ import { Route, Switch } from "react-router-dom";
 import Error404 from './404';
 import Header from './Header';
 import State from './State';
+import Fines from './Fines';
 import Calls from './Calls';
 import Vehicles from './Vehicles';
 import Bolo from './Bolo';
@@ -104,8 +105,9 @@ class App extends React.Component {
                                 <Route exact path="/vehicles/:regNum?" component={RequireAuth((props) => <Vehicles {...props} store={user} />, user)} />
                                 <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} />, user)} />
                                 <Route exact path="/bolo" component={RequireAuth((props) => <Bolo {...props} />, user)} />
+                                <Route exact path="/fines" component={RequireAuth((props) => <Fines {...props} />, user)} />
                                 <Route exact path="/incidents/:id?" component={RequireAuth((props) => <Incidents {...props} store={user} />, user)} />
-                                <Route exact path="/indictments" component={RequireAuth((props) => <Indictments {...props} />, user)} />
+                                <Route exact path="/indictments/:id?" component={RequireAuth((props) => <Indictments {...props} citizens={this.state.citizens} store={user} />, user)} />
                                 <Route exact path="/employees/:marking?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} store={user} />, user)} />
                                 <Route exact path="/citizens/:regNum?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />

@@ -58,11 +58,11 @@ class AddChapter extends React.Component {
                             if (!values.text) {
                                 errors.text = 'Required';
                             }
-                            
+
                             if (parseInt(values.detention) < 0 || 2147483647 < parseInt(values.fine)) {
                                 errors.fine = 'Must be in range [0, 2.147.483.647]';
                             }
-                            
+
                             if (parseInt(values.detention) < 0 || 2147483647 < parseInt(values.detention)) {
                                 errors.detention = 'Must be in range [0, 2.147.483.647]';
                             }
@@ -95,7 +95,9 @@ class AddChapter extends React.Component {
                             </Form>
                         )}
                     </Formik>
-                    <FontAwesomeIcon className="close" icon={faTimesCircle} onClick={this.handleCloseModal} />
+                    <div className="close-modal">
+                        <FontAwesomeIcon className="close" icon={faTimesCircle} onClick={this.handleCloseModal} />
+                    </div>
                 </ReactModal>
             </div>
         );

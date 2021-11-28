@@ -15,7 +15,7 @@ class PenalCode extends React.Component {
         };
     }
 
-    componentDidMount = async () => {
+    componentDidMount = () => {
         this.loadChapters();
     }
 

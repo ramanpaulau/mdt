@@ -25,6 +25,10 @@ public class Incident {
             inverseJoinColumns = @JoinColumn(name = "employee_id"))
     private Set<Employee> officers = new HashSet<>();
 
+    @OneToMany(targetEntity = Indictment.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "incident_id")
+    private Set<Indictment> indictments = new HashSet<>();
+
     public Incident() {
     }
 
@@ -92,5 +96,13 @@ public class Incident {
 
     public void setOfficers(Set<Employee> officers) {
         this.officers = officers;
+    }
+
+    public Set<Indictment> getIndictments() {
+        return indictments;
+    }
+
+    public void setIndictments(Set<Indictment> indictments) {
+        this.indictments = indictments;
     }
 }

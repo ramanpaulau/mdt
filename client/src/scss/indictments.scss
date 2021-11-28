@@ -1,0 +1,67 @@
+.indictments {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1 1;
+    gap: 5px;
+    height: calc(100vh - 52px);
+
+    .indictment-list {
+        width: 100%;
+        grid-area: list;
+
+        .indictment-item {
+            display: grid;
+            grid-template-areas: "id name location" "supervisor datetime button";
+            grid-auto-columns: 1fr;
+        }
+    }
+
+    .indictment-editor {
+        width: 100%;
+
+        .laws {
+            gap: 5px;
+            max-width: 500px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .text-label {
+            color: $bright;
+        }
+    }
+
+    .form-control {
+        background-color: $main;
+        border: none;
+        color: $bright;
+        height: 40px;
+        width: 200px;
+        border-radius: 5px;
+        padding: 0 12px;
+    }
+
+    .rdtPicker {
+        background-color: $main !important;
+        border: none;
+        color: $bright;
+    }
+
+    .rdtDay:hover,
+    .rdtTimeToggle:hover,
+    .rdtPicker th:hover,
+    .rdtBtn:hover {
+        background-color: $secondary !important;
+    }
+}
+
+.close-modal {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+@media screen and (min-width: 768px) {
+    .indictments {
+        flex-direction: row;
+    }
+}
