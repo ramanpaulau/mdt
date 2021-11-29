@@ -17,6 +17,8 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
 
     List<VehiclePlateNumbers> findAllProjectedBy();
 
+    Vehicle findByVin(Integer vin);
+
     @Query(value = "SELECT * FROM vehicle WHERE vehicle_owner IS NULL", nativeQuery = true)
     List<Vehicle> findByVehicleOwnerNull();
 

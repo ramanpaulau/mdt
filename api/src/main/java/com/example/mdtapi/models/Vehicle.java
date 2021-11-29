@@ -9,18 +9,19 @@ public class Vehicle {
     private String name;
     private Integer price;
 
-    /*@OneToOne(targetEntity = Person.class, fetch = FetchType.EAGER)
-    @JoinColumn(name = "person_regNum")
-    private Person owner;*/
+    @ManyToOne(targetEntity = Department.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "department_code")
+    private Department department;
 
     public Vehicle() {
     }
 
-    public Vehicle(Integer vin, String plateNum, String name, Integer price) {
+    public Vehicle(Integer vin, String plateNum, String name, Integer price, Department department) {
         this.vin = vin;
         this.plateNum = plateNum;
         this.name = name;
         this.price = price;
+        this.department = department;
     }
 
     public Integer getVin() {
@@ -55,11 +56,11 @@ public class Vehicle {
         this.price = price;
     }
 
-    /*public Person getOwner() {
-        return owner;
+    public Integer getDepartment() {
+        return (department != null)?department.getCode():0;
     }
 
-    public void setOwner(Person owner) {
-        this.owner = owner;
-    }*/
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
 }

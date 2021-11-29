@@ -1,7 +1,9 @@
 package com.example.mdtapi.rest;
 
+import com.example.mdtapi.models.Department;
 import com.example.mdtapi.models.Vehicle;
 import com.example.mdtapi.models.VehiclePlateNumbers;
+import com.example.mdtapi.repositories.DepartmentRepository;
 import com.example.mdtapi.repositories.VehicleRepository;
 import com.example.mdtapi.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +16,12 @@ public class VehicleRest {
     @Autowired
     private final VehicleRepository vehicleRepository;
 
-    public VehicleRest(VehicleRepository vehicleRepository) {
+    @Autowired
+    private final DepartmentRepository departmentRepository;
+
+    public VehicleRest(VehicleRepository vehicleRepository, DepartmentRepository departmentRepository) {
         this.vehicleRepository = vehicleRepository;
+        this.departmentRepository = departmentRepository;
     }
 
     @GetMapping("/vehicles")
@@ -37,6 +43,45 @@ public class VehicleRest {
     public ResponseMessage insert(@RequestBody Vehicle vehicle) {
         ResponseMessage res = ResponseMessage.OKMessage();
 
+        vehicleRepository.save(vehicle);
+        return res;
+    }
+
+    @PostMapping("/vehicle/{vin}/confiscate/{depCode}")
+    public ResponseMessage confiscate(@PathVariable Integer vin, @PathVariable Integer depCode) {
+        ResponseMessage res = ResponseMessage.OKMessage();
+
+        Vehicle vehicle = vehicleRepository.findByVin(vin);
+        if (vehicle == null) {
+            res.setSuccess(false);
+            res.setMessage("Vehicle not found");
+            return res;
+        }
+
+        Department department = departmentRepository.findByCode(depCode);
+        if (department == null) {
+            res.setSuccess(false);
+            res.setMessage("Department not found");
+            return res;
+        }
+
+        vehicle.setDepartment(department);
+        vehicleRepository.save(vehicle);
+        return res;
+    }
+
+    @PostMapping("/vehicle/{vin}/confiscate/remove")
+    public ResponseMessage confiscate(@PathVariable Integer vin) {
+        ResponseMessage res = ResponseMessage.OKMessage();
+
+        Vehicle vehicle = vehicleRepository.findByVin(vin);
+        if (vehicle == null) {
+            res.setSuccess(false);
+            res.setMessage("Vehicle not found");
+            return res;
+        }
+
+        vehicle.setDepartment(null);
         vehicleRepository.save(vehicle);
         return res;
     }

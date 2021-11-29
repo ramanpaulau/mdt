@@ -5,11 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Link } from 'react-router-dom';
 import Select from 'react-select';
+import { customStyles } from "./Employees";
 import Datetime from 'react-datetime';
 import "react-datetime/css/react-datetime.css";
 import axios from 'axios';
 import { observer } from "mobx-react";
-import { customStyles } from "./Employees";
 import SelectLaws from "./ModalWindows/SelectLaws";
 
 const INDICTMENTS_ON_PAGE = 7;

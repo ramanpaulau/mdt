@@ -2,9 +2,11 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faTimesCircle, faSave } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from 'axios';
+import Select from 'react-select';
+import { customStyles } from "./Employees";
 
 const VEHICLES_ON_PAGE = 3;
 
@@ -18,7 +20,8 @@ class Vehicles extends React.Component {
 
         this.state = {
             pageData: [],
-            cars: [],
+            vehicles: [],
+            departments: [],
             offset: 0,
             selectedIdx: -1,
             selectedPage: 0,
@@ -30,21 +33,36 @@ class Vehicles extends React.Component {
 
     loadPages = () => {
         this.setState({
-            pageData: this.state.cars.slice(this.state.offset, this.state.offset + VEHICLES_ON_PAGE),
-            pageCount: Math.ceil(this.state.cars.length / VEHICLES_ON_PAGE)
+            pageData: this.state.vehicles.slice(this.state.offset, this.state.offset + VEHICLES_ON_PAGE),
+            pageCount: Math.ceil(this.state.vehicles.length / VEHICLES_ON_PAGE)
         });
     }
 
-    loadCars = async () => {
+    /*loadCars = async () => {
         await axios.get("http://localhost:8081/vehicles").then(res => {
             this.setState({
                 cars: res.data
             }, () => this.loadPages());
         });
+    }*/
+
+
+    loadData = async () => {
+        await axios.all([
+            axios.get("http://localhost:8081/vehicles"),
+            axios.get("http://localhost:8081/departments")])
+            .then(axios.spread((firstResponse, secondResponse) => {
+                this.setState({
+                    vehicles: firstResponse.data,
+                    departments: secondResponse.data
+                }, () => this.loadPages())
+            })
+            )
+            .catch(error => console.log(error));
     }
 
     componentDidMount = () => {
-        this.loadCars();
+        this.loadData();
     }
 
     handlePageClick = (data) => {
@@ -71,6 +89,34 @@ class Vehicles extends React.Component {
             this.sendButton.current.click();
     }
 
+    sendDepartment = async () => {
+        if (!this.state.department)
+            return;
+        let vin = this.state.vehicles[this.state.selectedIdx].vin;
+        await axios.post("http://localhost:8081/vehicle/" + vin + "/confiscate/" + this.state.department).then(async res => {
+            if (!res.data.success)
+                console.log(res.data.message);
+            await axios.get("http://localhost:8081/vehicles").then(res => {
+                this.setState({
+                    vehicles: res.data
+                })
+            });
+        });
+    }
+
+    deleteDepartment = async () => {
+        let vin = this.state.vehicles[this.state.selectedIdx].vin;
+        await axios.post("http://localhost:8081/vehicle/" + vin + "/confiscate/remove").then(async res => {
+            if (!res.data.success)
+                console.log(res.data.message);
+            await axios.get("http://localhost:8081/vehicles").then(res => {
+                this.setState({
+                    vehicles: res.data
+                })
+            });
+        });
+    }
+
     render() {
         return (
             <div className="cars">
@@ -86,7 +132,7 @@ class Vehicles extends React.Component {
                                 <Link
                                     to={"/vehicles/" + (c.plateNum)}
                                     className="edit-button round-link"
-                                    onClick={() => this.setState({ selectedIdx: i + this.state.selectedPage * VEHICLES_ON_PAGE, password: "" })}>
+                                    onClick={() => this.setState({ selectedIdx: i + this.state.selectedPage * VEHICLES_ON_PAGE, department: this.state.vehicles[i + this.state.selectedPage * VEHICLES_ON_PAGE].department })}>
                                     View
                                 </Link>
                             </ul>
@@ -119,11 +165,11 @@ class Vehicles extends React.Component {
                                 New
                             </Link>
                         </h3>
-                        <h3 onClick={(this.state.selectedIdx === -1)?() => { this.sendCar() }:() => {}}>Send</h3>
+                        <h3 onClick={(this.state.selectedIdx === -1) ? () => { this.sendCar() } : () => { }}>Send</h3>
                     </div>
                     <div className="table-scroll">
                         <Formik
-                            initialValues={(this.state.selectedIdx === -1) ? this.emptyCar : this.state.cars[this.state.selectedIdx]}
+                            initialValues={(this.state.selectedIdx === -1) ? this.emptyCar : this.state.vehicles[this.state.selectedIdx]}
                             enableReinitialize={true}
                             validate={async values => {
                                 const errors = {};
@@ -167,7 +213,7 @@ class Vehicles extends React.Component {
                                 await axios.post("http://localhost:8081/vehicle", tmp)
                                     .then((res) => {
                                         if (res.data.success)
-                                            this.setState({ cars: [...this.state.cars, tmp] }, () => this.loadPages());
+                                            this.setState({ cars: [...this.state.vehicles, tmp] }, () => this.loadPages());
                                         else
                                             console.log(res.data.message);
                                     });
@@ -176,25 +222,46 @@ class Vehicles extends React.Component {
                             {({ isSubmitting }) => (
                                 <Form>
                                     <div>
-                                        <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1)?false:true} style={{ textTransform: "capitalize" }} name="name" />
+                                        <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1) ? false : true} style={{ textTransform: "capitalize" }} name="name" />
                                         <ErrorMessage name="name" className="error-label" component="div" />
                                         <span className="floating-label">Model name</span>
                                     </div>
                                     <div>
-                                        <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1)?false:true} style={{ textTransform: "capitalize" }} name="plateNum" />
+                                        <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1) ? false : true} style={{ textTransform: "capitalize" }} name="plateNum" />
                                         <ErrorMessage name="plateNum" className="error-label" component="div" />
                                         <span className="floating-label">Plate number</span>
                                     </div>
                                     <div>
-                                        <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1)?false:true} name="vin" />
+                                        <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1) ? false : true} name="vin" />
                                         <ErrorMessage name="vin" className="error-label" component="div" />
                                         <span className="floating-label">VIN</span>
                                     </div>
                                     <div>
-                                        <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1)?false:true} name="price" />
+                                        <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1) ? false : true} name="price" />
                                         <ErrorMessage name="price" className="error-label" component="div" />
                                         <span className="floating-label">Price</span>
                                     </div>
+                                    {(this.state.selectedIdx !== -1) ?
+                                        <div className="edit-list department" style={{ display: "flex", flexDirection: "column" }}>
+                                            <p className="text-label">Confiscated: </p>
+                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                options={this.state.departments.map(d => (
+                                                    {
+                                                        value: d.code,
+                                                        label: d.shortTitle
+                                                    })
+                                                )}
+                                                onChange={(e) => { this.setState({ department: e.value }) }}
+                                                value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : {}}
+                                                placeholder="Department"
+                                                noOptionsMessage={() => "Not found"} />
+                                            <span className="link-button" onClick={(e) => { e.preventDefault(); this.sendDepartment(); }}>
+                                                <FontAwesomeIcon icon={faSave} />
+                                            </span>
+                                            <span className="link-button" onClick={(e) => { e.preventDefault(); this.deleteDepartment(); }}>
+                                                <FontAwesomeIcon icon={faTimesCircle} />
+                                            </span>
+                                        </div> : ""}
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
                                 </Form>
                             )}

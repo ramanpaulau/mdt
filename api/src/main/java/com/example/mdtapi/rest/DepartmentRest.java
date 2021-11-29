@@ -2,14 +2,17 @@ package com.example.mdtapi.rest;
 
 import com.example.mdtapi.models.Department;
 import com.example.mdtapi.models.Person;
+import com.example.mdtapi.models.Unit;
 import com.example.mdtapi.repositories.DepartmentRepository;
 import com.example.mdtapi.repositories.PersonRepository;
+import com.example.mdtapi.repositories.UnitRepository;
 import com.example.mdtapi.utils.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class DepartmentRest {
@@ -20,9 +23,13 @@ public class DepartmentRest {
     @Autowired
     private final PersonRepository personRepository;
 
-    public DepartmentRest(DepartmentRepository departmentRepository, PersonRepository personRepository) {
+    @Autowired
+    private final UnitRepository unitRepository;
+
+    public DepartmentRest(DepartmentRepository departmentRepository, PersonRepository personRepository, UnitRepository unitRepository) {
         this.departmentRepository = departmentRepository;
         this.personRepository = personRepository;
+        this.unitRepository = unitRepository;
     }
 
     @GetMapping("/departments")
@@ -42,9 +49,25 @@ public class DepartmentRest {
         return (department == null) ? "" : department.getUnit();
     }
 
-    @PostMapping("/department/unit")
-    public ResponseMessage getMainUnit(@PathVariable String request) {
-        ResponseMessage res = ResponseMessage.NotImplemented();
+    @PostMapping("/department/{code}/main/{abbr}")
+    public ResponseMessage setMainUnit(@PathVariable Integer code, @PathVariable String abbr) {
+        ResponseMessage res = ResponseMessage.OKMessage();
+        Department department = departmentRepository.findByCode(code);
+        if (department == null) {
+            res.setSuccess(false);
+            res.setMessage("Department not found");
+            return res;
+        }
+
+        Optional<Unit> unit = unitRepository.getByAbbreviation(abbr);
+        if (unit.isEmpty()) {
+            res.setSuccess(false);
+            res.setMessage("Unit not found");
+            return res;
+        }
+
+        department.setUnit(unit.get());
+        departmentRepository.save(department);
         return res;
     }
 

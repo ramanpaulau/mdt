@@ -111,6 +111,14 @@ class Departments extends React.Component {
     isRankChanging = (title) => this.state.selectedRanks.filter((e) => e.title === title).length > 0
     isUnitChanging = (abbreviation) => this.state.selectedUnits.filter((e) => e.abbreviation === abbreviation).length > 0
 
+    setMain = async (abbreviation) => {
+        let code = this.state.departments[this.state.selectedDep].code;
+        await axios.post("http://localhost:8081/department/" + code + "/main/" + abbreviation).then(res => {
+            if (!res.data.success)
+                console.log(res.data.message);
+        }); 
+    }
+
     render() {
         return (
             <div className="departments">
@@ -400,6 +408,7 @@ class Departments extends React.Component {
                                     <li>Abbreviation: {o.abbreviation}</li>
                                     <li>{o.description}</li>
                                     <li className="controls">
+                                        <button className="round-link" type="submit" onClick={() => { this.setMain(o.abbreviation); }}>Main</button>
                                         <button className="round-link" type="submit" onClick={() => this.setState({ selectedUnit: i })}>Edit</button>
                                         <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
                                     </li>
