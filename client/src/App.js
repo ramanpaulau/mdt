@@ -35,6 +35,7 @@ class App extends React.Component {
             citizens: [],
             boloCitizens: [],
             boloVehicles: [],
+            activeOfficers: [],
             isLoading: true,
             bolo: 0
         }
@@ -67,6 +68,10 @@ class App extends React.Component {
                     boloVehicles: res.data
                 });
             });
+
+        await axios.get("http://localhost:8081/employee/states").then(res => {
+                this.setState({ activeOfficers: res.data });
+            });
     }
 
     wsConnect = () => {
@@ -86,6 +91,17 @@ class App extends React.Component {
                 });
                 this.client.subscribe('/ws/bolo/vehicles', vehicle => {
                     this.setState({ boloVehicles: [...this.state.boloVehicles, JSON.parse(vehicle.body)], bolo: this.state.bolo + 1 });
+                });
+                this.client.subscribe('/ws/active/employees', res => {
+                    let data = JSON.parse(res.body);
+                    console.log(JSON.parse(res.body));
+                    if (data.action === "add") {
+                        this.setState({ activeOfficers: [...this.state.activeOfficers, { employee: data.employee, state: data.state }]});
+                    } else if (data.action === "delete") {
+                        this.setState({ activeOfficers: [...this.state.activeOfficers.filter(o => o.employee.id !== data.employee.id)] });
+                    } else {
+                        this.setState({ activeOfficers: [...this.state.activeOfficers.filter(o => o.employee.id !== data.employee.id), { employee: data.employee, state: data.state }] });
+                    }
                 });
             },
 
@@ -123,7 +139,7 @@ class App extends React.Component {
                         <State store={user} />
                         <main>
                             <Switch>
-                                <Route exact path="/" component={RequireAuth((props) => <Home {...props} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} />, user)} />
+                                <Route exact path="/" component={RequireAuth((props) => <Home {...props} store={user} wsClient={this.client} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} activeOfficers={this.state.activeOfficers} />, user)} />
                                 <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} store={user} />, user)} />
                                 <Route exact path="/vehicles/:regNum?" component={RequireAuth((props) => <Vehicles {...props} store={user} />, user)} />
                                 <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} />, user)} />

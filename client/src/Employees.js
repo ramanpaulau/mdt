@@ -62,11 +62,13 @@ class Employees extends React.Component {
             qualifications: [],
             employees: [],
             ranks: [],
+            workHours: [],
             department: null,
             selectedRank: null,
             selectedCitizens: null,
             tag: 0,
-            isLoading: true
+            isLoading: true,
+            selectedEmployeeId: 0
         }
 
         this.sendButton = React.createRef();
@@ -115,6 +117,14 @@ class Employees extends React.Component {
         });
     }
 
+    loadWorkHours = async () => {
+        await axios.get("http://localhost:8081/work-hours/" + this.state.selectedEmployeeId).then(res => {
+            this.setState({
+                workHours: res.data
+            })
+        });
+    }
+
     addEmployee = () => {
         let tmp = {
             regNum: this.state.selectedCitizens.value,
@@ -160,6 +170,12 @@ class Employees extends React.Component {
     }
 
     render() {
+        let diff = 0, salary = 0;
+        this.state.workHours.map(w => diff += (w.endTime === null) ? 0 : Math.abs(new Date(w.endTime) - new Date(w.startTime)) / 1000)
+        const hours = Math.floor(diff / 3600) % 24;
+        diff -= hours * 3600;
+        const minutes = Math.floor(diff / 60) % 60;
+        diff -= minutes * 60;
 
         let filteredRanks = [];
         let filteredEmployees = [];
@@ -194,7 +210,7 @@ class Employees extends React.Component {
                     <div className="table-scroll">
                         {filteredEmployees.map((e, i) =>
                             <ul key={e.tag} className="employee-item">
-                                <li>{this.state.department.value}-{e.tag}</li>
+                                <li>{e.marking}</li>
                                 <li>{e.rank}</li>
                                 <Link
                                     to={"/citizens/" + e.person}
@@ -203,7 +219,7 @@ class Employees extends React.Component {
                                 </Link>
                                 <Link
                                     to={"/employees/" + this.state.department.value + "-" + e.tag}
-                                    onClick={() => this.handleView(e)}
+                                    onClick={() => { this.handleView(e); this.setState({ selectedEmployeeId: e.id }, () => { this.loadWorkHours(); }); }}
                                     className="edit-button round-link">
                                     <li>View</li>
                                 </Link>
@@ -306,6 +322,25 @@ class Employees extends React.Component {
                 <div className="block employee-work-hours">
                     <h3>Work hours</h3>
                     <div className="table-scroll">
+                        <p className="text-label">
+                            Worked this week:
+                            {" " + hours + "h " + minutes + "m " + ", salary: " +Math.floor( minutes / 60 * 220) + "$"}
+                        </p>
+                        <p className="text-label">
+                            Worked previous week:
+                            {" " + 0 + "h " + 0 + "m " + ", salary: " + Math.floor(0 / 60 * 220) + "$"}
+                        </p>
+                        {
+                            /*this.state.workHours.map(w => {
+                                let diff = (w.endTime === null) ? 0 : Math.abs(new Date(w.endTime) - new Date(w.startTime)) / 1000;
+                                let hours = Math.floor(diff / 3600) % 24;
+                                diff -= hours * 3600;
+                        
+                                let minutes = Math.floor(diff / 60) % 60;
+                                diff -= minutes * 60;
+                                return <p className="text-label">{hours + "h " + minutes + "m, salary: " + Math.floor(minutes / 60 * w.salary) + "$"}</p>;
+                            })*/
+                        }
                     </div>
                 </div>
             </div>

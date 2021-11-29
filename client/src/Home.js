@@ -1,12 +1,17 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import axios from "axios";
+import { observer } from "mobx-react";
 
 class Home extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = { bolo: "cars" };
+        this.state = { 
+            bolo: "cars",
+            activeOfficers: []
+         };
     }
 
     officers = [
@@ -32,6 +37,21 @@ class Home extends React.Component {
         {id: "15CH", name: "J. Stone", incident: "45"}, 
         {id: "68JK", name: "A. Smith", incident: "245"}
     ];
+
+    componentDidMount = () => {
+    }
+
+    sendState = async (state) => {
+        let tmp = {
+            id: this.props.store.employeeId,
+            state: state
+        }
+        this.props.wsClient.publish({ destination: "/api/employees/state", body: JSON.stringify(tmp) });
+        /*await axios.post("http://localhost:8081/employee/" + this.props.store.employeeId + "/state/" + state).then(res => {
+            if (!res.data.success)
+                console.log(res.data.message);
+        });*/
+    }
 
     boloClick = (type) => {
         this.setState({ bolo: type });
@@ -91,35 +111,33 @@ class Home extends React.Component {
                     <div>
                         <ul className="table-head">
                             <li>#</li>
-                            <li>ID</li>
+                            <li>Marking</li>
                             <li>Name</li>
                             <li>Department</li>
                             <li>Rank</li>
                             <li>State</li>
-                            <li>On-Call</li>
                         </ul>
                     </div>
                     <div className="table-scroll">
-                        {this.officers.map((o, i) => 
+                        {this.props.activeOfficers.map((o, i) => 
                             <ul className="unit-item" key={i} onMouseDown={this.handleDrag}>
                                 <li>{i + 1}</li>
-                                <li>{o.id}</li>
-                                <li>{o.name}</li>
-                                <li>{o.dep}</li>
-                                <li>{o.rank}</li>
+                                <li>{o.employee.marking}</li>
+                                <li>{o.employee.fullName}</li>
+                                <li>{o.employee.departmentTitle}</li>
+                                <li>{o.employee.rank}</li>
                                 <li>{o.state}</li>
-                                <li>{o.call}</li>
                             </ul>
                         )}
                     </div>
                 </div>
                 <div className="block active-states">
-                    <div className="state-elem"><p>10-2</p></div>
-                    <div className="state-elem"><p>10-7</p></div>
-                    <div className="state-elem"><p>10-8</p></div>
-                    <div className="state-elem"><p>10-9</p></div>
-                    <div className="state-elem"><p>10-14</p></div>
-                    <div className="state-elem"><p>10-48</p></div>
+                    <div className="state-elem" onClick={() => { this.sendState("10-2"); }} ><p>10-2</p></div>
+                    <div className="state-elem" onClick={() => { this.sendState("10-7"); }} ><p>10-7</p></div>
+                    <div className="state-elem" onClick={() => { this.sendState("10-8"); }} ><p>10-8</p></div>
+                    <div className="state-elem" onClick={() => { this.sendState("10-9"); }} ><p>10-9</p></div>
+                    <div className="state-elem" onClick={() => { this.sendState("10-14"); }} ><p>10-14</p></div>
+                    <div className="state-elem" onClick={() => { this.sendState("10-48"); }} ><p>10-48</p></div>
                     <div className="state-elem"><p>Panic</p></div>
                     <div className="state-elem">
                         <select className="marking">
@@ -162,4 +180,4 @@ class Home extends React.Component {
     }
 }
 
-export default Home;
+export default observer(Home);

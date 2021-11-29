@@ -63,8 +63,16 @@ public class Employee {
         this.person = person;
     }
 
+    public String getFullName() {
+        return person.getFullName();
+    }
+
     public Integer getDepartment() {
         return department.getCode();
+    }
+
+    public String getDepartmentTitle() {
+        return department.getShortTitle();
     }
 
     public void setDepartment(Department department) {
@@ -77,6 +85,10 @@ public class Employee {
 
     public void setRank(Rank rank) {
         this.rank = rank;
+    }
+
+    public Short getSalary() {
+        return rank.getSalary();
     }
 
     public Integer getTag() {
