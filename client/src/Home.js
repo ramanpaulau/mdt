@@ -45,19 +45,19 @@ class Home extends React.Component {
                         <div>
                             <ul className="table-head">
                                 <li>#</li>
-                                <li>ID</li>
+                                <li>Plate Number</li>
                                 <li>Model</li>
-                                <li>Color</li>
+                                <li>Indcident</li>
                             </ul>
                         </div>}
                     {(this.state.bolo === "cars") && 
                     <div className="table-scroll">
-                        {this.cars.map((c, i) => 
-                            <ul className="bolo-item" key={i} onMouseDown={this.handleDrag}>
+                        {this.props.boloVehicles.map((o, i) => 
+                            <ul className="bolo-item" key={i}>
                                 <li>{i + 1}</li>
-                                <li>{c.id}</li>
-                                <li>{c.model}</li>
-                                <li>{c.color}</li>
+                                <li>{o.record.plateNum}</li>
+                                <li>{o.record.name}</li>
+                                <li>{o.incident.id}</li>
                             </ul>
                         )}
                     </div>}
@@ -72,12 +72,12 @@ class Home extends React.Component {
                         </div>}
                     {(this.state.bolo === "persons") && 
                         <div className="table-scroll">
-                            {this.persons.map((p, i) => 
+                            {this.props.boloCitizens.map((o, i) => 
                                 <ul className="bolo-item" key={i} onMouseDown={this.handleDrag}>
                                     <li>{i}</li>
-                                    <li>{p.id}</li>
-                                    <li>{p.name}</li>
-                                    <li>{p.incident}</li>
+                                    <li>{o.record.regNum}</li>
+                                    <li>{o.record.name}</li>
+                                    <li>{o.incident.id}</li>
                                 </ul>
                             )}
                         </div>}

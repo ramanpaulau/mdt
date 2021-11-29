@@ -22,7 +22,9 @@ class Incidents extends React.Component {
         this.state = {
             pageData: [],
             incidents: [],
+            vehicles: [],
             boloCitizens: [],
+            boloVehicles: [],
             datetime: new Date(),
             citizen: undefined,
             plateNum: undefined,
@@ -50,8 +52,17 @@ class Incidents extends React.Component {
         });
     }
 
+    loadVehicles = async () => {
+        await axios.get("http://localhost:8081/vehicles").then(res => {
+            this.setState({
+                vehicles: res.data
+            });
+        });
+    }
+
     componentDidMount = () => {
         this.loadIncidents();
+        this.loadVehicles();
     }
 
     registerBOLOCitizen = async () => {
@@ -93,6 +104,15 @@ class Incidents extends React.Component {
         });
     }
 
+    loadBoloVehicles = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.get("http://localhost:8081/incident/" + id + "/vehicles").then(res => {
+            this.setState({
+                boloVehicles: res.data
+            });
+        });
+    }
+
     render() {
         return (
             <div className="incidents">
@@ -110,7 +130,7 @@ class Incidents extends React.Component {
                                     to={"/incidents/" + (o.id)}
                                     className="edit-button round-link"
                                     onClick={() => {
-                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => {this.loadBoloCitizens();});
+                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => {this.loadBoloCitizens(); this.loadBoloVehicles();});
                                     }}>
                                     View
                                 </Link>
@@ -222,7 +242,7 @@ class Incidents extends React.Component {
                                         </Link>
                                     )}
                                     <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                        options={[].map(l => (
+                                        options={this.state.vehicles.map(l => (
                                             {
                                                 value: l.plateNum,
                                                 label: l.plateNum

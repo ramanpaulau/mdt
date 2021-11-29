@@ -9,8 +9,13 @@
         width: 100%;
     }
 
-    .vehicle-list {
+    .car-list {
         width: 100%;
+    }
+
+    .car-item, .citizen-item {
+        display: grid;
+        grid-template-areas: ". ." ". .";
     }
 
 }

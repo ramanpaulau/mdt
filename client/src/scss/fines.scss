@@ -1,0 +1,49 @@
+.fines {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1 1;
+    gap: 5px;
+    height: calc(100vh - 52px);
+
+    .fine-list {
+        width: 100%;
+
+        .fine-item {
+            display: grid;
+            grid-template-areas: ". ." ". .";
+            grid-auto-columns: 1fr;
+        }
+        
+        .fine-item:nth-child(2n+1) {
+            select {
+                background-color: $secondary;
+            }
+        }
+    }
+
+    .fine-editor {
+        width: 100%;
+
+        .table-scroll {
+            display: flex;
+            justify-content: center;
+        }
+
+        .laws {
+            gap: 5px;
+            max-width: 500px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .text-label {
+            color: $bright;
+        }
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .fines {
+        flex-direction: row;
+    }
+}

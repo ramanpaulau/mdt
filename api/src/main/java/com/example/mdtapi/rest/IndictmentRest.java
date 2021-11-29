@@ -49,7 +49,7 @@ public class IndictmentRest {
 
     @PostMapping("/indictment")
     public ResponseMessage insert(@RequestBody String request) {
-        ResponseMessage res = ResponseMessage.NotImplemented();
+        ResponseMessage res = ResponseMessage.OKMessage();
 
         System.out.println(request);
 

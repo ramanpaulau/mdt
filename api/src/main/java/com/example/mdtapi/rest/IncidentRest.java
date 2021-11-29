@@ -1,9 +1,8 @@
 package com.example.mdtapi.rest;
 
-import com.example.mdtapi.models.Employee;
-import com.example.mdtapi.models.Incident;
-import com.example.mdtapi.models.Person;
+import com.example.mdtapi.models.*;
 import com.example.mdtapi.repositories.EmployeeRepository;
+import com.example.mdtapi.repositories.FineRepository;
 import com.example.mdtapi.repositories.IncidentRepository;
 import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;
@@ -49,26 +48,36 @@ public class IncidentRest {
         return incident.get().getBoloPersons();
     }
 
+    @GetMapping("/incident/{id}/vehicles")
+    public Set<Vehicle> allVehicles(@PathVariable Integer id) {
+        Optional<Incident> incident = incidentRepository.findById(id);
+        if (incident.isEmpty())
+            return null;
+        return incident.get().getBoloVehicles();
+    }
+
     @GetMapping("/bolo/persons")
-    public Set<Person> allBoloPersons() {
-        Set<Person> persons = new HashSet<>();
+    public Set<BOLORecord<Person>> allBoloPersons() {
+        Set<BOLORecord<Person>> res = new HashSet<>();
 
         List<Incident> incident = incidentRepository.findAll();
         for (Incident i : incident)
-            persons.addAll(i.getBoloPersons());
+            for (Person p : i.getBoloPersons())
+                res.add(new BOLORecord<>(i, p));
 
-        return persons;
+        return res;
     }
 
     @GetMapping("/bolo/vehicles")
-    public Set<Person> allBoloVehicles() {
-        Set<Person> persons = new HashSet<>();
+    public Set<BOLORecord<Vehicle>> allBoloVehicles() {
+        Set<BOLORecord<Vehicle>> res = new HashSet<>();
 
         List<Incident> incident = incidentRepository.findAll();
         for (Incident i : incident)
-            persons.addAll(i.getBoloVehicles());
+            for (Vehicle v : i.getBoloVehicles())
+                res.add(new BOLORecord<>(i, v));
 
-        return persons;
+        return res;
     }
 
     @PostMapping("/incident")

@@ -4,15 +4,15 @@ import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Link } from 'react-router-dom';
-import Select from 'react-select'
+import Select from 'react-select';
 import Datetime from 'react-datetime';
 import "react-datetime/css/react-datetime.css";
 import axios from 'axios';
 import { observer } from "mobx-react";
 import { customStyles } from "./Employees";
-import SelectLaws from "./ModalWindows/SelectLaws"
+import SelectLaws from "./ModalWindows/SelectLaws";
 
-const INDICTMENTS_ON_PAGE = 3;
+const INDICTMENTS_ON_PAGE = 7;
 
 class Indictments extends React.Component {
 
@@ -102,20 +102,16 @@ class Indictments extends React.Component {
                     <h3>Indictments</h3>
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
-                            <ul className="incident-item" key={i} onMouseDown={this.handleDrag}>
+                            <ul className="indictment-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="id">#{o.id}</li>
                                 <li className="">Start time: {new Date(o.startTime).toLocaleString()}</li>
                                 <li className="">End time: {new Date(o.endTime).toLocaleString()}</li>
-                                <li className="">Added: {o.employee}</li>
+                                <li className="">Created: {o.employee}</li>
                                 <li className="">{o.laws}</li>
-                                <li className="">{o.person}</li>
                                 <Link
-                                    to={"/indictments/" + (o.id)}
-                                    className="edit-button round-link"
-                                    onClick={() => {
-                                        this.setState({ selectedIdx: i + this.state.selectedPage * INDICTMENTS_ON_PAGE });
-                                    }}>
-                                    View
+                                    to={"/citizens/" + (o.person)}
+                                    className="edit-button round-link">
+                                    {o.person}
                                 </Link>
                             </ul>
                         )}
@@ -182,6 +178,10 @@ class Indictments extends React.Component {
                                     else {
                                         this.setState({ indictments: [...this.state.indictments, tmp] }, () => { this.getPageData() });
                                     }
+                                });
+                                await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
+                                    if (!res.data.success)
+                                        console.log(res.data.message);
                                 });
                             }}
                         >

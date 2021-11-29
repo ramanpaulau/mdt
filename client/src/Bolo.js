@@ -16,32 +16,39 @@ class Bolo extends React.Component {
                     <div className="table-scroll">
                         {this.props.boloCitizens.map((o, i) =>
                             <ul className="citizen-item" key={i} onMouseDown={this.handleDrag}>
-                                <li className="regnum">{o.regNum}</li>
-                                <li className="fullname">{o.name + " " + o.surname}</li>
-                                <li className="phone">Phone: {o.phoneNumber}</li>
+                                <li className="fullname">{o.record.name + " " + o.record.surname}</li>
+                                <li className="phone">Phone: {o.record.phoneNumber}</li>
                                 <Link
-                                    to={"/citizens/" + (o.regNum)}
+                                    to={"/incidents/" + o.incident.id}
                                     className="edit-button round-link">
-                                    View
+                                    Incident: {o.incident.id}
+                                </Link>
+                                <Link
+                                    to={"/citizens/" + (o.record.regNum)}
+                                    className="edit-button round-link">
+                                    {o.record.regNum}
                                 </Link>
                             </ul>
                         )}
                     </div>
                 </div>
 
-                <div className="block vehicle-list">
+                <div className="block car-list">
                     <h3>BOLO Vehicles</h3>
                     <div className="table-scroll">
-                        {this.props.boloVehicles.map((c, i) =>
-                            <ul className="vehicle-item" key={i} onMouseDown={this.handleDrag}>
-                                <li className="vin">{c.vin}</li>
-                                <li className="name">{c.name}</li>
-                                <li className="plateNum">{c.plateNum}</li>
-                                <li className="price">{c.price}$</li>
+                        {this.props.boloVehicles.map((o, i) =>
+                            <ul className="car-item" key={i} onMouseDown={this.handleDrag}>
+                                <li className="vin">VIN: {o.record.vin}</li>
+                                <li className="name">{o.record.name}</li>
                                 <Link
-                                    to={"/vehicles/" + (c.plateNum)}
+                                    to={"/incidents/" + o.incident.id}
                                     className="edit-button round-link">
-                                    View
+                                    Incident: {o.incident.id}
+                                </Link>
+                                <Link
+                                    to={"/vehicles/" + (o.record.plateNum)}
+                                    className="edit-button round-link">
+                                    {o.record.plateNum}
                                 </Link>
                             </ul>
                         )}

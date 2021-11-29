@@ -6,6 +6,7 @@
 @import "license.scss";
 @import "incidents.scss";
 @import "indictments.scss";
+@import "fines.scss";
 @import "employees.scss";
 @import "home.scss";
 @import "bolo.scss";
@@ -51,7 +52,8 @@ ul {
 
 .call-item, .citizen-item, .department-item, 
 .employee-item, .inventory-item, .history-item, 
-.license-item, .car-item, .incident-item {
+.license-item, .car-item, .incident-item, .indictment-item,
+.fine-item {
   margin: 0;
   padding: 20px;
   color: $bright;
