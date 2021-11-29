@@ -1,6 +1,7 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from "axios";
+import { Translation } from 'react-i18next';
 
 class Licenses extends React.Component {
     constructor(props) {
@@ -21,7 +22,7 @@ class Licenses extends React.Component {
             axios.get("http://localhost:8081/qualifications")])
             .then(axios.spread((firstResponse, secondResponse) =>
                 this.setState({
-                    data: firstResponse.data.map(e => {return {...e, type: "License"}}).concat(secondResponse.data.map(e => {return {...e, type: "Qualification"}})).sort((a, b) =>
+                    data: firstResponse.data.map(e => { return { ...e, type: "License" } }).concat(secondResponse.data.map(e => { return { ...e, type: "Qualification" } })).sort((a, b) =>
                         (a.name > b.name) ? 1 : -1
                     )
                 })
@@ -32,7 +33,11 @@ class Licenses extends React.Component {
         return (
             <div className="license">
                 <div className="block license-list">
-                    <h3>Licenses</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Licenses')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         <ul className="license-item license-add">
                             <Formik

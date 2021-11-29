@@ -11,6 +11,7 @@ import "react-datetime/css/react-datetime.css";
 import axios from 'axios';
 import { observer } from "mobx-react";
 import SelectLaws from "./ModalWindows/SelectLaws";
+import { Translation } from 'react-i18next';
 
 const INDICTMENTS_ON_PAGE = 7;
 
@@ -99,7 +100,11 @@ class Indictments extends React.Component {
         return (
             <div className="indictments">
                 <div className="block indictment-list">
-                    <h3>Indictments</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Indictments')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
                             <ul className="indictment-item" key={i} onMouseDown={this.handleDrag}>
@@ -136,14 +141,23 @@ class Indictments extends React.Component {
                 <div className="block indictment-editor">
                     <div className="title">
                         <h3>
-                            <Link
-                                to={"/indictments"}
-                                className="link"
-                                onClick={() => { this.setState({ selectedIdx: -1 }); }}>
-                                New
-                            </Link>
+                            <Translation>
+                                {
+                                    t =>
+                                        <Link
+                                            to={"/indicments"}
+                                            className="link"
+                                            onClick={() => { this.setState({ selectedIdx: -1 }); }}>
+                                            {t('Title New')}
+                                        </Link>
+                                }
+                            </Translation>
                         </h3>
-                        <h3 onClick={() => { this.sendIndictment() }}>Send</h3>
+                        <Translation>
+                            {
+                                t => <h3 onClick={() => { this.sendIndictment() }}>{t('Title Send')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         <Formik

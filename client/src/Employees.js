@@ -5,6 +5,7 @@ import Select from 'react-select'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Translation } from 'react-i18next';
 
 export const customStyles = {
     container: (provided) => ({
@@ -188,7 +189,11 @@ class Employees extends React.Component {
             <div className="employees">
                 <div className="block employee-list">
                     <div className="title title-select">
-                        <h3>Employees</h3>
+                        <Translation>
+                            {
+                                t => <h3>{t('Title Employees')}</h3>
+                            }
+                        </Translation>
                         <div>
                             <Link
                                 style={{ textDecoration: 'none' }}
@@ -230,14 +235,23 @@ class Employees extends React.Component {
                 <div className="block employee-editor">
                     <div className="title">
                         <h3>
-                            <Link
-                                to={"/employees"}
-                                className="link"
-                                onClick={() => this.clearForm()}>
-                                New
-                            </Link>
+                            <Translation>
+                                {
+                                    t =>
+                                        <Link
+                                            to={"/employees"}
+                                            className="link"
+                                            onClick={() => this.clearForm()}>
+                                            {t('Title New')}
+                                        </Link>
+                                }
+                            </Translation>
                         </h3>
-                        <h3 onClick={() => this.addEmployee()}>Send</h3>
+                        <Translation>
+                            {
+                                t => <h3 onClick={() => { this.addEmployee() }}>{t('Title Send')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         <Formik>
@@ -320,11 +334,15 @@ class Employees extends React.Component {
                     </div>
                 </div>
                 <div className="block employee-work-hours">
-                    <h3>Work hours</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Work hours')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         <p className="text-label">
                             Worked this week:
-                            {" " + hours + "h " + minutes + "m " + ", salary: " +Math.floor( minutes / 60 * 220) + "$"}
+                            {" " + hours + "h " + minutes + "m " + ", salary: " + Math.floor(minutes / 60 * 220) + "$"}
                         </p>
                         <p className="text-label">
                             Worked previous week:

@@ -7,6 +7,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from 'axios';
 import Select from 'react-select';
 import { customStyles } from "./Employees";
+import { Translation } from 'react-i18next';
 
 const VEHICLES_ON_PAGE = 3;
 
@@ -121,7 +122,11 @@ class Vehicles extends React.Component {
         return (
             <div className="cars">
                 <div className="block car-list">
-                    <h3>Vehicles</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Vehicles')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.state.pageData.map((c, i) =>
                             <ul className="car-item" key={i} onMouseDown={this.handleDrag}>
@@ -158,14 +163,23 @@ class Vehicles extends React.Component {
                 <div className="block car-editor">
                     <div className="title">
                         <h3>
-                            <Link
-                                to={"/vehicles"}
-                                className="link"
-                                onClick={() => { this.setState({ selectedIdx: -1 }); }}>
-                                New
-                            </Link>
+                            <Translation>
+                                {
+                                    t =>
+                                        <Link
+                                            to={"/vehicles"}
+                                            className="link"
+                                            onClick={() => { this.setState({ selectedIdx: -1 }); }}>
+                                            {t('Title New')}
+                                        </Link>
+                                }
+                            </Translation>
                         </h3>
-                        <h3 onClick={(this.state.selectedIdx === -1) ? () => { this.sendCar() } : () => { }}>Send</h3>
+                        <Translation>
+                            {
+                                t => <h3 onClick={(this.state.selectedIdx === -1) ? () => { this.sendCar() } : () => { }}>{t('Title Send')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         <Formik

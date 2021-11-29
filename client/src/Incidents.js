@@ -9,6 +9,7 @@ import axios from 'axios';
 import Datetime from 'react-datetime';
 import "react-datetime/css/react-datetime.css";
 import { customStyles } from "./Employees";
+import { Translation } from 'react-i18next';
 
 const INCIDENTS_ON_PAGE = 3;
 
@@ -117,7 +118,11 @@ class Incidents extends React.Component {
         return (
             <div className="incidents">
                 <div className="block incident-list">
-                    <h3>Incidents</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Incidents')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
                             <ul className="incident-item" key={i} onMouseDown={this.handleDrag}>
@@ -130,7 +135,7 @@ class Incidents extends React.Component {
                                     to={"/incidents/" + (o.id)}
                                     className="edit-button round-link"
                                     onClick={() => {
-                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => {this.loadBoloCitizens(); this.loadBoloVehicles();});
+                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => { this.loadBoloCitizens(); this.loadBoloVehicles(); });
                                     }}>
                                     View
                                 </Link>
@@ -157,14 +162,23 @@ class Incidents extends React.Component {
                 <div className="block incident-editor">
                     <div className="title">
                         <h3>
-                            <Link
-                                to={"/incidents"}
-                                className="link"
-                                onClick={() => { this.setState({ selectedIdx: -1 }); }}>
-                                New
-                            </Link>
+                            <Translation>
+                                {
+                                    t =>
+                                        <Link
+                                            to={"/incidents"}
+                                            className="link"
+                                            onClick={() => { this.setState({ selectedIdx: -1 }); }}>
+                                            {t('Title New')}
+                                        </Link>
+                                }
+                            </Translation>
                         </h3>
-                        <h3 onClick={() => { this.sendIncident() }}>Send</h3>
+                        <Translation>
+                            {
+                                t => <h3 onClick={() => { this.sendIncident() }}>{t('Title Send')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         <Formik
@@ -224,7 +238,11 @@ class Incidents extends React.Component {
                 </div>
                 <div className="block incident-info">
                     <div className="title">
-                        <h3 style={{ borderRight: "none" }}>Incident info</h3>
+                        <Translation>
+                            {
+                                t => <h3 style={{ borderRight: "none" }}>{t('Title Incident info')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         {(this.state.selectedIdx === -1) ? "" :

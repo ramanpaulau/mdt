@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle, faPlus, faSave, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { observer } from "mobx-react";
 import SelectSearch from 'react-select-search';
+import { Translation } from 'react-i18next';
 
 const CALLS_ON_PAGE = 20;
 
@@ -131,7 +132,11 @@ class Calls extends React.Component {
             <div className="calls">
                 {((this.props.store.employeeId) || (this.props.store.admin)) ?
                     <div className="block calls-list">
-                        <h3>ACTIVE CALLS</h3>
+                        <Translation>
+                            {
+                                t => <h3>{t('Title Calls')}</h3>
+                            }
+                        </Translation>
                         <div className="table-scroll">
                             {this.state.data.map((o, i) =>
                                 <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
@@ -170,14 +175,23 @@ class Calls extends React.Component {
                 <div className="block calls-editor">
                     <div className="title">
                         <h3>
-                            <Link
-                                to={"/calls"}
-                                className="link"
-                                onClick={() => { this.setState({ selectedCall: this.emptyCall }); }}>
-                                New
-                            </Link>
+                            <Translation>
+                                {
+                                    t =>
+                                        <Link
+                                            to={"/calls"}
+                                            className="link"
+                                            onClick={() => { this.setState({ selectedCall: this.emptyCall }); }}>
+                                            {t('Title New')}
+                                        </Link>
+                                }
+                            </Translation>
                         </h3>
-                        <h3>Send</h3>
+                        <Translation>
+                            {
+                                t => <h3>{t('Title Send')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         <form>

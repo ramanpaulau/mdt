@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from 'react-router-dom';
 import { observer } from "mobx-react";
+import { Translation } from 'react-i18next';
 
 class Bolo extends React.Component {
 
@@ -12,7 +13,11 @@ class Bolo extends React.Component {
         return (
             <div className="bolo">
                 <div className="block citizen-list">
-                    <h3>BOLO Citizens</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title BOLO Citizens')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.props.boloCitizens.map((o, i) =>
                             <ul className="citizen-item" key={i} onMouseDown={this.handleDrag}>
@@ -34,7 +39,11 @@ class Bolo extends React.Component {
                 </div>
 
                 <div className="block car-list">
-                    <h3>BOLO Vehicles</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title BOLO Vehicles')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.props.boloVehicles.map((o, i) =>
                             <ul className="car-item" key={i} onMouseDown={this.handleDrag}>

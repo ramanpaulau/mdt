@@ -8,7 +8,8 @@ import { faChevronLeft, faChevronRight, faSave } from '@fortawesome/free-solid-s
 import { observer } from "mobx-react";
 import SelectLaws from "./ModalWindows/SelectLaws";
 import { customStyles } from "./Employees";
-import Select from 'react-select'
+import Select from 'react-select';
+import { Translation } from 'react-i18next';
 
 const FINES_ON_PAGE = 7;
 
@@ -64,7 +65,11 @@ class Fines extends React.Component {
         return (
             <div className="fines">
                 <div className="block fine-list">
-                    <h3>Fines</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Fines')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
                             <ul className="fine-item" key={i} onMouseDown={this.handleDrag}>
@@ -102,14 +107,23 @@ class Fines extends React.Component {
                 <div className="block fine-editor">
                     <div className="title">
                         <h3>
-                            <Link
-                                to={"/fines"}
-                                className="link"
-                                onClick={() => { this.setState({ selectedIdx: -1 }); }}>
-                                New
-                            </Link>
+                            <Translation>
+                                {
+                                    t =>
+                                        <Link
+                                            to={"/fines"}
+                                            className="link"
+                                            onClick={() => { this.setState({ selectedIdx: -1 }); }}>
+                                            {t('Title New')}
+                                        </Link>
+                                }
+                            </Translation>
                         </h3>
-                        <h3 onClick={() => { this.sendFine(); }}>Send</h3>
+                        <Translation>
+                            {
+                                t => <h3 onClick={() => { this.sendFine() }}>{t('Title Send')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         <Formik

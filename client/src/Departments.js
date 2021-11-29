@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle, faPlus, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from 'axios';
+import { Translation } from 'react-i18next';
 
 const DEPARTMENTS_ON_PAGE = 5;
 
@@ -116,14 +117,18 @@ class Departments extends React.Component {
         await axios.post("http://localhost:8081/department/" + code + "/main/" + abbreviation).then(res => {
             if (!res.data.success)
                 console.log(res.data.message);
-        }); 
+        });
     }
 
     render() {
         return (
             <div className="departments">
                 <div className="block department-list">
-                    <h3>Departments</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Departments')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
                             <ul className="department-item" key={i} onMouseDown={this.handleDrag}>
@@ -160,14 +165,23 @@ class Departments extends React.Component {
                     <div className="block department-editor">
                         <div className="title">
                             <h3>
-                                <Link
-                                    to={"/departments"}
-                                    className="link"
-                                    onClick={() => { this.setState({ selectedDep: -1 }, () => this.getSelectedRanks()); }}>
-                                    New
-                                </Link>
+                                <Translation>
+                                    {
+                                        t =>
+                                            <Link
+                                                to={"/departments"}
+                                                className="link"
+                                                onClick={() => { this.setState({ selectedDep: -1 }, () => this.getSelectedRanks()); }}>
+                                                {t('Title New')}
+                                            </Link>
+                                    }
+                                </Translation>
                             </h3>
-                            <h3 onClick={() => { this.sendDepartment() }}>Send</h3>
+                            <Translation>
+                                {
+                                    t => <h3 onClick={() => { this.sendDepartment() }}>{t('Title Send')}</h3>
+                                }
+                            </Translation>
                         </div>
                         <div className="table-scroll">
                             <Formik
@@ -254,7 +268,11 @@ class Departments extends React.Component {
                     : ""}
                 {((this.props.store.employeeId) || (this.props.store.admin)) ?
                     <div className="block department-ranks">
-                        <h3>Ranks</h3>
+                        <Translation>
+                            {
+                                t => <h3>{t('Title Ranks')}</h3>
+                            }
+                        </Translation>
                         <div className="table-scroll">
                             <div className="rank-form">
                                 <Formik
@@ -333,7 +351,11 @@ class Departments extends React.Component {
                     : ""}
                 {((this.props.store.employeeId) || (this.props.store.admin)) ?
                     <div className="block department-units">
-                        <h3>Units</h3>
+                        <Translation>
+                            {
+                                t => <h3>{t('Title Units')}</h3>
+                            }
+                        </Translation>
                         <div className="table-scroll">
                             <div className="rank-form">
                                 <Formik

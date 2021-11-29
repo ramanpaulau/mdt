@@ -8,6 +8,7 @@ import ReactPaginate from 'react-paginate';
 import axios from 'axios';
 import { user } from './auth/User';
 import { customStyles } from './Employees';
+import { Translation } from 'react-i18next';
 
 const HISTORY_ON_PAGE = 6;
 
@@ -90,7 +91,7 @@ class Inventory extends React.Component {
         }
 
         console.log(tmp);
-        
+
         await axios.post("http://localhost:8081/history", tmp).then(res => {
             if (!res.data.success)
                 console.log(res.data.message);
@@ -115,7 +116,11 @@ class Inventory extends React.Component {
             <div className="inventory">
                 <div className="block inventory-list">
                     <div className="title title-select">
-                        <h3>Inventory</h3>
+                        <Translation>
+                            {
+                                t => <h3>{t('Title Inventory')}</h3>
+                            }
+                        </Translation>
                         <div>
                             <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
                                 options={this.state.departments.map(d => (
@@ -136,8 +141,8 @@ class Inventory extends React.Component {
                                 <li>{e.amount}</li>
                                 <SelectAmount callback={(amount, action) => {
                                     let newInventory = [...this.state.inventory];
-                                    let selected = {...this.state.inventory[i]};
-                                    selected.amount = (action)? selected.amount + amount : selected.amount - amount;
+                                    let selected = { ...this.state.inventory[i] };
+                                    selected.amount = (action) ? selected.amount + amount : selected.amount - amount;
                                     if (selected.amount > 0)
                                         newInventory[i] = selected;
                                     else
@@ -152,14 +157,23 @@ class Inventory extends React.Component {
                 <div className="block inventory-editor">
                     <div className="title">
                         <h3>
-                            <Link
-                                to={"/inventory"}
-                                className="link"
-                                onClick={() => this.clearForm()}>
-                                New
-                            </Link>
+                            <Translation>
+                                {
+                                    t =>
+                                        <Link
+                                            to={"/inventory"}
+                                            className="link"
+                                            onClick={() => this.clearForm()}>
+                                            {t('Title New')}
+                                        </Link>
+                                }
+                            </Translation>
                         </h3>
-                        <h3 onClick={() => this.sendItem()}>Send</h3>
+                        <Translation>
+                            {
+                                t => <h3 onClick={() => { this.sendItem() }}>{t('Title Send')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         <Formik
@@ -214,14 +228,18 @@ class Inventory extends React.Component {
                     </div>
                 </div>
                 <div className="block inventory-history">
-                    <h3>History</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title History')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
                             <ul className="history-item" key={i} onMouseDown={this.handleDrag}>
                                 <li>{(new Date(o.date)).toLocaleString()}</li>
                                 <li>{o.description}</li>
                                 <li>{o.amount}</li>
-                                <li>{(o.action)?<FontAwesomeIcon className="green" icon={faChevronCircleUp} />:<FontAwesomeIcon className="red" icon={faChevronCircleDown} />}</li>
+                                <li>{(o.action) ? <FontAwesomeIcon className="green" icon={faChevronCircleUp} /> : <FontAwesomeIcon className="red" icon={faChevronCircleDown} />}</li>
                                 <li>{o.employee}</li>
                             </ul>
                         )}

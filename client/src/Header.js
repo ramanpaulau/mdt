@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGlobe, faPhone, faIdCardAlt, faCar, faCoins, faFileAlt, faEye, faWarehouse, faGavel, faLandmark, faTimes, faList, faUserTie, faStamp } from '@fortawesome/free-solid-svg-icons';
 import { observer } from "mobx-react";
+import i18n from './i18n';
 
 class Header extends React.Component {
     constructor(props) {
@@ -190,6 +191,9 @@ class Header extends React.Component {
                             </NavLink>
                         </li>
                         <li className="nav-li">
+                            <LanguagePicker />
+                        </li>
+                        <li className="nav-li">
                             <NavLink
                                 to="/login"
                                 className="nav-a"
@@ -214,3 +218,37 @@ class Header extends React.Component {
 }
 
 export default observer(Header);
+
+class LanguagePicker extends React.Component {
+
+    langs = ['en', 'cz', 'ru'];
+
+    constructor() {
+        super();
+
+        this.state = {
+            lang: 'en',
+            idx: 0
+        }
+    }
+
+    componentDidMount = () => {
+        let lang = localStorage.getItem('lang');
+        this.setState({ lang: lang, idx: (lang === 'en') ? 0 : (lang === 'cz') ? 1 : 2 });
+        i18n.changeLanguage(lang);
+    }
+
+    changeLanguage = () => {
+        let idx = (this.state.idx + 1) % 3;
+        console.log(idx);
+        localStorage.setItem('lang', this.langs[idx]);
+        this.setState({ lang: this.langs[idx], idx: idx });
+        i18n.changeLanguage(this.langs[idx]);
+    }
+
+    render() {
+        return (
+            <h1 className="lang-select" onClick={() => this.changeLanguage()} style={{ textTransform: 'uppercase' }}>{this.state.lang}</h1>
+        )
+    }
+}

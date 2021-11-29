@@ -9,6 +9,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from 'axios';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { customStyles } from "./Employees";
+import { Translation } from 'react-i18next';
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -170,7 +171,11 @@ class Citizens extends React.Component {
         return (
             <div className="citizens">
                 <div className="block citizen-list">
-                    <h3>Citizens</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Citizens')}</h3>
+                        }
+                    </Translation>
                     <div className="table-scroll">
                         {this.state.pageData.map((o, i) =>
                             <ul className="citizen-item" key={i} onMouseDown={this.handleDrag}>
@@ -208,14 +213,23 @@ class Citizens extends React.Component {
                 <div className="block citizen-editor">
                     <div className="title">
                         <h3>
-                            <Link
-                                to={"/citizens"}
-                                className="link"
-                                onClick={() => { this.setState({ selectedIdx: -1, password: "" }); }}>
-                                New
-                            </Link>
+                            <Translation>
+                                {
+                                    t =>
+                                        <Link
+                                            to={"/citizens"}
+                                            className="link"
+                                            onClick={() => { this.setState({ selectedIdx: -1, password: "" }); }}>
+                                            {t('Title New')}
+                                        </Link>
+                                }
+                            </Translation>
                         </h3>
-                        <h3 onClick={() => { this.sendRegistration() }}>Send</h3>
+                        <Translation>
+                            {
+                                t => <h3 onClick={() => { this.sendRegistration() }}>{t('Title Send')}</h3>
+                            }
+                        </Translation>
                     </div>
                     <div className="table-scroll">
                         <Formik
@@ -313,7 +327,11 @@ class Citizens extends React.Component {
                 </div>
                 <div className="block citizen-info">
                     <div className="title">
-                        <h3 style={{ borderRight: "none" }}>Citizen info</h3>
+                        <Translation>
+                            {
+                                t => <h3 style={{ borderRight: "none" }}>{t('Title Citizens info')}</h3>
+                            }
+                        </Translation>
                     </div>
                     {(this.state.selectedIdx === -1) ? "" :
                         <div className="table-scroll">
@@ -341,7 +359,7 @@ class Citizens extends React.Component {
                                     <FontAwesomeIcon icon={faPlus} />
                                 </span>
                             </div>
-{/*
+                            {/*
                             <div className="edit-list property">
                                 <p className="text-label">Property: </p>
                                 <Link
