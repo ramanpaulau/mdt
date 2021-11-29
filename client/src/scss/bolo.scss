@@ -1,0 +1,22 @@
+.bolo {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1 1;
+    gap: 5px;
+    height: calc(100vh - 52px);
+
+    .citizen-list {
+        width: 100%;
+    }
+
+    .vehicle-list {
+        width: 100%;
+    }
+
+}
+
+@media screen and (min-width: 768px) {
+    .bolo {
+        flex-direction: row;
+    }
+}

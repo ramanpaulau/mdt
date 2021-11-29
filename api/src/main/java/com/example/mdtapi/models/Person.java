@@ -23,7 +23,7 @@ public class Person {
 	private boolean admin;
 	private State state;
 
-	@ManyToMany(cascade = { CascadeType.ALL })
+	@ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "person_license",
 			joinColumns = { @JoinColumn(name = "license_id") },

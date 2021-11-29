@@ -2,16 +2,14 @@ package com.example.mdtapi.rest;
 
 import com.example.mdtapi.models.Employee;
 import com.example.mdtapi.models.Incident;
+import com.example.mdtapi.models.Person;
 import com.example.mdtapi.repositories.EmployeeRepository;
 import com.example.mdtapi.repositories.IncidentRepository;
 import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.text.ParsePosition;
@@ -19,8 +17,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 public class IncidentRest {
@@ -39,6 +39,36 @@ public class IncidentRest {
     @GetMapping("/incidents")
     public List<Incident> all() {
         return incidentRepository.findAll();
+    }
+
+    @GetMapping("/incident/{id}/persons")
+    public Set<Person> allPersons(@PathVariable Integer id) {
+        Optional<Incident> incident = incidentRepository.findById(id);
+        if (incident.isEmpty())
+            return null;
+        return incident.get().getBoloPersons();
+    }
+
+    @GetMapping("/bolo/persons")
+    public Set<Person> allBoloPersons() {
+        Set<Person> persons = new HashSet<>();
+
+        List<Incident> incident = incidentRepository.findAll();
+        for (Incident i : incident)
+            persons.addAll(i.getBoloPersons());
+
+        return persons;
+    }
+
+    @GetMapping("/bolo/vehicles")
+    public Set<Person> allBoloVehicles() {
+        Set<Person> persons = new HashSet<>();
+
+        List<Incident> incident = incidentRepository.findAll();
+        for (Incident i : incident)
+            persons.addAll(i.getBoloVehicles());
+
+        return persons;
     }
 
     @PostMapping("/incident")

@@ -33,7 +33,11 @@ class App extends React.Component {
         this.state = {
             calls: 5,
             citizens: [],
-            isLoading: true
+            boloCitizens: [],
+            boloVehicles: [],
+            isLoading: true,
+            calls: 0,
+            bolo: 0
         }
     }
 
@@ -50,6 +54,20 @@ class App extends React.Component {
                     isLoading: false
                 });
             });
+
+        await axios.get("http://localhost:8081/bolo/persons")
+            .then((res) => {
+                this.setState({
+                    boloCitizens: res.data
+                });
+            });
+
+        await axios.get("http://localhost:8081/bolo/vehicles")
+            .then((res) => {
+                this.setState({
+                    boloVehicles: res.data
+                });
+            });
     }
 
     wsConnect = () => {
@@ -63,6 +81,12 @@ class App extends React.Component {
             onConnect: () => {
                 this.client.subscribe('/ws/persons', citizen => {
                     this.setState({ citizens: [...this.state.citizens, JSON.parse(citizen.body)] });
+                });
+                this.client.subscribe('/ws/bolo/persons', citizen => {
+                    this.setState({ boloCitizens: [...this.state.boloCitizens, JSON.parse(citizen.body)], bolo: this.state.bolo + 1 });
+                });
+                this.client.subscribe('/ws/bolo/vehicles', vehicle => {
+                    this.setState({ boloVehicles: [...this.state.boloVehicles, JSON.parse(vehicle.body)], bolo: this.state.bolo + 1 });
                 });
             },
 
@@ -96,7 +120,7 @@ class App extends React.Component {
                 <Route exact path="/login" component={RequireNotAuth((props) => <Login {...props} store={user} wsConnect={this.wsConnect} />)} />
                 <React.Fragment>
                     <div className="app">
-                        <Header calls={this.state.calls} store={user} wsDisconnect={this.wsDisconnect} />
+                        <Header calls={this.state.calls} cabololls={this.state.bolo} store={user} wsDisconnect={this.wsDisconnect} />
                         <State store={user} />
                         <main>
                             <Switch>
@@ -104,9 +128,9 @@ class App extends React.Component {
                                 <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} store={user} />, user)} />
                                 <Route exact path="/vehicles/:regNum?" component={RequireAuth((props) => <Vehicles {...props} store={user} />, user)} />
                                 <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} />, user)} />
-                                <Route exact path="/bolo" component={RequireAuth((props) => <Bolo {...props} />, user)} />
+                                <Route exact path="/bolo" component={RequireAuth((props) => <Bolo clearNots={(this.state.bolo) ? this.clearNotifications : () => { }} {...props} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} />, user)} />
                                 <Route exact path="/fines" component={RequireAuth((props) => <Fines {...props} />, user)} />
-                                <Route exact path="/incidents/:id?" component={RequireAuth((props) => <Incidents {...props} store={user} />, user)} />
+                                <Route exact path="/incidents/:id?" component={RequireAuth((props) => <Incidents {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/indictments/:id?" component={RequireAuth((props) => <Indictments {...props} citizens={this.state.citizens} store={user} />, user)} />
                                 <Route exact path="/employees/:marking?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} store={user} />, user)} />

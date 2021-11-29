@@ -148,6 +148,7 @@ class Header extends React.Component {
                                     onClick={this.navigate}>
                                     <FontAwesomeIcon icon={faEye} />
                                 </NavLink>
+                                {this.props.bolo ? <div className="notification"><p>{this.props.bolo}</p></div> : ""}
                             </li>
                             : ""}
                         <li className="nav-li">

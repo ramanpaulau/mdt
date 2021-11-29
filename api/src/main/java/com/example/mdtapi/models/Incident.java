@@ -18,12 +18,27 @@ public class Incident {
     @JoinColumn(name = "employee_id")
     private Employee supervisor;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "active_officers",
             joinColumns = @JoinColumn(name = "incident_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id"))
     private Set<Employee> officers = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "bolo_persons",
+            joinColumns = @JoinColumn(name = "incident_id"),
+            inverseJoinColumns = @JoinColumn(name = "person_reg_num"))
+    private Set<Person> boloPersons = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "bolo_vehicles",
+            joinColumns = @JoinColumn(name = "incident_id"),
+            inverseJoinColumns = @JoinColumn(name = "vehicle_plate_num"))
+    private Set<Vehicle> boloVehicles = new HashSet<>();
+
 
     @OneToMany(targetEntity = Indictment.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "incident_id")
@@ -32,7 +47,7 @@ public class Incident {
     public Incident() {
     }
 
-    public Incident(Integer id, String title, String location, LocalDateTime dateTime, String details, Employee supervisor, Set<Employee> officers) {
+    public Incident(Integer id, String title, String location, LocalDateTime dateTime, String details, Employee supervisor, Set<Employee> officers, Set<Person> boloPersons, Set<Vehicle> boloVehicles, Set<Indictment> indictments) {
         this.id = id;
         this.title = title;
         this.location = location;
@@ -40,6 +55,9 @@ public class Incident {
         this.details = details;
         this.supervisor = supervisor;
         this.officers = officers;
+        this.boloPersons = boloPersons;
+        this.boloVehicles = boloVehicles;
+        this.indictments = indictments;
     }
 
     public Integer getId() {
@@ -96,6 +114,22 @@ public class Incident {
 
     public void setOfficers(Set<Employee> officers) {
         this.officers = officers;
+    }
+
+    public Set<Person> getBoloPersons() {
+        return boloPersons;
+    }
+
+    public void setBoloPersons(Set<Person> boloPersons) {
+        this.boloPersons = boloPersons;
+    }
+
+    public Set<Vehicle> getBoloVehicles() {
+        return boloVehicles;
+    }
+
+    public void setBoloVehicles(Set<Vehicle> boloVehicles) {
+        this.boloVehicles = boloVehicles;
     }
 
     public Set<Indictment> getIndictments() {

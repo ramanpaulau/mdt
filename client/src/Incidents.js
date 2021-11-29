@@ -22,7 +22,10 @@ class Incidents extends React.Component {
         this.state = {
             pageData: [],
             incidents: [],
+            boloCitizens: [],
             datetime: new Date(),
+            citizen: undefined,
+            plateNum: undefined,
             offset: 0,
             selectedIdx: -1,
             selectedPage: 0,
@@ -51,6 +54,22 @@ class Incidents extends React.Component {
         this.loadIncidents();
     }
 
+    registerBOLOCitizen = async () => {
+        let tmp = {
+            citizenRegNum: this.state.citizen,
+            incidentId: this.state.incidents[this.state.selectedIdx].id
+        }
+        this.props.wsClient.publish({ destination: "/api/incident/bolo/persons", body: JSON.stringify(tmp) });
+    }
+
+    registerBOLOVehicle = async () => {
+        let tmp = {
+            vehiclePlateNum: this.state.plateNum,
+            incidentId: this.state.incidents[this.state.selectedIdx].id
+        }
+        this.props.wsClient.publish({ destination: "/api/incident/bolo/vehicles", body: JSON.stringify(tmp) });
+    }
+
     handlePageClick = (data) => {
         let selected = data.selected;
         let offset = Math.ceil(selected * INCIDENTS_ON_PAGE);
@@ -63,6 +82,15 @@ class Incidents extends React.Component {
     sendIncident = () => {
         if (this.sendButton.current)
             this.sendButton.current.click();
+    }
+
+    loadBoloCitizens = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.get("http://localhost:8081/incident/" + id + "/persons").then(res => {
+            this.setState({
+                boloCitizens: res.data
+            });
+        });
     }
 
     render() {
@@ -82,7 +110,7 @@ class Incidents extends React.Component {
                                     to={"/incidents/" + (o.id)}
                                     className="edit-button round-link"
                                     onClick={() => {
-                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE });
+                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => {this.loadBoloCitizens();});
                                     }}>
                                     View
                                 </Link>
@@ -183,7 +211,7 @@ class Incidents extends React.Component {
                             <div>
                                 <div className="edit-list bolo-vehicle">
                                     <p className="text-label">BOLO Vehicles: </p>
-                                    {[].map(v =>
+                                    {this.state.boloVehicles.map(v =>
                                         <Link key={v.vin}
                                             to={"/vehicles/" + v.plateNum}
                                             className="round-link">
@@ -210,25 +238,25 @@ class Incidents extends React.Component {
 
                                 <div className="edit-list bolo-citizen">
                                     <p className="text-label">BOLO Citizen: </p>
-                                    {[].map(v =>
-                                        <Link key={v.vin}
-                                            to={"/citizen/" + v.plateNum}
+                                    {this.state.boloCitizens.map(c =>
+                                        <Link key={c.regNum}
+                                            to={"/citizens/" + c.regNum}
                                             className="round-link">
-                                            {v.plateNum + " / " + v.name}
+                                            {c.regNum + " / " + c.name}
                                             <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
                                     )}
-                                    <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                        options={[].map(l => (
+                                    <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                        options={this.props.citizens.map(c => (
                                             {
-                                                value: l.plateNum,
-                                                label: l.plateNum
+                                                value: c.regNum,
+                                                label: c.regNum
                                             })
                                         )}
-                                        onChange={(e) => { this.setState({ plateNum: e.value }) }}
-                                        placeholder="Citizens"
+                                        onChange={(e) => { this.setState({ citizen: e.value }) }}
+                                        placeholder="Citizen"
                                         noOptionsMessage={() => "Not found"} />
                                     <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerBOLOCitizen(); }}>
                                         <FontAwesomeIcon icon={faPlus} />
