@@ -20,6 +20,8 @@ class Vehicles extends React.Component {
         super(props);
 
         this.state = {
+            filter: '',
+            filteredData: [],
             pageData: [],
             vehicles: [],
             departments: [],
@@ -33,20 +35,15 @@ class Vehicles extends React.Component {
     }
 
     loadPages = () => {
-        this.setState({
+        /*this.setState({
             pageData: this.state.vehicles.slice(this.state.offset, this.state.offset + VEHICLES_ON_PAGE),
             pageCount: Math.ceil(this.state.vehicles.length / VEHICLES_ON_PAGE)
+        });*/
+        this.setState({
+            pageData: (this.state.filter) ? this.state.filteredData.slice(this.state.offset, this.state.offset + VEHICLES_ON_PAGE) : this.state.vehicles.slice(this.state.offset, this.state.offset + VEHICLES_ON_PAGE),
+            pageCount: (this.state.filter) ? Math.ceil(this.state.filteredData.length / VEHICLES_ON_PAGE) : Math.ceil(this.state.vehicles.length / VEHICLES_ON_PAGE)
         });
     }
-
-    /*loadCars = async () => {
-        await axios.get("http://localhost:8081/vehicles").then(res => {
-            this.setState({
-                cars: res.data
-            }, () => this.loadPages());
-        });
-    }*/
-
 
     loadData = async () => {
         await axios.all([
@@ -128,6 +125,7 @@ class Vehicles extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
+                    <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.vehicles.filter(v => v.plateNum.toLowerCase().includes(e.target.value.toLowerCase()) || (v.vin + '').toLowerCase().includes(e.target.value.toLowerCase()) )}, () => this.loadPages() )} />
                         {this.state.pageData.map((c, i) =>
                             <ul className="car-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="vin">{c.vin}</li>

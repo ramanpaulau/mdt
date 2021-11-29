@@ -17,6 +17,10 @@
                 grid-area: button;
             }
         }
+
+        .text-input {
+            width: calc(100% - 25px);
+        }
     }
 
     .car-editor {

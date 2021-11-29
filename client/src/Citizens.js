@@ -48,6 +48,8 @@ class Citizens extends React.Component {
             selectedIdx = this.props.citizens.findIndex(e => e.regNum === this.props.match.params.regNum);
 
         this.state = {
+            filter: '',
+            filteredData: [],
             pageData: [],
             licenses: [],
             vehicle: [],
@@ -66,8 +68,8 @@ class Citizens extends React.Component {
 
     loadCitizens = () => {
         this.setState({
-            pageData: this.props.citizens.slice(this.state.offset, this.state.offset + CITIZENS_ON_PAGE),
-            pageCount: Math.ceil(this.props.citizens.length / CITIZENS_ON_PAGE)
+            pageData: (this.state.filter) ? this.state.filteredData.slice(this.state.offset, this.state.offset + CITIZENS_ON_PAGE) : this.props.citizens.slice(this.state.offset, this.state.offset + CITIZENS_ON_PAGE),
+            pageCount: (this.state.filter) ? Math.ceil(this.state.filteredData.length / CITIZENS_ON_PAGE) : Math.ceil(this.props.citizens.length / CITIZENS_ON_PAGE)
         });
     }
 
@@ -177,6 +179,7 @@ class Citizens extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
+                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.props.citizens.filter(c => c.regNum.toLowerCase().includes(e.target.value.toLowerCase()) || (c.name.toLowerCase() + ' ' + c.surname.toLowerCase()).includes(e.target.value.toLowerCase()) )}, () => this.loadCitizens() )} />
                         {this.state.pageData.map((o, i) =>
                             <ul className="citizen-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="regnum">{o.regNum}</li>
@@ -406,6 +409,18 @@ class Citizens extends React.Component {
                                 <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerVehicle(); }}>
                                     <FontAwesomeIcon icon={faPlus} />
                                 </span>
+                            </div>
+
+                            <div className="edit-list">
+                                <p className="text-label">Fines: </p>
+                                <Link
+                                    to={"/incidents/3"}
+                                    className="round-link">
+                                    #15
+                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                        <FontAwesomeIcon icon={faTimesCircle} />
+                                    </span>
+                                </Link>
                             </div>
 
                             <div className="edit-list related-incidents">

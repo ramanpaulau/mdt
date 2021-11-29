@@ -21,6 +21,8 @@ class Incidents extends React.Component {
         super(props);
 
         this.state = {
+            filter: '',
+            filteredData: [],
             pageData: [],
             incidents: [],
             vehicles: [],
@@ -40,8 +42,8 @@ class Incidents extends React.Component {
 
     getPageData = () => {
         this.setState({
-            pageData: this.state.incidents.slice(this.state.offset, this.state.offset + INCIDENTS_ON_PAGE),
-            pageCount: Math.ceil(this.state.incidents.length / INCIDENTS_ON_PAGE)
+            pageData: (this.state.filter) ? this.state.filteredData.slice(this.state.offset, this.state.offset + INCIDENTS_ON_PAGE) : this.state.incidents.slice(this.state.offset, this.state.offset + INCIDENTS_ON_PAGE),
+            pageCount: (this.state.filter) ? Math.ceil(this.state.filteredData.length / INCIDENTS_ON_PAGE) : Math.ceil(this.state.incidents.length / INCIDENTS_ON_PAGE)
         });
     }
 
@@ -124,6 +126,7 @@ class Incidents extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
+                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.incidents.filter(i => (i.id + '').includes(e.target.value)) }, () => this.getPageData())} />
                         {this.state.pageData.map((o, i) =>
                             <ul className="incident-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="id">#{o.id}</li>

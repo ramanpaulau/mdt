@@ -12,6 +12,10 @@
             grid-template-areas: "id name location" "supervisor datetime button";
             grid-auto-columns: 1fr;
         }
+        
+        .text-input {
+            width: calc(100% - 25px);
+        }
     }
 
     .incident-editor {

@@ -1,7 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import axios from "axios";
 import { observer } from "mobx-react";
 
 class Home extends React.Component {
@@ -47,10 +46,6 @@ class Home extends React.Component {
             state: state
         }
         this.props.wsClient.publish({ destination: "/api/employees/state", body: JSON.stringify(tmp) });
-        /*await axios.post("http://localhost:8081/employee/" + this.props.store.employeeId + "/state/" + state).then(res => {
-            if (!res.data.success)
-                console.log(res.data.message);
-        });*/
     }
 
     boloClick = (type) => {
