@@ -234,6 +234,10 @@ class LanguagePicker extends React.Component {
 
     componentDidMount = () => {
         let lang = localStorage.getItem('lang');
+        if (!lang) {
+            localStorage.setItem('lang', this.langs[0]);
+            lang = 'en';
+        }
         this.setState({ lang: lang, idx: (lang === 'en') ? 0 : (lang === 'cz') ? 1 : 2 });
         i18n.changeLanguage(lang);
     }
