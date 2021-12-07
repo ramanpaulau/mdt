@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Select from 'react-select'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimesCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faSave } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Translation } from 'react-i18next';
 
@@ -100,6 +100,7 @@ class Employees extends React.Component {
                 })
             }))
             .catch(error => console.log(error));
+        this.loadQualification();
     }
 
     loadEmployees = async () => {
@@ -313,7 +314,7 @@ class Employees extends React.Component {
                                             placeholder="Qualification"
                                             noOptionsMessage={() => "Qualification not found"} />
                                         <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                            <FontAwesomeIcon icon={faPlus} />
+                                            <FontAwesomeIcon icon={faSave} />
                                         </span>
                                     </div>
 
@@ -340,24 +341,29 @@ class Employees extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                        <p className="text-label">
-                            Worked this week:
-                            {" " + hours + "h " + minutes + "m, salary: " + Math.floor(minutes / 60 * 220) + "$"}
-                        </p>
-                        <p className="text-label">
-                            Worked previous week:
-                            {" " + 0 + "h " + 0 + "m, salary: " + Math.floor(0 / 60 * 220) + "$"}
-                        </p>
-                        {
-                            /*this.state.workHours.map(w => {
-                                let diff = (w.endTime === null) ? 0 : Math.abs(new Date(w.endTime) - new Date(w.startTime)) / 1000;
-                                let hours = Math.floor(diff / 3600) % 24;
-                                diff -= hours * 3600;
-                        
-                                let minutes = Math.floor(diff / 60) % 60;
-                                diff -= minutes * 60;
-                                return <p className="text-label">{hours + "h " + minutes + "m, salary: " + Math.floor(minutes / 60 * w.salary) + "$"}</p>;
-                            })*/
+                        {(this.state.selectedEmployeeId) ?
+                            <div>
+                                <p className="text-label">
+                                    Worked this week:
+                                    {" " + hours + "h " + minutes + "m, salary: " + Math.floor(minutes / 60 * 220) + "$"}
+                                </p>
+                                <p className="text-label">
+                                    Worked previous week:
+                                    {" " + 0 + "h " + 0 + "m, salary: " + Math.floor(0 / 60 * 220) + "$"}
+                                </p>
+                                {
+                                    /*this.state.workHours.map(w => {
+                                        let diff = (w.endTime === null) ? 0 : Math.abs(new Date(w.endTime) - new Date(w.startTime)) / 1000;
+                                        let hours = Math.floor(diff / 3600) % 24;
+                                        diff -= hours * 3600;
+                                
+                                        let minutes = Math.floor(diff / 60) % 60;
+                                        diff -= minutes * 60;
+                                        return <p className="text-label">{hours + "h " + minutes + "m, salary: " + Math.floor(minutes / 60 * w.salary) + "$"}</p>;
+                                    })*/
+                                }
+                            </div>
+                            : ""
                         }
                     </div>
                 </div>

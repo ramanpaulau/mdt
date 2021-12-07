@@ -2,40 +2,18 @@ import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { observer } from "mobx-react";
+import moment from "moment";
+import { Link } from 'react-router-dom';
 
 class Home extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = { 
+        this.state = {
             bolo: "cars",
             activeOfficers: []
-         };
+        };
     }
-
-    officers = [
-        {id: "1-LN-33", name: "J. Perez", dep: "LSPDV", rank: "PO II", state: "10-8", call: "-"}, 
-        {id: "1-LN-33", name: "J. Perez", dep: "LSPDV", rank: "PO II", state: "10-8", call: "-"},
-        {id: "1-LN-33", name: "J. Perez", dep: "LSPDV", rank: "PO II", state: "10-8", call: "-"},
-        {id: "1-LN-33", name: "J. Perez", dep: "LSPDV", rank: "PO II", state: "10-8", call: "-"},
-        {id: "1-LN-33", name: "J. Perez", dep: "LSPDV", rank: "PO II", state: "10-8", call: "-"}
-    ];
-
-    calls = [
-        {id: 12, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22"},
-        {id: 13, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11"},
-        {id: 14, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-"}
-    ];
-
-    cars = [
-        {id: "15CH", model: "Dominator ASP", color: "red"}, 
-        {id: "84AS", model: "Sugoi", color: "yellow"}
-    ];
-
-    persons = [
-        {id: "15CH", name: "J. Stone", incident: "45"}, 
-        {id: "68JK", name: "A. Smith", incident: "245"}
-    ];
 
     componentDidMount = () => {
     }
@@ -56,7 +34,7 @@ class Home extends React.Component {
         return (
             <div className="home" onMouseMove={this.handleMove} onMouseUp={this.handleDrop} >
                 <div className="block active-bolo">
-                    {(this.state.bolo === "cars") && 
+                    {(this.state.bolo === "cars") &&
                         <div>
                             <ul className="table-head">
                                 <li>#</li>
@@ -65,18 +43,18 @@ class Home extends React.Component {
                                 <li>Indcident</li>
                             </ul>
                         </div>}
-                    {(this.state.bolo === "cars") && 
-                    <div className="table-scroll">
-                        {this.props.boloVehicles.map((o, i) => 
-                            <ul className="bolo-item" key={i}>
-                                <li>{i + 1}</li>
-                                <li>{o.record.plateNum}</li>
-                                <li>{o.record.name}</li>
-                                <li>{o.incident.id}</li>
-                            </ul>
-                        )}
-                    </div>}
-                    {(this.state.bolo === "persons") && 
+                    {(this.state.bolo === "cars") &&
+                        <div className="table-scroll">
+                            {this.props.boloVehicles.map((o, i) =>
+                                <ul className="bolo-item" key={i}>
+                                    <li>{i + 1}</li>
+                                    <li>{o.record.plateNum}</li>
+                                    <li>{o.record.name}</li>
+                                    <li>{o.incident.id}</li>
+                                </ul>
+                            )}
+                        </div>}
+                    {(this.state.bolo === "persons") &&
                         <div>
                             <ul className="table-head">
                                 <li>#</li>
@@ -85,9 +63,9 @@ class Home extends React.Component {
                                 <li>Indcident</li>
                             </ul>
                         </div>}
-                    {(this.state.bolo === "persons") && 
+                    {(this.state.bolo === "persons") &&
                         <div className="table-scroll">
-                            {this.props.boloCitizens.map((o, i) => 
+                            {this.props.boloCitizens.map((o, i) =>
                                 <ul className="bolo-item" key={i} onMouseDown={this.handleDrag}>
                                     <li>{i}</li>
                                     <li>{o.record.regNum}</li>
@@ -114,7 +92,7 @@ class Home extends React.Component {
                         </ul>
                     </div>
                     <div className="table-scroll">
-                        {this.props.activeOfficers.map((o, i) => 
+                        {this.props.activeOfficers.map((o, i) =>
                             <ul className="unit-item" key={i} onMouseDown={this.handleDrag}>
                                 <li>{i + 1}</li>
                                 <li>{o.employee.marking}</li>
@@ -154,19 +132,36 @@ class Home extends React.Component {
                             <li>Action</li>
                         </ul>
                     </div>
-                    <div className="table-scroll"> 
-                        {this.calls.map((o, i) => 
+                    <div className="table-scroll">
+                        {this.props.calls.map((o, i) =>
+                            /*moment(new Date(o.time)).isAfter(moment().subtract(1, 'hours')) &&
+                            moment(new Date(o.time)).isBefore(moment()) ?*/
                             <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
                                 <li>{o.id}</li>
-                                <li>{o.time}</li>
+                                <li>{new Date(o.time).toLocaleTimeString()}</li>
                                 <li>{o.location}</li>
-                                <li>{o.officers}</li>
+                                <li>{o.employees.map((e, i) =>
+                                    <Link 
+                                        key={i}
+                                        className="round-link"
+                                        to={"/employees/" + e.marking}>
+                                        {e.marking}
+                                    </Link>
+                                )}</li>
                                 <li>
-                                    <span className="link-button" onClick={(e) => {e.preventDefault(); }}>
+                                    <span className="link-button" onClick={(e) => {
+                                        e.preventDefault();
+                                        let tmp = {
+                                            employeeId: this.props.store.employeeId,
+                                            callId: o.id
+                                        }
+                                        this.props.wsClient.publish({ destination: "/api/call/officers", body: JSON.stringify(tmp) });
+                                    }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </li>
                             </ul>
+                            /*: ""*/
                         )}
                     </div>
                 </div>

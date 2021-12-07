@@ -75,7 +75,6 @@ class Header extends React.Component {
                                 onClick={this.navigate}>
                                 <FontAwesomeIcon icon={faPhone} />
                             </NavLink>
-                            {this.props.calls ? <div className="notification"><p>{this.props.calls}</p></div> : ""}
                         </li>
                         {((this.props.store.employeeId) || (this.props.store.admin)) ?
                             <li className="nav-li">
@@ -149,7 +148,6 @@ class Header extends React.Component {
                                     onClick={this.navigate}>
                                     <FontAwesomeIcon icon={faEye} />
                                 </NavLink>
-                                {this.props.bolo ? <div className="notification"><p>{this.props.bolo}</p></div> : ""}
                             </li>
                             : ""}
                         <li className="nav-li">

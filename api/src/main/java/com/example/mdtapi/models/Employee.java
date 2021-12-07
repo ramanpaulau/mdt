@@ -75,6 +75,10 @@ public class Employee {
         return department.getShortTitle();
     }
 
+    public String getDepartmentFullTitle() {
+        return department.getTitle();
+    }
+
     public void setDepartment(Department department) {
         this.department = department;
     }

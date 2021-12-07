@@ -4,7 +4,7 @@ import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faTimesCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import Select from 'react-select'
+import Select from 'react-select';
 import axios from 'axios';
 import Datetime from 'react-datetime';
 import "react-datetime/css/react-datetime.css";

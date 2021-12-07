@@ -2,71 +2,18 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimesCircle, faPlus, faSave, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faSave, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { observer } from "mobx-react";
-import SelectSearch from 'react-select-search';
+import Select from 'react-select';
+import { customStyles } from "./Employees";
 import { Translation } from 'react-i18next';
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import axios from "axios";
 
 const CALLS_ON_PAGE = 20;
 
 class Calls extends React.Component {
-
-    calls = [
-        { id: 1, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 2, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 3, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 4, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 5, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 6, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 7, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 8, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 9, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 10, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 11, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 12, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 13, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 14, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 15, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 16, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 17, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 18, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 19, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 20, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 21, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 22, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 23, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 24, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 25, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 26, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 27, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 28, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 29, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 30, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 31, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 32, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 33, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 34, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 35, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 36, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 37, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 38, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 39, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" },
-        { id: 40, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 41, time: "20:22", location: "Route 1", phone: "431-4578", description: "Speeding", officers: "3-TM-11" },
-        { id: 42, time: "20:46", location: 7893, phone: "458-4567", description: "Central bank robbery", officers: "-" },
-        { id: 43, time: "20:15", location: 3547, phone: "anonymous", description: "Murder near central mall", officers: "1-LN-15, 1-LN-22" }
-    ];
-
-    reportIds = [
-        { name: "1", value: 1 },
-        { name: "2", value: 2 },
-        { name: "3", value: 3 },
-        { name: "4", value: 4 }
-    ];
-
-    tag = "2-RM-5";
-
-    emptyCall = { id: "", time: "", location: "", phone: "", description: "", officers: "" };
+    emptyCall = { id: "", time: "", location: "", phone: "", text: "", officers: "" };
 
     constructor(props) {
         super(props);
@@ -76,26 +23,38 @@ class Calls extends React.Component {
         if (id === undefined)
             id = 0;
 
-        let selectedCall = (id === 0) ? this.emptyCall : this.calls[id];
+        let selectedIdx = -1;
+        if (this.props.match.params.id)
+            selectedIdx = this.props.calls.findIndex(c => c.id === parseInt(this.props.match.params.id));
 
         this.state = {
-            data: [],
+            pageData: [],
+            reports: [],
+            report: 0,
             offset: 0,
-            selectedCall: selectedCall,
+            selectedIdx: selectedIdx,
+            selectedPage: 0,
             pageCount: 0
         };
+
+        this.sendButton = React.createRef();
     }
 
     loadCalls = () => {
         this.setState({
-            data: this.calls.slice(this.state.offset, this.state.offset + CALLS_ON_PAGE),
-            pageCount: Math.ceil(this.calls.length / CALLS_ON_PAGE)
+            pageData: this.props.calls.slice(this.state.offset, this.state.offset + CALLS_ON_PAGE),
+            pageCount: Math.ceil(this.props.calls.length / CALLS_ON_PAGE)
+        });
+    }
+    loadReports = async () => {
+        await axios.get("http://localhost:8081/incidents").then(res => {
+            this.setState({ reports: res.data.map(r => r.id) });
         });
     }
 
     componentDidMount = () => {
-        this.props.clearNots("calls");
         this.loadCalls();
+        this.loadReports();
     }
 
     handlePageClick = (data) => {
@@ -107,27 +66,25 @@ class Calls extends React.Component {
         });
     };
 
-    selectCall = (id) => {
-        this.setState({ selectedCall: this.calls[id] });
+    sendCall = () => {
+        if (this.sendButton.current)
+            this.sendButton.current.click();
     }
 
     handleTextarea = (event) => {
         let tmp = this.state.selectedCall;
-        tmp.description = event.target.value;
+        tmp.text = event.target.value;
         this.setState({ selectCall: tmp });
-    }
-
-    removeReport = (id) => {
-        alert(id);
     }
 
     optionsSearch = () => {
         return (v) => {
-            return this.reportIds.filter((e) => e.name.toLowerCase().startsWith(v.toLowerCase()));
+            return this.state.reports.filter((e) => e.name.toLowerCase().startsWith(v.toLowerCase()));
         };
     }
 
     render() {
+        let incidentId = (this.state.selectedIdx === -1) ? 0 : this.props.calls[this.state.selectedIdx].incidentId;
         return (
             <div className="calls">
                 {((this.props.store.employeeId) || (this.props.store.admin)) ?
@@ -138,18 +95,20 @@ class Calls extends React.Component {
                             }
                         </Translation>
                         <div className="table-scroll">
-                            {this.state.data.map((o, i) =>
+                            {this.state.pageData.map((o, i) =>
                                 <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
                                     <li className="call-location">Location: {o.location}</li>
                                     <li className="call-id">#{o.id}</li>
-                                    <li className="call-time">Time: {o.time}</li>
+                                    <li className="call-time">Time: {(new Date(o.time)).toLocaleString()}</li>
                                     <li></li>
                                     <li className="call-phone">Phone: {o.phone}</li>
                                     <Link
                                         to={"/calls/" + o.id}
                                         className="edit-button round-link"
-                                        onClick={() => this.selectCall(o.id)}>
-                                        Edit
+                                        onClick={() => {
+                                            this.setState({ selectedIdx: i + this.state.selectedPage * CALLS_ON_PAGE });
+                                        }}>
+                                        View
                                     </Link>
                                 </ul>
                             )}
@@ -181,7 +140,7 @@ class Calls extends React.Component {
                                         <Link
                                             to={"/calls"}
                                             className="link"
-                                            onClick={() => { this.setState({ selectedCall: this.emptyCall }); }}>
+                                            onClick={() => { this.setState({ selectedIdx: -1 }); }}>
                                             {t('Title New')}
                                         </Link>
                                 }
@@ -189,72 +148,114 @@ class Calls extends React.Component {
                         </h3>
                         <Translation>
                             {
-                                t => <h3>{t('Title Send')}</h3>
+                                t => <h3 onClick={() => { this.sendCall() }}>{t('Title Send')}</h3>
                             }
                         </Translation>
                     </div>
                     <div className="table-scroll">
-                        <form>
-                            <div>
-                                <span className="floating-label">{(this.state.selectedCall.id !== "") ? '#' + this.state.selectedCall.id : ""}</span>
-                            </div>
+                        <Formik
+                            initialValues={(this.state.selectedIdx === -1) ? this.emptyCall : this.props.calls[this.state.selectedIdx]}
+                            enableReinitialize={true}
+                            validate={async values => {
+                                const errors = {};
 
-                            <div>
-                                <input type="text" className="text-input" required value={this.state.selectedCall.time} onChange={() => { }} />
-                                <span className="floating-label">Time of call</span>
-                            </div>
+                                if (!values.phone) {
+                                    errors.phone = 'Required';
+                                } else if (!/^\d{3}-\d{4}$/i.test(values.phone)) {
+                                    errors.phone = 'Invalid phone number';
+                                }
 
-                            <div>
-                                <input type="text" className="text-input" required value={this.state.selectedCall.location} onChange={() => { }} />
-                                <span className="floating-label">Location</span>
-                            </div>
-                            <div>
-                                <input type="text" className="text-input" required value={this.state.selectedCall.phone} onChange={() => { }} />
-                                <span className="floating-label">Phone</span>
-                            </div>
+                                return errors;
+                            }}
+                            onSubmit={async (values) => {
+                                let tmp = {
+                                    location: values.location,
+                                    phone: values.phone,
+                                    text: values.text
+                                };
+                                this.props.wsClient.publish({ destination: "/api/calls", body: JSON.stringify(tmp) });
+                            }}
+                        >
+                            {({ isSubmitting }) => (
+                                <Form>
+                                    <div>
+                                        <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="location" />
+                                        <ErrorMessage name="location" className="error-label" component="div" />
+                                        <span className="floating-label">Location</span>
+                                    </div>
+                                    <div>
+                                        <Field className="text-input" type="text" name="phone" />
+                                        <ErrorMessage name="phone" className="error-label" component="div" />
+                                        <span className="floating-label">Phone</span>
+                                    </div>
+                                    <div className="textarea">
+                                        <Field className="text-input" type="text" as="textarea" name="text" />
+                                        <ErrorMessage name="text" className="error-label" component="div" />
+                                        <span className="floating-label">Text</span>
+                                    </div>
+                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
 
-                            <textarea value={this.state.selectedCall.description} onChange={() => { }} />
 
-                            <div className="edit-list officers">
-                                <p className="text-label">Officers: </p>
-                                <Link
-                                    to={"/officers?tag=1-LN-20"}
-                                    className="round-link">
-                                    1-LN-20
-                                </Link>
-                                <Link
-                                    to={"/officers?tag=1-LN-11"}
-                                    className="round-link">
-                                    1-LN-11
-                                </Link>
-                                <Link
-                                    to={"/officers?tag=" + this.tag}
-                                    className="round-link">
-                                    {this.tag}
-                                </Link>
-                            </div>
+                                    {(this.state.selectedIdx === -1) ? "" :
+                                        <div className="edit-list officers">
+                                            <p className="text-label">Officers: </p>
+                                            {this.props.calls[this.state.selectedIdx].employees.map((e, i) =>
+                                                <Link
+                                                    key={i}
+                                                    className="round-link"
+                                                    to={"/employees/" + e.marking}>
+                                                    {e.marking}
+                                                </Link>
+                                            )}
+                                        </div>
+                                    }
 
-                            <div className="edit-list report">
-                                <p className="text-label">Report: </p>
-                                <Link
-                                    to={"/report?id=51"}
-                                    className="round-link">
-                                    #51
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.removeReport(51); }}>
-                                        <FontAwesomeIcon icon={faTimesCircle} />
-                                    </span>
-                                </Link>
-                                <div className="report-controls">
-                                    <SelectSearch options={this.reportIds} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="Report ID" />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faSave} />
-                                    </span>
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faPlus} />
-                                    </span>
-                                </div>
-                            </div>
-                        </form>
+                                    {(this.state.selectedIdx === -1) ? "" :
+                                        <div className="edit-list report">
+                                            <p className="text-label">Report: </p>
+                                            {(incidentId) ?
+                                                <Link
+                                                    to={"/incidents/" + incidentId}
+                                                    className="round-link">
+                                                    #{incidentId}
+                                                    <span className="link-button" onClick={async (e) => {
+                                                        e.preventDefault();
+                                                        let tmp = {
+                                                            cid: this.props.calls[this.state.selectedIdx].id
+                                                        }
+                                                        this.props.wsClient.publish({ destination: "/api/call/incident/delete", body: JSON.stringify(tmp) });
+                                                    }}>
+                                                        <FontAwesomeIcon icon={faTimesCircle} />
+                                                    </span>
+                                                </Link>
+                                                : ""}
+                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, margin: "0px" }) }}
+                                                options={this.state.reports.map(r => (
+                                                    {
+                                                        value: r,
+                                                        label: r
+                                                    })
+                                                )}
+                                                onChange={(e) => { this.setState({ report: e.value }) }}
+                                                placeholder="Report ID"
+                                                noOptionsMessage={() => "Not found"} />
+                                            <span className="link-button" onClick={async (e) => {
+                                                e.preventDefault();
+                                                if (!this.state.report)
+                                                    return;
+                                                let tmp = {
+                                                    cid: this.props.calls[this.state.selectedIdx].id,
+                                                    iid: this.state.report
+                                                }
+                                                this.props.wsClient.publish({ destination: "/api/call/incident/add", body: JSON.stringify(tmp) });
+                                            }}>
+                                                <FontAwesomeIcon icon={faSave} />
+                                            </span>
+                                        </div>
+                                    }
+                                </Form>
+                            )}
+                        </Formik>
                     </div>
                 </div>
             </div>

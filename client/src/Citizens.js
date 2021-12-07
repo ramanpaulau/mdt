@@ -13,7 +13,7 @@ import { Translation } from 'react-i18next';
 
 import "react-datepicker/dist/react-datepicker.css";
 
-const CITIZENS_ON_PAGE = 3;
+const CITIZENS_ON_PAGE = 6;
 
 class Citizens extends React.Component {
 
@@ -83,7 +83,6 @@ class Citizens extends React.Component {
 
     loadVehicles = async () => {
         await axios.get("http://localhost:8081/vehicles/free").then(res => {
-            console.log(res.data);
             this.setState({
                 vehicle: res.data
             });

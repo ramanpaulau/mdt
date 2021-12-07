@@ -4,15 +4,17 @@ import axios from 'axios';
 export class User {
     regNum = '';
     admin = false;
-    employee = {};
+    //employee = {};
     employeeId = 0;
+    department = '';
 
     constructor() {
         makeObservable(this,
             {
                 regNum: observable,
-                employee: observable,
+                //employee: observable,
                 employeeId: observable,
+                department: observable,
                 admin: observable,
                 clear: action,
                 loadUser: action
@@ -62,9 +64,10 @@ export class User {
                             });
                     }
                     axios.get("http://localhost:8081/get_employee_info/" + res.data.regNum).then(action("getEmployee", res => {
-                        if (res.data)
+                        if (res.data) {
                             this.employeeId = res.data.id;
-                        else
+                            this.department = res.data.departmentFullTitle;
+                        } else
                             this.employeeId = 0;
                     }));
                 } else {

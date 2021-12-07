@@ -8,7 +8,7 @@
     height: calc(100vh - 52px);
 }
 
-@media screen and (min-width: 768px) {  
+@media screen and (min-width: 768px) {
     .calls {
         flex-direction: row;
     }
@@ -60,8 +60,9 @@
     color: $highlight;
 }
 
-.pagination .previous, .pagination .next {
-    width: 20px; 
+.pagination .previous,
+.pagination .next {
+    width: 20px;
 }
 
 form textarea {
@@ -74,7 +75,8 @@ form textarea {
     grid-area: officers;
 }
 
-.officers p, .report p {
+.officers p,
+.report p {
     margin-right: 20px;
 }
 
@@ -124,7 +126,14 @@ form textarea {
 
     form {
         grid-template-columns: 1fr 1fr;
-        grid-template-areas: "id time" "location phone" "text text" "officers officers" "report report";
+        grid-template-areas: ". ." "text text" "officers officers" "report report";
+
+        .textarea {
+            grid-area: text;
+            textarea {
+                width: 500px;
+            }
+        }
     }
 
     .table-scroll div:first-child .floating-label {

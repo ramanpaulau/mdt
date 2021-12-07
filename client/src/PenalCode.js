@@ -96,8 +96,8 @@ class PenalCode extends React.Component {
                                                             <li key={la.number}>
                                                                 <Collapsible open={true} trigger={<CollapsibleTrigger chapter={ch.number} subchapter={su.number} law={la.number} value={la.text} remove={() => this.removeLaw(ch.number, su.number, la.number)} />} >
                                                                     <ul>
-                                                                        {(la.fine !== 0) ? <li>Max fine: {la.fine}</li> : ""}
-                                                                        {(la.detention !== 0) ? <li>Max detention: {la.detention}</li> : ""}
+                                                                        {(la.fine !== 0) ? <li>Max fine: {la.fine}$</li> : ""}
+                                                                        {(la.detention !== 0) ? <li>Max detention: {la.detention} min.</li> : ""}
                                                                     </ul>
                                                                 </Collapsible>
                                                             </li>

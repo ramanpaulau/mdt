@@ -135,22 +135,6 @@ header {
     z-index: 2;
   }
 
-nav .notification {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-  background-color: $rare;
-  top: 10%;
-  right: 10%;
-  border: 1px solid $dark;
-}
-
-nav .notification p {
-  margin: 0;
-  font-size: 0.7rem;
-}
-
 /* State */
 .state {
   background-color: $secondary;

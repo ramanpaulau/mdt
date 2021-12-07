@@ -35,10 +35,6 @@ class Vehicles extends React.Component {
     }
 
     loadPages = () => {
-        /*this.setState({
-            pageData: this.state.vehicles.slice(this.state.offset, this.state.offset + VEHICLES_ON_PAGE),
-            pageCount: Math.ceil(this.state.vehicles.length / VEHICLES_ON_PAGE)
-        });*/
         this.setState({
             pageData: (this.state.filter) ? this.state.filteredData.slice(this.state.offset, this.state.offset + VEHICLES_ON_PAGE) : this.state.vehicles.slice(this.state.offset, this.state.offset + VEHICLES_ON_PAGE),
             pageCount: (this.state.filter) ? Math.ceil(this.state.filteredData.length / VEHICLES_ON_PAGE) : Math.ceil(this.state.vehicles.length / VEHICLES_ON_PAGE)
@@ -52,7 +48,8 @@ class Vehicles extends React.Component {
             .then(axios.spread((firstResponse, secondResponse) => {
                 this.setState({
                     vehicles: firstResponse.data,
-                    departments: secondResponse.data
+                    departments: secondResponse.data,
+                    selectedIdx: (this.props.match.params.plateNum) ? firstResponse.data.findIndex(e => e.plateNum === this.props.match.params.plateNum) : -1,
                 }, () => this.loadPages())
             })
             )
@@ -71,16 +68,6 @@ class Vehicles extends React.Component {
             this.loadPages();
         });
     };
-
-    removeLicense = (id) => {
-        alert(id);
-    }
-
-    optionsSearch = () => {
-        return (v) => {
-            return this.licenseIds.filter((e) => e.name.toLowerCase().startsWith(v.toLowerCase()));
-        };
-    }
 
     sendCar = () => {
         if (this.sendButton.current)
@@ -125,7 +112,7 @@ class Vehicles extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                    <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.vehicles.filter(v => v.plateNum.toLowerCase().includes(e.target.value.toLowerCase()) || (v.vin + '').toLowerCase().includes(e.target.value.toLowerCase()) )}, () => this.loadPages() )} />
+                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.vehicles.filter(v => v.plateNum.toLowerCase().includes(e.target.value.toLowerCase()) || (v.vin + '').toLowerCase().includes(e.target.value.toLowerCase())) }, () => this.loadPages())} />
                         {this.state.pageData.map((c, i) =>
                             <ul className="car-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="vin">{c.vin}</li>
@@ -267,12 +254,14 @@ class Vehicles extends React.Component {
                                                 value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : {}}
                                                 placeholder="Department"
                                                 noOptionsMessage={() => "Not found"} />
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); this.sendDepartment(); }}>
-                                                <FontAwesomeIcon icon={faSave} />
-                                            </span>
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); this.deleteDepartment(); }}>
-                                                <FontAwesomeIcon icon={faTimesCircle} />
-                                            </span>
+                                            <div>
+                                                <span className="link-button" onClick={(e) => { e.preventDefault(); this.sendDepartment(); }}>
+                                                    <FontAwesomeIcon icon={faSave} />
+                                                </span>
+                                                <span className="link-button" onClick={(e) => { e.preventDefault(); this.deleteDepartment(); }}>
+                                                    <FontAwesomeIcon icon={faTimesCircle} />
+                                                </span>
+                                            </div>
                                         </div> : ""}
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
                                 </Form>

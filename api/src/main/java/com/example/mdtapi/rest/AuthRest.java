@@ -84,20 +84,6 @@ public class AuthRest {
 
     @PostMapping("/get_password_token")
     public ResponseMessage passwordToken(@RequestBody String request) {
-        /*Person person = personRepository.findByRegNum(regNum);
-
-        if (person == null)
-            return "";
-
-        PasswordToken token = passwordTokenRepository.findByPerson(person);
-        if (token != null) {
-            return token.getToken();
-        }
-
-        String uuid = UUID.randomUUID().toString();
-        PasswordToken pToken = new PasswordToken(uuid, person);
-        passwordTokenRepository.save(pToken);
-        return uuid;*/
         ResponseMessage res = new ResponseMessage();
 
         String customer, target;

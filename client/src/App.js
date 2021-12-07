@@ -31,47 +31,41 @@ class App extends React.Component {
         super(props);
 
         this.state = {
-            calls: 5,
             citizens: [],
             boloCitizens: [],
             boloVehicles: [],
             activeOfficers: [],
+            calls: [],
             isLoading: true,
-            bolo: 0
+            boloNs: 3,
+            callNs: 5,
+            notification: ""
         }
     }
 
     componentDidMount = async () => {
         user.wsConnet = this.wsConnect();
 
-        await axios.get("http://localhost:8081/persons")
-            .then((res) => {
-                res.data = res.data.map(c => {
+        await axios.all([
+            axios.get("http://localhost:8081/persons"),
+            axios.get("http://localhost:8081/bolo/persons"),
+            axios.get("http://localhost:8081/bolo/vehicles"),
+            axios.get("http://localhost:8081/employee/states"),
+            axios.get("http://localhost:8081/calls")])
+            .then(axios.spread((res1, res2, res3, res4, res5) => {
+                res1.data = res1.data.map(c => {
                     c.birthdate = new Date(c.birthdate); return c;
                 });
                 this.setState({
-                    citizens: res.data,
+                    citizens: res1.data,
+                    boloCitizens: res2.data,
+                    boloVehicles: res3.data,
+                    activeOfficers: res4.data,
+                    calls: res5.data,
                     isLoading: false
-                });
-            });
-
-        await axios.get("http://localhost:8081/bolo/persons")
-            .then((res) => {
-                this.setState({
-                    boloCitizens: res.data
-                });
-            });
-
-        await axios.get("http://localhost:8081/bolo/vehicles")
-            .then((res) => {
-                this.setState({
-                    boloVehicles: res.data
-                });
-            });
-
-        await axios.get("http://localhost:8081/employee/states").then(res => {
-                this.setState({ activeOfficers: res.data });
-            });
+                })
+            }))
+            .catch(error => console.log(error));
     }
 
     wsConnect = () => {
@@ -85,22 +79,34 @@ class App extends React.Component {
             onConnect: () => {
                 this.client.subscribe('/ws/persons', citizen => {
                     this.setState({ citizens: [...this.state.citizens, JSON.parse(citizen.body)] });
+                    this.setNotification("Citizens database has been updated.");
                 });
                 this.client.subscribe('/ws/bolo/persons', citizen => {
                     this.setState({ boloCitizens: [...this.state.boloCitizens, JSON.parse(citizen.body)], bolo: this.state.bolo + 1 });
+                    this.setNotification("BOLO list has been updated.");
                 });
                 this.client.subscribe('/ws/bolo/vehicles', vehicle => {
                     this.setState({ boloVehicles: [...this.state.boloVehicles, JSON.parse(vehicle.body)], bolo: this.state.bolo + 1 });
+                    this.setNotification("BOLO list has been updated.");
                 });
                 this.client.subscribe('/ws/active/employees', res => {
                     let data = JSON.parse(res.body);
                     console.log(JSON.parse(res.body));
                     if (data.action === "add") {
-                        this.setState({ activeOfficers: [...this.state.activeOfficers, { employee: data.employee, state: data.state }]});
+                        this.setState({ activeOfficers: [...this.state.activeOfficers, { employee: data.employee, state: data.state }] });
                     } else if (data.action === "delete") {
                         this.setState({ activeOfficers: [...this.state.activeOfficers.filter(o => o.employee.id !== data.employee.id)] });
                     } else {
                         this.setState({ activeOfficers: [...this.state.activeOfficers.filter(o => o.employee.id !== data.employee.id), { employee: data.employee, state: data.state }] });
+                    }
+                });
+                this.client.subscribe('/ws/calls', call => {
+                    let callBody = JSON.parse(call.body);
+                    if (this.state.calls.some(c => c.id === callBody.id)) {
+                        this.setState({ calls: [...this.state.calls.filter(c => c.id !== callBody.id), callBody].sort((a, b) => (a.time > b.time) ? -1 : (a.time === b.time) ? 0 : 1) });
+                    } else {
+                        this.setState({ calls: [...this.state.calls, callBody] });
+                        this.setNotification("Calls list has been updated.");
                     }
                 });
             },
@@ -119,12 +125,16 @@ class App extends React.Component {
         this.client = null;
     }
 
-    componentWillUnmount = () => {
-        this.wsDisconnect();
+    setNotification(text) {
+        if (this.timeoutID)
+            clearTimeout(this.timeoutID);
+        this.setState({ notification: text });
+        this.timeoutID = setTimeout(() => this.setState({ notification: "" }), 7000);
     }
 
-    clearNotifications = (name) => {
-        this.setState({ [name]: 0 });
+    componentWillUnmount = () => {
+        this.wsDisconnect();
+        clearTimeout(this.timeoutID);
     }
 
     render() {
@@ -135,15 +145,15 @@ class App extends React.Component {
                 <Route exact path="/login" component={RequireNotAuth((props) => <Login {...props} store={user} wsConnect={this.wsConnect} />)} />
                 <React.Fragment>
                     <div className="app">
-                        <Header calls={this.state.calls} cabololls={this.state.bolo} store={user} wsDisconnect={this.wsDisconnect} />
-                        <State store={user} />
+                        <Header store={user} wsDisconnect={this.wsDisconnect} />
+                        <State store={user} notification={this.state.notification} />
                         <main>
                             <Switch>
-                                <Route exact path="/" component={RequireAuth((props) => <Home {...props} store={user} wsClient={this.client} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} activeOfficers={this.state.activeOfficers} />, user)} />
-                                <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls clearNots={(this.state.calls) ? this.clearNotifications : () => { }} {...props} store={user} />, user)} />
-                                <Route exact path="/vehicles/:regNum?" component={RequireAuth((props) => <Vehicles {...props} store={user} />, user)} />
+                                <Route exact path="/" component={RequireAuth((props) => <Home {...props} store={user} wsClient={this.client} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} calls={this.state.calls} activeOfficers={this.state.activeOfficers} />, user)} />
+                                <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls {...props} wsClient={this.client} calls={this.state.calls} store={user} />, user)} />
+                                <Route exact path="/vehicles/:plateNum?" component={RequireAuth((props) => <Vehicles {...props} store={user} />, user)} />
                                 <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} />, user)} />
-                                <Route exact path="/bolo" component={RequireAuth((props) => <Bolo clearNots={(this.state.bolo) ? this.clearNotifications : () => { }} {...props} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} />, user)} />
+                                <Route exact path="/bolo" component={RequireAuth((props) => <Bolo {...props} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} />, user)} />
                                 <Route exact path="/fines" component={RequireAuth((props) => <Fines {...props} citizens={this.state.citizens} store={user} />, user)} />
                                 <Route exact path="/incidents/:id?" component={RequireAuth((props) => <Incidents {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/indictments/:id?" component={RequireAuth((props) => <Indictments {...props} citizens={this.state.citizens} store={user} />, user)} />

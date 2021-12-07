@@ -83,7 +83,7 @@ class Inventory extends React.Component {
             return;
 
         let tmp = {
-            employee: user.employee.id,
+            employee: user.employeeId,
             description: description,
             amount: amount,
             action: action,

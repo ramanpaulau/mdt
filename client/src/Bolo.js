@@ -6,7 +6,6 @@ import { Translation } from 'react-i18next';
 class Bolo extends React.Component {
 
     componentDidMount = () => {
-        this.props.clearNots("bolo");
     }
 
     render() {
