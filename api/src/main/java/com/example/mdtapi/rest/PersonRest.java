@@ -71,12 +71,23 @@ public class PersonRest {
         }
 
         person.getVehicles().add(vehicle);
-        /*vehicle.setOwner(person);
-        person.getVehicles().add(vehicle);
-        vehicleRepository.save(vehicle);*/
         personRepository.save(person);
         return res;
     }
+
+    @DeleteMapping("/person/{regNum}/vehicle/{vin}")
+    public void removeVehicle(@PathVariable String regNum, @PathVariable int vin) {
+        Vehicle vehicle = vehicleRepository.findByVin(vin);
+
+        Person person = personRepository.findByRegNum(regNum);
+        if (vehicle == null || person == null) {
+            return;
+        }
+
+        person.getVehicles().remove(vehicle);
+        personRepository.save(person);
+    }
+
 
     @GetMapping("/person/{regNum}/vehicles")
     public Set<Vehicle> getVehicles(@PathVariable String regNum) {

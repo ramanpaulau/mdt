@@ -19,25 +19,6 @@ class Citizens extends React.Component {
 
     states = ["alive", "dead", "missing"];
 
-    licenseIds = [
-        { name: "1", value: 1 },
-        { name: "2", value: 2 },
-        { name: "3", value: 3 },
-        { name: "4", value: 4 }
-    ];
-    propertyIds = [
-        { name: "1", value: 1 },
-        { name: "2", value: 2 },
-        { name: "3", value: 3 },
-        { name: "4", value: 4 }
-    ];
-    transportIds = [
-        { name: "1", value: 1 },
-        { name: "2", value: 2 },
-        { name: "3", value: 3 },
-        { name: "4", value: 4 }
-    ];
-
     emptyCitizen = { regNum: "", name: "", surname: "", state: "", phoneNumber: "", birthdate: "" };
 
     constructor(props) {
@@ -389,7 +370,13 @@ class Citizens extends React.Component {
                                         to={"/vehicles/" + v.plateNum}
                                         className="round-link">
                                         {v.plateNum + " / " + v.name}
-                                        <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                        <span className="link-button" onClick={async (e) => {
+                                            e.preventDefault();
+                                            await axios.delete("http://localhost:8081/person/" + this.props.citizens[this.state.selectedIdx].regNum + "/vehicle/" + v.vin).then(_ => {
+                                                this.getCitizenVehicles();
+                                                this.loadVehicles();
+                                            });
+                                        }}>
                                             <FontAwesomeIcon icon={faTimesCircle} />
                                         </span>
                                     </Link>
