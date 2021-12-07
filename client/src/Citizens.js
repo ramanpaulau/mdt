@@ -54,7 +54,7 @@ class Citizens extends React.Component {
             licenses: [],
             vehicle: [],
             citizenVehicles: [],
-            license: {},
+            license: undefined,
             offset: 0,
             selectedIdx: selectedIdx,
             selectedPage: 0,
@@ -178,7 +178,7 @@ class Citizens extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.props.citizens.filter(c => c.regNum.toLowerCase().includes(e.target.value.toLowerCase()) || (c.name.toLowerCase() + ' ' + c.surname.toLowerCase()).includes(e.target.value.toLowerCase()) )}, () => this.loadCitizens() )} />
+                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.props.citizens.filter(c => c.regNum.toLowerCase().includes(e.target.value.toLowerCase()) || (c.name.toLowerCase() + ' ' + c.surname.toLowerCase()).includes(e.target.value.toLowerCase())) }, () => this.loadCitizens())} />
                         {this.state.pageData.map((o, i) =>
                             <ul className="citizen-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="regnum">{o.regNum}</li>
@@ -339,14 +339,26 @@ class Citizens extends React.Component {
                         <div className="table-scroll">
                             <div className="edit-list licenses">
                                 <p className="text-label">Licenses: </p>
-                                <Link
-                                    to={"/licenses"}
-                                    className="round-link">
-                                    Driving
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faTimesCircle} />
-                                    </span>
-                                </Link>
+                                {this.props.citizens[this.state.selectedIdx].licenses.map((l, i) =>
+                                    <Link
+                                        key={i}
+                                        className="round-link"
+                                        to={"/licenses"}>
+                                        {l.name}
+                                        <span className="link-button" onClick={(e) => {
+                                            e.preventDefault();
+                                            let tmp = {
+                                                regNum: this.props.citizens[this.state.selectedIdx].regNum,
+                                                lid: l.id
+                                            };
+                                            if (!tmp.lid || !tmp.lid)
+                                                return;
+                                            this.props.wsClient.publish({ destination: "/api/person/license/delete", body: JSON.stringify(tmp) });
+                                        }}>
+                                            <FontAwesomeIcon icon={faTimesCircle} />
+                                        </span>
+                                    </Link>
+                                )}
                                 <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
                                     options={this.state.licenses.map(l => (
                                         {
@@ -357,32 +369,19 @@ class Citizens extends React.Component {
                                     onChange={(e) => { this.setState({ license: e.value }) }}
                                     placeholder="License"
                                     noOptionsMessage={() => "Not found"} />
-                                <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                <span className="link-button" onClick={(e) => {
+                                    e.preventDefault();
+                                    let tmp = {
+                                        regNum: this.props.citizens[this.state.selectedIdx].regNum,
+                                        lid: this.state.license
+                                    };
+                                    if (!tmp.lid || !tmp.lid)
+                                        return;
+                                    this.props.wsClient.publish({ destination: "/api/person/license/add", body: JSON.stringify(tmp) });
+                                }}>
                                     <FontAwesomeIcon icon={faPlus} />
                                 </span>
                             </div>
-                            {/*
-                            <div className="edit-list property">
-                                <p className="text-label">Property: </p>
-                                <Link
-                                    to={"/property?id=3"}
-                                    className="round-link">
-                                    #3
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faTimesCircle} />
-                                    </span>
-                                </Link>
-                                <div className="report-controls">
-                                    <SelectSearch options={this.propertyIds} search filterOptions={this.optionsSearch} emptyMessage="Not found" placeholder="Property ID" />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faSave} />
-                                    </span>
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faPlus} />
-                                    </span>
-                                </div>
-                            </div>
-*/}
                             <div className="edit-list transport">
                                 <p className="text-label">Vehicles: </p>
                                 {this.state.citizenVehicles.map(v =>

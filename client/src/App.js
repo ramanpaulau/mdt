@@ -78,8 +78,13 @@ class App extends React.Component {
             webSocketFactory: () => new SockJS("http://localhost:8081/mdt"),
             onConnect: () => {
                 this.client.subscribe('/ws/persons', citizen => {
-                    this.setState({ citizens: [...this.state.citizens, JSON.parse(citizen.body)] });
-                    this.setNotification("Citizens database has been updated.");
+                    let citizenBody = JSON.parse(citizen.body);
+                    if (this.state.citizens.some(c => c.regNum === citizenBody.regNum)) {
+                        this.setState({ citizens: [...this.state.citizens.filter(c => c.regNum !== citizenBody.regNum), citizenBody].sort((a, b) => (a.regNum > b.regNum) ? 1 : (a.regNum === b.regNum) ? 0 : -1) });
+                    } else {
+                        this.setState({ citizens: [...this.state.citizens, citizenBody] });
+                        this.setNotification("Citizens database has been updated.");
+                    }
                 });
                 this.client.subscribe('/ws/bolo/persons', citizen => {
                     this.setState({ boloCitizens: [...this.state.boloCitizens, JSON.parse(citizen.body)], bolo: this.state.bolo + 1 });

@@ -15,4 +15,6 @@ public interface PersonRepository extends JpaRepository<Person, String> {
     boolean existsByRegNum(String regNUm);
 
     List<PersonView> findAllProjectedBy();
+
+    List<PersonView> findAllProjectedByOrderByRegNum();
 }

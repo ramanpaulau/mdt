@@ -9,12 +9,21 @@
 
         .license-add {
             background-color: $secondary;
+
+            form {
+                display: grid;
+                grid-template-areas: "name type" "description button";
+            
+                .button, .type {
+                    text-align: center;
+                }
+            }
         }
 
-        ul form {
-            margin: 0;
+        .license-item {
             display: grid;
             grid-template-areas: "name ." "description button";
+            grid-auto-columns: 1fr;
 
             .name {
                 grid-area: name;

@@ -23,7 +23,7 @@ public class Person {
 	private boolean admin;
 	private State state;
 
-	@ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "person_license",
 			joinColumns = { @JoinColumn(name = "license_id") },
@@ -125,6 +125,10 @@ public class Person {
 
 	public void setLicenses(Set<License> licenses) {
 		this.licenses = licenses;
+	}
+
+	public void removeLicense(License license) {
+		this.licenses.remove(license);
 	}
 
 	public Set<Vehicle> getVehicles() {

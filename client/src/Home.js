@@ -134,8 +134,8 @@ class Home extends React.Component {
                     </div>
                     <div className="table-scroll">
                         {this.props.calls.map((o, i) =>
-                            /*moment(new Date(o.time)).isAfter(moment().subtract(1, 'hours')) &&
-                            moment(new Date(o.time)).isBefore(moment()) ?*/
+                            moment(new Date(o.time)).isAfter(moment().subtract(1, 'hours')) &&
+                            moment(new Date(o.time)).isBefore(moment()) ?
                             <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
                                 <li>{o.id}</li>
                                 <li>{new Date(o.time).toLocaleTimeString()}</li>
@@ -161,7 +161,7 @@ class Home extends React.Component {
                                     </span>
                                 </li>
                             </ul>
-                            /*: ""*/
+                            : ""
                         )}
                     </div>
                 </div>

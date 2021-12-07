@@ -38,7 +38,7 @@ public class PersonRest {
 
     @GetMapping("/persons")
     public List<PersonView> all() {
-        return personRepository.findAllProjectedBy();
+        return personRepository.findAllProjectedByOrderByRegNum();
     }
 
     @PostMapping("/person/vehicle")
