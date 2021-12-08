@@ -15,7 +15,12 @@
 
     .car-item, .citizen-item {
         display: grid;
+        grid-auto-columns: 1fr;
         grid-template-areas: ". ." ". .";
+
+        .edit-button {
+            width: 120px;
+        }
     }
 
 }

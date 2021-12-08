@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface IndictmentRepository extends JpaRepository<Indictment, Integer> {
-    List<Indictment> findByPerson(Person person);
+    List<Indictment> findByPersonOrderByIdAsc(Person person);
 }

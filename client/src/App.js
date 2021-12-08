@@ -37,8 +37,6 @@ class App extends React.Component {
             activeOfficers: [],
             calls: [],
             isLoading: true,
-            boloNs: 3,
-            callNs: 5,
             notification: ""
         }
     }
@@ -86,17 +84,35 @@ class App extends React.Component {
                         this.setNotification("Citizens database has been updated.");
                     }
                 });
+
                 this.client.subscribe('/ws/bolo/persons', citizen => {
-                    this.setState({ boloCitizens: [...this.state.boloCitizens, JSON.parse(citizen.body)], bolo: this.state.bolo + 1 });
+                    citizen = JSON.parse(citizen.body);
+                    if (!citizen)
+                        return;
+
+                    if (citizen.action === "add") {
+                        this.setState({ boloCitizens: [...this.state.boloCitizens, citizen.body] });
+                    } else if (citizen.action === "delete") {
+                        this.setState({ boloCitizens: [...this.state.boloCitizens.filter(c => c.record.regNum !== citizen.body.record.regNum)] });
+                    }
                     this.setNotification("BOLO list has been updated.");
                 });
+
                 this.client.subscribe('/ws/bolo/vehicles', vehicle => {
-                    this.setState({ boloVehicles: [...this.state.boloVehicles, JSON.parse(vehicle.body)], bolo: this.state.bolo + 1 });
+                    vehicle = JSON.parse(vehicle.body);
+                    if (!vehicle)
+                        return;
+
+                    if (vehicle.action === "add") {
+                        this.setState({ boloVehicles: [...this.state.boloVehicles, vehicle.body] });
+                    } else if (vehicle.action === "delete") {
+                        this.setState({ boloVehicles: [...this.state.boloVehicles.filter(v => v.record.vin !== vehicle.body.record.vin)] });
+                    }
                     this.setNotification("BOLO list has been updated.");
                 });
+
                 this.client.subscribe('/ws/active/employees', res => {
                     let data = JSON.parse(res.body);
-                    console.log(JSON.parse(res.body));
                     if (data.action === "add") {
                         this.setState({ activeOfficers: [...this.state.activeOfficers, { employee: data.employee, state: data.state }] });
                     } else if (data.action === "delete") {
@@ -105,6 +121,7 @@ class App extends React.Component {
                         this.setState({ activeOfficers: [...this.state.activeOfficers.filter(o => o.employee.id !== data.employee.id), { employee: data.employee, state: data.state }] });
                     }
                 });
+
                 this.client.subscribe('/ws/calls', call => {
                     let callBody = JSON.parse(call.body);
                     if (this.state.calls.some(c => c.id === callBody.id)) {

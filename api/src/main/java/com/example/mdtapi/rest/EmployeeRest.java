@@ -125,4 +125,16 @@ public class EmployeeRest {
         employee.get().getQualifications().add(qualification.get());
         employeeRepository.save(employee.get());
     }
+
+    @DeleteMapping("/employee/{eid}/qualification/{qid}/delete")
+    public void removeQualification(@PathVariable int eid, @PathVariable int qid) {
+        Optional<Employee> employee = employeeRepository.findById(eid);
+        Optional<Qualification> qualification = qualificationRepository.findById(qid);
+
+        if (employee.isEmpty() || qualification.isEmpty())
+            return;
+
+        employee.get().getQualifications().remove(qualification.get());
+        employeeRepository.save(employee.get());
+    }
 }

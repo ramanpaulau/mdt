@@ -39,6 +39,19 @@ public class Incident {
             inverseJoinColumns = @JoinColumn(name = "vehicle_plate_num"))
     private Set<Vehicle> boloVehicles = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "witnesses",
+            joinColumns = @JoinColumn(name = "incident_id"),
+            inverseJoinColumns = @JoinColumn(name = "person_reg_num"))
+    private Set<Person> witnesses = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "suspects",
+            joinColumns = @JoinColumn(name = "incident_id"),
+            inverseJoinColumns = @JoinColumn(name = "person_reg_num"))
+    private Set<Person> suspects = new HashSet<>();
 
     @OneToMany(targetEntity = Indictment.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "incident_id")
@@ -47,7 +60,7 @@ public class Incident {
     public Incident() {
     }
 
-    public Incident(Integer id, String title, String location, LocalDateTime dateTime, String details, Employee supervisor, Set<Employee> officers, Set<Person> boloPersons, Set<Vehicle> boloVehicles, Set<Indictment> indictments) {
+    public Incident(Integer id, String title, String location, LocalDateTime dateTime, String details, Employee supervisor, Set<Employee> officers, Set<Person> boloPersons, Set<Vehicle> boloVehicles, Set<Person> witnesses, Set<Person> suspects, Set<Indictment> indictments) {
         this.id = id;
         this.title = title;
         this.location = location;
@@ -57,6 +70,8 @@ public class Incident {
         this.officers = officers;
         this.boloPersons = boloPersons;
         this.boloVehicles = boloVehicles;
+        this.witnesses = witnesses;
+        this.suspects = suspects;
         this.indictments = indictments;
     }
 
@@ -130,6 +145,22 @@ public class Incident {
 
     public void setBoloVehicles(Set<Vehicle> boloVehicles) {
         this.boloVehicles = boloVehicles;
+    }
+
+    public Set<Person> getWitnesses() {
+        return witnesses;
+    }
+
+    public void setWitnesses(Set<Person> witnesses) {
+        this.witnesses = witnesses;
+    }
+
+    public Set<Person> getSuspects() {
+        return suspects;
+    }
+
+    public void setSuspects(Set<Person> suspects) {
+        this.suspects = suspects;
     }
 
     public Set<Indictment> getIndictments() {

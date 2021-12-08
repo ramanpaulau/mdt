@@ -66,7 +66,7 @@ class Employees extends React.Component {
             ranks: [],
             workHours: [],
             department: null,
-            qualification: undefined,
+            qualification: null,
             selectedRank: null,
             selectedCitizens: null,
             tag: 0,
@@ -102,7 +102,7 @@ class Employees extends React.Component {
                 })
             }))
             .catch(error => console.log(error));
-        this.loadQualification();
+        this.loadQualifications();
     }
 
     loadEmployees = async () => {
@@ -113,7 +113,7 @@ class Employees extends React.Component {
         });
     }
 
-    loadQualification = async () => {
+    loadQualifications = async () => {
         await axios.get("http://localhost:8081/qualifications").then(res => {
             this.setState({
                 qualifications: res.data
@@ -157,6 +157,7 @@ class Employees extends React.Component {
 
     clearForm = () => {
         this.setState({ selectedCitizens: null, selectedRank: null, tag: 0 });
+        this.clearData();
     }
 
     handleView = (e) => {
@@ -179,6 +180,10 @@ class Employees extends React.Component {
         return (v) => {
             return this.licenseIds.filter((e) => e.name.toLowerCase().startsWith(v.toLowerCase()));
         };
+    }
+
+    clearData = () => {
+        this.setState({ qualification: null });
     }
 
     render() {
@@ -237,7 +242,11 @@ class Employees extends React.Component {
                                 </Link>
                                 <Link
                                     to={"/employees/" + this.state.department.value + "-" + e.tag}
-                                    onClick={() => { this.handleView(e); this.setState({ selectedEmployeeId: e.id }, () => { this.loadWorkHours(); this.loadIncidents(); }); }}
+                                    onClick={() => {
+                                        this.handleView(e);
+                                        this.clearData();
+                                        this.setState({ selectedEmployeeId: e.id }, () => { this.loadWorkHours(); this.loadIncidents(); });
+                                    }}
                                     className="edit-button round-link">
                                     <li>View</li>
                                 </Link>
@@ -307,16 +316,22 @@ class Employees extends React.Component {
 
                                     <div className="edit-list licenses">
                                         <p className="text-label">Qualifications: </p>
-                                        {qualifications.map(q => 
-                                        <Link
-                                            key={q.id}
-                                            to={"/licenses"}
-                                            className="round-link">
-                                            {q.name}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                                <FontAwesomeIcon icon={faTimesCircle} />
-                                            </span>
-                                        </Link>
+                                        {qualifications.map(q =>
+                                            <Link
+                                                key={q.id}
+                                                to={"/licenses"}
+                                                className="round-link">
+                                                {q.name}
+                                                <span className="link-button" onClick={async (e) => {
+                                                    e.preventDefault();
+                                                    await axios.delete("http://localhost:8081/employee/" + this.state.selectedEmployeeId + "/qualification/" + q.id + "/delete").then(_ => {
+                                                        this.loadEmployees()
+                                                        this.clearData();
+                                                    });
+                                                }}>
+                                                    <FontAwesomeIcon icon={faTimesCircle} />
+                                                </span>
+                                            </Link>
                                         )}
                                         <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
                                             options={this.state.qualifications.map(q => (
@@ -325,27 +340,30 @@ class Employees extends React.Component {
                                                     label: q.name
                                                 })
                                             )}
-                                            onChange={(e) => { this.setState({ qualification: e.value }) }}
+                                            value={this.state.qualification}
+                                            onChange={(e) => { this.setState({ qualification: e }) }}
                                             placeholder="Qualification"
                                             noOptionsMessage={() => "Qualification not found"} />
-                                        <span className="link-button" onClick={async (e) => { 
-                                            e.preventDefault(); 
+                                        <span className="link-button" onClick={async (e) => {
+                                            e.preventDefault();
                                             let tmp = {
                                                 eid: this.state.selectedEmployeeId,
-                                                qid: this.state.qualification
+                                                qid: this.state.qualification.value
                                             };
                                             if (!tmp.eid || !tmp.qid)
                                                 return;
                                             await axios.post("http://localhost:8081/employee/" + tmp.eid + "/qualification/" + tmp.qid + "/add").then(_ => {
+                                                this.loadEmployees()
+                                                this.clearData();
                                             });
-                                            }}>
+                                        }}>
                                             <FontAwesomeIcon icon={faPlus} />
                                         </span>
                                     </div>
 
                                     <div className="edit-list related-incidents">
                                         <p className="text-label">Incidents: </p>
-                                        {this.state.incidents.map(i => 
+                                        {this.state.incidents.map(i =>
                                             <Link
                                                 key={i.id}
                                                 to={"/incidents/" + i.id}

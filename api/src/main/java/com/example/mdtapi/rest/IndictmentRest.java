@@ -50,7 +50,7 @@ public class IndictmentRest {
         if (person == null)
             return null;
 
-        return indictmentRepository.findByPerson(person);
+        return indictmentRepository.findByPersonOrderByIdAsc(person);
     }
 
     @PostMapping("/indictment")

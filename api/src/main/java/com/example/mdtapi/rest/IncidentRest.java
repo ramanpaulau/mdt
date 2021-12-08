@@ -4,6 +4,7 @@ import com.example.mdtapi.models.*;
 import com.example.mdtapi.repositories.EmployeeRepository;
 import com.example.mdtapi.repositories.FineRepository;
 import com.example.mdtapi.repositories.IncidentRepository;
+import com.example.mdtapi.repositories.PersonRepository;
 import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,10 +17,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class IncidentRest {
@@ -30,9 +28,13 @@ public class IncidentRest {
     @Autowired
     private final EmployeeRepository employeeRepository;
 
-    public IncidentRest(IncidentRepository incidentRepository, EmployeeRepository employeeRepository) {
+    @Autowired
+    private final PersonRepository personRepository;
+
+    public IncidentRest(IncidentRepository incidentRepository, EmployeeRepository employeeRepository, PersonRepository personRepository) {
         this.incidentRepository = incidentRepository;
         this.employeeRepository = employeeRepository;
+        this.personRepository = personRepository;
     }
 
     @GetMapping("/incidents")
@@ -68,6 +70,17 @@ public class IncidentRest {
         return res;
     }
 
+    @GetMapping("/bolo/persons/group")
+    public Set<BOLORecords<Person>> allBoloPersonsGroup() {
+        Set<BOLORecords<Person>> res = new HashSet<>();
+
+        List<Incident> incidents = incidentRepository.findAll();
+        for (Incident i : incidents)
+            res.add(new BOLORecords<>(i.getId(), i.getBoloPersons()));
+
+        return res;
+    }
+
     @GetMapping("/bolo/vehicles")
     public Set<BOLORecord<Vehicle>> allBoloVehicles() {
         Set<BOLORecord<Vehicle>> res = new HashSet<>();
@@ -76,6 +89,18 @@ public class IncidentRest {
         for (Incident i : incident)
             for (Vehicle v : i.getBoloVehicles())
                 res.add(new BOLORecord<>(i, v));
+
+        return res;
+    }
+
+
+    @GetMapping("/bolo/vehicles/group")
+    public Set<BOLORecords<Vehicle>> allBoloVehiclesGroup() {
+        Set<BOLORecords<Vehicle>> res = new HashSet<>();
+
+        List<Incident> incidents = incidentRepository.findAll();
+        for (Incident i : incidents)
+            res.add(new BOLORecords<>(i.getId(), i.getBoloVehicles()));
 
         return res;
     }
@@ -161,5 +186,103 @@ public class IncidentRest {
 
         incident.get().getOfficers().add(employee.get());
         incidentRepository.save(incident.get());
+    }
+
+    @GetMapping("/incident/{iid}/suspects")
+    public Set<Person> getSuspects(@PathVariable int iid) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+
+        if (incident.isEmpty())
+            return null;
+
+        return incident.get().getSuspects();
+    }
+
+    @GetMapping("/incident/{iid}/witnesses")
+    public Set<Person> getWitnesses(@PathVariable int iid) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+
+        if (incident.isEmpty())
+            return null;
+
+        return incident.get().getWitnesses();
+    }
+
+    @PostMapping("/incident/{iid}/suspect/{regNum}/add")
+    public void addSuspect(@PathVariable int iid, @PathVariable String regNum) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+        Person person = personRepository.findByRegNum(regNum);
+
+        if (incident.isEmpty() || person == null)
+            return;
+
+        incident.get().getSuspects().add(person);
+        incidentRepository.save(incident.get());
+    }
+
+    @PostMapping("/incident/{iid}/witness/{regNum}/add")
+    public void addWitness(@PathVariable int iid, @PathVariable String regNum) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+        Person person = personRepository.findByRegNum(regNum);
+
+        if (incident.isEmpty() || person == null)
+            return;
+
+        incident.get().getWitnesses().add(person);
+        incidentRepository.save(incident.get());
+    }
+
+    @DeleteMapping("/incident/{iid}/suspect/{regNum}/delete")
+    public void deleteSuspect(@PathVariable int iid, @PathVariable String regNum) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+        Person person = personRepository.findByRegNum(regNum);
+
+        if (incident.isEmpty() || person == null)
+            return;
+
+        incident.get().getSuspects().remove(person);
+        incidentRepository.save(incident.get());
+    }
+
+    @DeleteMapping("/incident/{iid}/witness/{regNum}/delete")
+    public void deleteWitness(@PathVariable int iid, @PathVariable String regNum) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+        Person person = personRepository.findByRegNum(regNum);
+
+        if (incident.isEmpty() || person == null)
+            return;
+
+        incident.get().getWitnesses().remove(person);
+        incidentRepository.save(incident.get());
+    }
+
+    @DeleteMapping("/incident/{iid}/officer/{oid}/delete")
+    public void deleteOfficer(@PathVariable int iid, @PathVariable int oid) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+        Optional<Employee> employee = employeeRepository.findById(oid);
+
+        if (incident.isEmpty() || employee.isEmpty())
+            return;
+
+        incident.get().getOfficers().remove(employee.get());
+        incidentRepository.save(incident.get());
+    }
+
+    @GetMapping("/incidents/person/{regNum}")
+    public List<Integer> getByPerson(@PathVariable String regNum) {
+        List<Incident> incidents = incidentRepository.findAll();
+        Person person = personRepository.findByRegNum(regNum);
+        List<Integer> incidentIds = new ArrayList<>();
+
+
+        if (person == null)
+            return null;
+
+        for (Incident incident : incidents) {
+            if (incident.getWitnesses().contains(person) || incident.getSuspects().contains(person))
+                incidentIds.add(incident.getId());
+        }
+
+        return  incidentIds;
     }
 }

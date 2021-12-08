@@ -20,7 +20,7 @@ public class Employee {
     @JoinColumn(name = "rank_title")
     private Rank rank;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
     @JoinTable(
             name = "employee_qualification",
             joinColumns = { @JoinColumn(name = "qualification_id") },

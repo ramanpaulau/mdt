@@ -238,7 +238,8 @@ class Inventory extends React.Component {
                             <ul className="history-item" key={i} onMouseDown={this.handleDrag}>
                                 <li>{(new Date(o.date)).toLocaleString()}</li>
                                 <li>{o.description}</li>
-                                <li>{o.amount}</li>
+                                <li>*{o.amount}</li>
+                                <li>{o.department}</li>
                                 <li>{(o.action) ? <FontAwesomeIcon className="green" icon={faChevronCircleUp} /> : <FontAwesomeIcon className="red" icon={faChevronCircleDown} />}</li>
                                 <li>{o.employee}</li>
                             </ul>

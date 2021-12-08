@@ -29,11 +29,15 @@ class Incidents extends React.Component {
             boloCitizens: [],
             boloVehicles: [],
             activeOfficers: [],
+            suspects: [],
+            witnesses: [],
             indictments: [],
             datetime: new Date(),
-            citizen: undefined,
-            officer: undefined,
-            plateNum: undefined,
+            citizen: null,
+            officer: null,
+            suspect: null,
+            witness: null,
+            vehicle: null,
             employees: [],
             offset: 0,
             selectedIdx: -1,
@@ -51,47 +55,40 @@ class Incidents extends React.Component {
         });
     }
 
-    loadIncidents = async () => {
-        await axios.get("http://localhost:8081/incidents").then(res => {
-            this.setState({
-                incidents: res.data
-            }, () => { this.getPageData() });
-        });
+    componentDidMount = async () => {
+        await axios.all([
+            axios.get("http://localhost:8081/incidents"),
+            axios.get("http://localhost:8081/vehicles"),
+            axios.get("http://localhost:8081/employees")])
+            .then(axios.spread((res1, res2, res3) => {
+                let selectedIdx = -1;
+                if (this.props.match.params.id)
+                    selectedIdx = res1.data.findIndex(i => i.id === parseInt(this.props.match.params.id));
+                this.setState({
+                    incidents: res1.data,
+                    vehicles: res2.data,
+                    employees: res3.data,
+                    selectedIdx: selectedIdx
+                }, () => {
+                    if (this.state.selectedIdx !== -1)
+                        this.loadData();
+                    this.getPageData();
+                })
+            }))
+            .catch(error => console.log(error));
     }
 
-    loadVehicles = async () => {
-        await axios.get("http://localhost:8081/vehicles").then(res => {
-            this.setState({
-                vehicles: res.data
-            });
-        });
-    }
-
-    loadEmployees = async () => {
-        await axios.get("http://localhost:8081/employees").then(res => {
-            this.setState({
-                employees: res.data
-            });
-        });
-    }
-
-    componentDidMount = () => {
-        this.loadIncidents();
-        this.loadVehicles();
-        this.loadEmployees();
-    }
-
-    registerBOLOCitizen = async () => {
+    addBOLOCitizen = async () => {
         let tmp = {
-            citizenRegNum: this.state.citizen,
+            citizenRegNum: this.state.citizen.value,
             incidentId: this.state.incidents[this.state.selectedIdx].id
         }
         this.props.wsClient.publish({ destination: "/api/incident/bolo/persons", body: JSON.stringify(tmp) });
     }
 
-    registerBOLOVehicle = async () => {
+    addBOLOVehicle = async () => {
         let tmp = {
-            vehiclePlateNum: this.state.plateNum,
+            vehiclePlateNum: this.state.vehicle.value,
             incidentId: this.state.incidents[this.state.selectedIdx].id
         }
         this.props.wsClient.publish({ destination: "/api/incident/bolo/vehicles", body: JSON.stringify(tmp) });
@@ -99,7 +96,35 @@ class Incidents extends React.Component {
 
     addActiveOfficer = async () => {
         let id = this.state.incidents[this.state.selectedIdx].id;
-        await axios.post("http://localhost:8081/incident/" + id + "/officer/" + this.state.officer + "/add");
+        await axios.post("http://localhost:8081/incident/" + id + "/officer/" + this.state.officer.value + "/add").then(_ => this.loadOfficers());
+    }
+
+    addSuspect = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.post("http://localhost:8081/incident/" + id + "/suspect/" + this.state.suspect.value + "/add").then(_ => this.loadSuspects());
+    }
+
+    addWitness = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.post("http://localhost:8081/incident/" + id + "/witness/" + this.state.witness.value + "/add").then(_ => this.loadWitnesses());
+    }
+
+    loadSuspects = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.get("http://localhost:8081/incident/" + id + "/suspects").then(res => {
+            this.setState({
+                suspects: res.data
+            });
+        });
+    }
+
+    loadWitnesses = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.get("http://localhost:8081/incident/" + id + "/witnesses").then(res => {
+            this.setState({
+                witnesses: res.data
+            });
+        });
     }
 
     handlePageClick = (data) => {
@@ -147,8 +172,27 @@ class Incidents extends React.Component {
         let id = this.state.incidents[this.state.selectedIdx].id;
         await axios.get("http://localhost:8081/incident/" + id + "/indictments").then(res => {
             this.setState({
-                indictments: res.data
+                indictments: res.data.sort((a, b) => (a.id > b.id) ? 1 : (a.id === b.id) ? 0 : -1)
             });
+        });
+    }
+
+    loadData = () => {
+        this.loadBoloCitizens();
+        this.loadBoloVehicles();
+        this.loadOfficers();
+        this.loadIndictments();
+        this.loadSuspects();
+        this.loadWitnesses();
+    }
+
+    clearForm = () => {
+        this.setState({
+            vehicle: null,
+            citizen: null,
+            officer: null,
+            witness: null,
+            suspect: null
         });
     }
 
@@ -170,7 +214,7 @@ class Incidents extends React.Component {
                                 <li className="location">Location: {o.location}</li>
                                 <li className="superviser">Supervisor:
                                     <Link
-                                        style={{marginLeft: "5px"}}
+                                        style={{ marginLeft: "5px" }}
                                         to={"/employees/" + o.supervisor}
                                         className="round-link">
                                         {o.supervisor}
@@ -181,7 +225,7 @@ class Incidents extends React.Component {
                                     to={"/incidents/" + (o.id)}
                                     className="edit-button round-link"
                                     onClick={() => {
-                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => { this.loadBoloCitizens(); this.loadBoloVehicles(); this.loadOfficers(); this.loadIndictments(); });
+                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => { this.loadData(); this.clearForm(); });
                                     }}>
                                     View
                                 </Link>
@@ -300,7 +344,14 @@ class Incidents extends React.Component {
                                             to={"/vehicles/" + v.plateNum}
                                             className="round-link">
                                             {v.plateNum + " / " + v.name}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                            <span className="link-button" onClick={(e) => {
+                                                e.preventDefault();
+                                                let tmp = {
+                                                    vehiclePlateNum: v.plateNum,
+                                                    incidentId: this.state.incidents[this.state.selectedIdx].id
+                                                }
+                                                this.props.wsClient.publish({ destination: "/api/incident/bolo/vehicles/delete", body: JSON.stringify(tmp) });
+                                            }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
@@ -312,10 +363,11 @@ class Incidents extends React.Component {
                                                 label: l.plateNum
                                             })
                                         )}
-                                        onChange={(e) => { this.setState({ plateNum: e.value }) }}
+                                        onChange={(e) => { this.setState({ vehicle: e }) }}
+                                        value={this.state.vehicle}
                                         placeholder="Vehicles"
                                         noOptionsMessage={() => "Not found"} />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerBOLOVehicle(); }}>
+                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.addBOLOVehicle(); this.setState({ vehicle: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
@@ -327,7 +379,14 @@ class Incidents extends React.Component {
                                             to={"/citizens/" + c.regNum}
                                             className="round-link">
                                             {c.regNum + " / " + c.name}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                            <span className="link-button" onClick={(e) => {
+                                                e.preventDefault();
+                                                let tmp = {
+                                                    citizenRegNum: c.regNum,
+                                                    incidentId: this.state.incidents[this.state.selectedIdx].id
+                                                }
+                                                this.props.wsClient.publish({ destination: "/api/incident/bolo/persons/delete", body: JSON.stringify(tmp) });
+                                            }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
@@ -339,22 +398,27 @@ class Incidents extends React.Component {
                                                 label: c.regNum
                                             })
                                         )}
-                                        onChange={(e) => { this.setState({ citizen: e.value }) }}
+                                        onChange={(e) => { this.setState({ citizen: e }) }}
+                                        value={this.state.citizen}
                                         placeholder="Citizen"
                                         noOptionsMessage={() => "Not found"} />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerBOLOCitizen(); }}>
+                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.addBOLOCitizen(); this.setState({ citizen: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
 
                                 <div className="edit-list active-officers">
                                     <p className="text-label">Active officers: </p>
-                                    {this.state.activeOfficers.map(e =>
-                                        <Link key={e.id}
-                                            to={"/employees/" + e.marking}
+                                    {this.state.activeOfficers.map(o =>
+                                        <Link key={o.id}
+                                            to={"/employees/" + o.marking}
                                             className="round-link">
-                                            {e.marking}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                            {o.marking}
+                                            <span className="link-button" onClick={async (e) => {
+                                                e.preventDefault();
+                                                await axios.delete("http://localhost:8081/incident/" + this.state.incidents[this.state.selectedIdx].id + "/officer/" + o.id + "/delete").then(_ => this.loadOfficers());
+                                                this.setState({ officer: null });
+                                            }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
@@ -366,10 +430,11 @@ class Incidents extends React.Component {
                                                 label: e.marking
                                             })
                                         )}
-                                        onChange={(e) => { this.setState({ officer: e.value }) }}
+                                        onChange={(e) => { this.setState({ officer: e }) }}
+                                        value={this.state.officer}
                                         placeholder="Officers"
                                         noOptionsMessage={() => "Not found"} />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.addActiveOfficer(); }}>
+                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.addActiveOfficer(); this.setState({ officer: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
@@ -380,19 +445,23 @@ class Incidents extends React.Component {
                                         <Link key={i.id}
                                             to={"/indictments/" + i.id}
                                             className="round-link">
-                                            {i.id}
+                                            #{i.id}
                                         </Link>
                                     )}
                                 </div>
 
                                 <div className="edit-list witnesses">
                                     <p className="text-label">Witnesses: </p>
-                                    {[].map(v =>
-                                        <Link key={v.vin}
-                                            to={"/citizen/" + v.plateNum}
+                                    {this.state.witnesses.map(c =>
+                                        <Link key={c.regNum}
+                                            to={"/citizens/" + c.regNum}
                                             className="round-link">
-                                            {v.plateNum + " / " + v.name}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                            {c.regNum + " / " + c.name}
+                                            <span className="link-button" onClick={async (e) => {
+                                                e.preventDefault();
+                                                await axios.delete("http://localhost:8081/incident/" + this.state.incidents[this.state.selectedIdx].id + "/witness/" + c.regNum + "/delete").then(_ => this.loadWitnesses());
+                                                this.setState({ witness: null });
+                                            }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
@@ -404,22 +473,27 @@ class Incidents extends React.Component {
                                                 label: c.regNum
                                             })
                                         )}
-                                        onChange={(e) => { this.setState({ plateNum: e.value }) }}
+                                        onChange={(e) => { this.setState({ witness: e }) }}
+                                        value={this.state.witness}
                                         placeholder="Witnesses"
                                         noOptionsMessage={() => "Not found"} />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerBOLOCitizen(); }}>
+                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.addWitness(); this.setState({ witness: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
 
                                 <div className="edit-list suspect">
                                     <p className="text-label">Suspect: </p>
-                                    {[].map(v =>
-                                        <Link key={v.vin}
-                                            to={"/citizen/" + v.plateNum}
+                                    {this.state.suspects.map(c =>
+                                        <Link key={c.regNum}
+                                            to={"/citizens/" + c.regNum}
                                             className="round-link">
-                                            {v.plateNum + " / " + v.name}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
+                                            {c.regNum + " / " + c.name}
+                                            <span className="link-button" onClick={async (e) => {
+                                                e.preventDefault();
+                                                await axios.delete("http://localhost:8081/incident/" + this.state.incidents[this.state.selectedIdx].id + "/suspect/" + c.regNum + "/delete").then(_ => this.loadSuspects());
+                                                this.setState({ suspect: null });
+                                            }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
@@ -431,10 +505,11 @@ class Incidents extends React.Component {
                                                 label: c.regNum
                                             })
                                         )}
-                                        onChange={(e) => { this.setState({ plateNum: e.value }) }}
+                                        onChange={(e) => { this.setState({ suspect: e }) }}
+                                        value={this.state.suspect}
                                         placeholder="Suspect"
                                         noOptionsMessage={() => "Not found"} />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerBOLOCitizen(); }}>
+                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.addSuspect(); this.setState({ suspect: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>

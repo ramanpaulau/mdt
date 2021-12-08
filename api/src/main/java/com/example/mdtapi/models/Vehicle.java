@@ -1,6 +1,7 @@
 package com.example.mdtapi.models;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Vehicle {
@@ -62,5 +63,29 @@ public class Vehicle {
 
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vehicle vehicle = (Vehicle) o;
+        return Objects.equals(vin, vehicle.vin) && Objects.equals(plateNum, vehicle.plateNum) && Objects.equals(name, vehicle.name) && Objects.equals(price, vehicle.price) && Objects.equals(department, vehicle.department);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vin, plateNum, name, price, department);
+    }
+
+    @Override
+    public String toString() {
+        return "Vehicle{" +
+                "vin=" + vin +
+                ", plateNum='" + plateNum + '\'' +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", department=" + department +
+                '}';
     }
 }

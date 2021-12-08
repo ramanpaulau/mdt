@@ -6,9 +6,11 @@ import { Translation } from 'react-i18next';
 class Bolo extends React.Component {
 
     componentDidMount = () => {
+        //console.log(this.props.boloCitizens);
     }
 
     render() {
+        console.log(this.props.boloVehicles);
         return (
             <div className="bolo">
                 <div className="block citizen-list">

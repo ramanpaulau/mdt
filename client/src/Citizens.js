@@ -33,10 +33,13 @@ class Citizens extends React.Component {
             filteredData: [],
             pageData: [],
             licenses: [],
-            vehicle: [],
+            vehicles: [],
             citizenVehicles: [],
             citizenFines: [],
-            license: undefined,
+            citizenIndictments: [],
+            citizenRecords: [],
+            license: null,
+            vehicle: null,
             offset: 0,
             selectedIdx: selectedIdx,
             selectedPage: 0,
@@ -66,7 +69,7 @@ class Citizens extends React.Component {
     loadVehicles = async () => {
         await axios.get("http://localhost:8081/vehicles/free").then(res => {
             this.setState({
-                vehicle: res.data
+                vehicles: res.data
             });
         });
     }
@@ -76,10 +79,8 @@ class Citizens extends React.Component {
         this.loadLicenses();
         this.loadVehicles();
 
-        if (this.props.match.params.regNum) {
-            this.getCitizenVehicles();
-            this.getCitizenFines();
-        }
+        if (this.props.match.params.regNum)
+            this.loadData();
     }
 
     componentWillUnmount = () => {
@@ -143,12 +144,24 @@ class Citizens extends React.Component {
         });
     }
 
+    getCitizenIndictments = async () => {
+        await axios.get("http://localhost:8081/indictments/person/" + this.props.citizens[this.state.selectedIdx].regNum).then(res => {
+            this.setState({ citizenIndictments: res.data });
+        });
+    }
+
+    getCitizenRecords = async () => {
+        await axios.get("http://localhost:8081/incidents/person/" + this.props.citizens[this.state.selectedIdx].regNum).then(res => {
+            this.setState({ citizenRecords: res.data });
+        });
+    }
+
     registerVehicle = async () => {
-        if (!this.state.plateNum)
+        if (!this.state.vehicle)
             return;
         let tmp = {
             regNum: this.props.citizens[this.state.selectedIdx].regNum,
-            plateNum: this.state.plateNum
+            plateNum: this.state.vehicle.value
         }
         await axios.post("http://localhost:8081/person/vehicle", tmp).then(res => {
             if (!res.data.success)
@@ -156,6 +169,18 @@ class Citizens extends React.Component {
             this.getCitizenVehicles();
             this.loadVehicles();
         });
+        this.setState({ vehicle: null });
+    }
+
+    clearForm = () => {
+        this.setState({ vehicle: null, license: null });
+    }
+
+    loadData = () => {
+        this.getCitizenVehicles(); 
+        this.getCitizenFines(); 
+        this.getCitizenIndictments(); 
+        this.getCitizenRecords();
     }
 
     render() {
@@ -178,7 +203,7 @@ class Citizens extends React.Component {
                                     to={"/citizens/" + (o.regNum)}
                                     className="edit-button round-link"
                                     onClick={() => {
-                                        this.setState({ selectedIdx: i + this.state.selectedPage * CITIZENS_ON_PAGE, password: "" }, () => { this.getCitizenVehicles(); this.getCitizenFines(); });
+                                        this.setState({ selectedIdx: i + this.state.selectedPage * CITIZENS_ON_PAGE, password: "" }, () => { this.loadData(); this.clearForm(); });
                                     }}>
                                     View
                                 </Link>
@@ -344,6 +369,7 @@ class Citizens extends React.Component {
                                             if (!tmp.lid || !tmp.lid)
                                                 return;
                                             this.props.wsClient.publish({ destination: "/api/person/license/delete", body: JSON.stringify(tmp) });
+                                            this.setState({ license: null });
                                         }}>
                                             <FontAwesomeIcon icon={faTimesCircle} />
                                         </span>
@@ -356,18 +382,20 @@ class Citizens extends React.Component {
                                             label: l.name
                                         })
                                     )}
-                                    onChange={(e) => { this.setState({ license: e.value }) }}
+                                    onChange={(e) => { this.setState({ license: e }) }}
+                                    value={this.state.license}
                                     placeholder="License"
                                     noOptionsMessage={() => "Not found"} />
                                 <span className="link-button" onClick={(e) => {
                                     e.preventDefault();
                                     let tmp = {
                                         regNum: this.props.citizens[this.state.selectedIdx].regNum,
-                                        lid: this.state.license
+                                        lid: this.state.license.value
                                     };
                                     if (!tmp.regNum || !tmp.lid)
                                         return;
                                     this.props.wsClient.publish({ destination: "/api/person/license/add", body: JSON.stringify(tmp) });
+                                    this.setState({ license: null });
                                 }}>
                                     <FontAwesomeIcon icon={faPlus} />
                                 </span>
@@ -384,6 +412,7 @@ class Citizens extends React.Component {
                                             await axios.delete("http://localhost:8081/person/" + this.props.citizens[this.state.selectedIdx].regNum + "/vehicle/" + v.vin).then(_ => {
                                                 this.getCitizenVehicles();
                                                 this.loadVehicles();
+                                                this.setState({ vehicle: null });
                                             });
                                         }}>
                                             <FontAwesomeIcon icon={faTimesCircle} />
@@ -391,13 +420,14 @@ class Citizens extends React.Component {
                                     </Link>
                                 )}
                                 <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                    options={this.state.vehicle.map(l => (
+                                    options={this.state.vehicles.map(l => (
                                         {
                                             value: l.plateNum,
                                             label: l.plateNum
                                         })
                                     )}
-                                    onChange={(e) => { this.setState({ plateNum: e.value }) }}
+                                    onChange={(e) => { this.setState({ vehicle: e }) }}
+                                    value={this.state.vehicle}
                                     placeholder="Vehicles"
                                     noOptionsMessage={() => "Not found"} />
                                 <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerVehicle(); }}>
@@ -409,36 +439,34 @@ class Citizens extends React.Component {
                                 <p className="text-label">Fines: </p>
                                 {this.state.citizenFines.map(f =>
                                     (f.state) ? "" :
-                                    <Link key={f.id}
-                                        to={"/fines/" + f.person}
-                                        className="round-link">
-                                        {f.amount}$
-                                    </Link>
+                                        <Link key={f.id}
+                                            to={"/fines/" + f.person}
+                                            className="round-link">
+                                            {f.amount}$
+                                        </Link>
                                 )}
                             </div>
 
                             <div className="edit-list related-incidents">
                                 <p className="text-label">Related incidents: </p>
-                                <Link
-                                    to={"/incidents/3"}
-                                    className="round-link">
-                                    #3
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faTimesCircle} />
-                                    </span>
-                                </Link>
+                                {this.state.citizenRecords.map(i =>
+                                    <Link key={i}
+                                        to={"/incidents/" + i}
+                                        className="round-link">
+                                        #{i}
+                                    </Link>
+                                )}
                             </div>
 
                             <div className="edit-list criminal">
                                 <p className="text-label">Criminal records: </p>
-                                <Link
-                                    to={"/records?id=3"}
-                                    className="round-link">
-                                    #3
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faTimesCircle} />
-                                    </span>
-                                </Link>
+                                {this.state.citizenIndictments.map(i =>
+                                    <Link key={i.id}
+                                        to={"/indictments/" + i.id}
+                                        className="round-link">
+                                        #{i.id}
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     }

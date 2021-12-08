@@ -1,12 +1,10 @@
 package com.example.mdtapi.controllers;
 
-import com.example.mdtapi.models.Incident;
-import com.example.mdtapi.models.Person;
-import com.example.mdtapi.models.PersonMessage;
-import com.example.mdtapi.models.Vehicle;
+import com.example.mdtapi.models.*;
 import com.example.mdtapi.repositories.IncidentRepository;
 import com.example.mdtapi.repositories.PersonRepository;
 import com.example.mdtapi.repositories.VehicleRepository;
+import com.example.mdtapi.utils.BOLOResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +30,7 @@ public class BOLOVehicleController {
 
     @MessageMapping("/incident/bolo/vehicles")
     @SendTo("/ws/bolo/vehicles")
-    public Vehicle insert(@RequestBody String request) throws Exception {
-        System.out.println(request);
-
+    public BOLOResponse<BOLORecord<Vehicle>> insert(@RequestBody String request) throws Exception {
         int incidentId;
         String plateNum;
         JSONObject subchapter = new JSONObject(request);
@@ -55,10 +51,51 @@ public class BOLOVehicleController {
         if (vehicle == null)
             return null;
 
-        Incident incident1 = incident.get();
-        incident1.getBoloVehicles().add(vehicle);
-        incidentRepository.save(incident1);
+        if (incident.get().getBoloVehicles().contains(vehicle))
+            return null;
 
-        return vehicle;
+        incident.get().getBoloVehicles().add(vehicle);
+        incidentRepository.save(incident.get());
+
+        BOLOResponse<BOLORecord<Vehicle>> response = new BOLOResponse<>();
+        BOLORecord<Vehicle> record = new BOLORecord<>(incident.get(), vehicle);
+
+        response.setAction("add");
+        response.setBody(record);
+        return response;
+    }
+
+    @MessageMapping("/incident/bolo/vehicles/delete")
+    @SendTo("/ws/bolo/vehicles")
+    public BOLOResponse<BOLORecord<Vehicle>> delete(@RequestBody String request) throws Exception {
+        int incidentId;
+        String plateNum;
+        JSONObject subchapter = new JSONObject(request);
+        try {
+            incidentId = subchapter.getInt("incidentId");
+            if (incidentId < 0)
+                throw new JSONException("Negative value");
+            plateNum = subchapter.getString("vehiclePlateNum");
+        } catch (JSONException ignored) {
+            return null;
+        }
+
+        Optional<Incident> incident = incidentRepository.findById(incidentId);
+        if (incident.isEmpty())
+            return null;
+
+        Vehicle vehicle = vehicleRepository.findByPlateNum(plateNum);
+        if (vehicle == null)
+            return null;
+
+        incident.get().getBoloVehicles().remove(vehicle);
+        incidentRepository.save(incident.get());
+
+        BOLOResponse<BOLORecord<Vehicle>> response = new BOLOResponse<>();
+        BOLORecord<Vehicle> record = new BOLORecord<>(incident.get(), vehicle);
+
+        response.setAction("delete");
+        response.setBody(record);
+        return response;
     }
 }

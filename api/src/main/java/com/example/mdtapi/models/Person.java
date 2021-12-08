@@ -38,19 +38,6 @@ public class Person {
 	public Person() {
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Person person = (Person) o;
-		return admin == person.admin && Objects.equals(regNum, person.regNum) && Objects.equals(name, person.name) && Objects.equals(surname, person.surname) && Objects.equals(password, person.password) && Objects.equals(birthdate, person.birthdate) && Objects.equals(phoneNumber, person.phoneNumber) && state == person.state;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(regNum, name, surname, birthdate);
-	}
-
 	public String getRegNum() {
 		return regNum;
 	}
@@ -137,6 +124,19 @@ public class Person {
 
 	public void setVehicles(Set<Vehicle> vehicles) {
 		this.vehicles = vehicles;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Person person = (Person) o;
+		return admin == person.admin && Objects.equals(regNum, person.regNum) && Objects.equals(name, person.name) && Objects.equals(surname, person.surname) && Objects.equals(password, person.password) && Objects.equals(birthdate, person.birthdate) && Objects.equals(phoneNumber, person.phoneNumber) && state == person.state && Objects.equals(licenses, person.licenses) && Objects.equals(vehicles, person.vehicles);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(regNum, name, surname, password, birthdate, phoneNumber, admin, state, licenses, vehicles);
 	}
 }
 
