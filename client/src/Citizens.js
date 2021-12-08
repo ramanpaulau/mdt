@@ -35,6 +35,7 @@ class Citizens extends React.Component {
             licenses: [],
             vehicle: [],
             citizenVehicles: [],
+            citizenFines: [],
             license: undefined,
             offset: 0,
             selectedIdx: selectedIdx,
@@ -75,8 +76,10 @@ class Citizens extends React.Component {
         this.loadLicenses();
         this.loadVehicles();
 
-        if (this.props.match.params.regNum)
+        if (this.props.match.params.regNum) {
             this.getCitizenVehicles();
+            this.getCitizenFines();
+        }
     }
 
     componentWillUnmount = () => {
@@ -128,6 +131,12 @@ class Citizens extends React.Component {
         this.timeoutID = setTimeout(() => this.copyLabel.current.classList.remove("copied"), 3000);
     }
 
+    getCitizenFines = async () => {
+        await axios.get("http://localhost:8081/person/" + this.props.citizens[this.state.selectedIdx].regNum + "/fines").then(res => {
+            this.setState({ citizenFines: res.data });
+        });
+    }
+
     getCitizenVehicles = async () => {
         await axios.get("http://localhost:8081/person/" + this.props.citizens[this.state.selectedIdx].regNum + "/vehicles").then(res => {
             this.setState({ citizenVehicles: res.data });
@@ -169,7 +178,7 @@ class Citizens extends React.Component {
                                     to={"/citizens/" + (o.regNum)}
                                     className="edit-button round-link"
                                     onClick={() => {
-                                        this.setState({ selectedIdx: i + this.state.selectedPage * CITIZENS_ON_PAGE, password: "" }, () => { this.getCitizenVehicles() });
+                                        this.setState({ selectedIdx: i + this.state.selectedPage * CITIZENS_ON_PAGE, password: "" }, () => { this.getCitizenVehicles(); this.getCitizenFines(); });
                                     }}>
                                     View
                                 </Link>
@@ -398,14 +407,14 @@ class Citizens extends React.Component {
 
                             <div className="edit-list">
                                 <p className="text-label">Fines: </p>
-                                <Link
-                                    to={"/incidents/3"}
-                                    className="round-link">
-                                    #15
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                        <FontAwesomeIcon icon={faTimesCircle} />
-                                    </span>
-                                </Link>
+                                {this.state.citizenFines.map(f =>
+                                    (f.state) ? "" :
+                                    <Link key={f.id}
+                                        to={"/fines/" + f.person}
+                                        className="round-link">
+                                        {f.amount}$
+                                    </Link>
+                                )}
                             </div>
 
                             <div className="edit-list related-incidents">

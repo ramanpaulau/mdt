@@ -1,8 +1,10 @@
 package com.example.mdtapi.rest;
 
+import com.example.mdtapi.models.Fine;
 import com.example.mdtapi.models.Person;
 import com.example.mdtapi.models.PersonView;
 import com.example.mdtapi.models.Vehicle;
+import com.example.mdtapi.repositories.FineRepository;
 import com.example.mdtapi.repositories.PersonRepository;
 import com.example.mdtapi.repositories.VehicleRepository;
 import com.example.mdtapi.utils.ResponseMessage;
@@ -30,10 +32,14 @@ public class PersonRest {
     @Autowired
     private final VehicleRepository vehicleRepository;
 
-    public PersonRest(PersonRepository personRepository, PasswordEncoder passwordEncoder, VehicleRepository vehicleRepository) {
+    @Autowired
+    private final FineRepository fineRepository;
+
+    public PersonRest(PersonRepository personRepository, PasswordEncoder passwordEncoder, VehicleRepository vehicleRepository, FineRepository fineRepository) {
         this.personRepository = personRepository;
         this.passwordEncoder = passwordEncoder;
         this.vehicleRepository = vehicleRepository;
+        this.fineRepository = fineRepository;
     }
 
     @GetMapping("/persons")
@@ -92,6 +98,13 @@ public class PersonRest {
     @GetMapping("/person/{regNum}/vehicles")
     public Set<Vehicle> getVehicles(@PathVariable String regNum) {
         return personRepository.findByRegNum(regNum).getVehicles();
+    }
+
+    @GetMapping("/person/{regNum}/fines")
+    public List<Fine> getFines(@PathVariable String regNum) {
+        Person person = personRepository.findByRegNum(regNum);
+
+        return (person == null) ? null : fineRepository.findByPerson(person);
     }
 
     @PostConstruct
