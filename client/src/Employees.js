@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Select from 'react-select'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimesCircle, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Translation } from 'react-i18next';
 
@@ -62,9 +62,11 @@ class Employees extends React.Component {
             departments: [],
             qualifications: [],
             employees: [],
+            incidents: [],
             ranks: [],
             workHours: [],
             department: null,
+            qualification: undefined,
             selectedRank: null,
             selectedCitizens: null,
             tag: 0,
@@ -123,6 +125,14 @@ class Employees extends React.Component {
         await axios.get("http://localhost:8081/work-hours/" + this.state.selectedEmployeeId).then(res => {
             this.setState({
                 workHours: res.data
+            })
+        });
+    }
+
+    loadIncidents = async () => {
+        await axios.get("http://localhost:8081/incident/officer/" + this.state.selectedEmployeeId).then(res => {
+            this.setState({
+                incidents: res.data
             })
         });
     }
@@ -186,6 +196,8 @@ class Employees extends React.Component {
             filteredEmployees = this.state.employees.filter(e => e.department === this.state.department.value)
         }
 
+        let qualifications = (this.state.selectedEmployeeId) ? this.state.employees.filter(e => e.id === this.state.selectedEmployeeId)[0].qualifications : [];
+
         return (
             <div className="employees">
                 <div className="block employee-list">
@@ -225,7 +237,7 @@ class Employees extends React.Component {
                                 </Link>
                                 <Link
                                     to={"/employees/" + this.state.department.value + "-" + e.tag}
-                                    onClick={() => { this.handleView(e); this.setState({ selectedEmployeeId: e.id }, () => { this.loadWorkHours(); }); }}
+                                    onClick={() => { this.handleView(e); this.setState({ selectedEmployeeId: e.id }, () => { this.loadWorkHours(); this.loadIncidents(); }); }}
                                     className="edit-button round-link">
                                     <li>View</li>
                                 </Link>
@@ -295,39 +307,52 @@ class Employees extends React.Component {
 
                                     <div className="edit-list licenses">
                                         <p className="text-label">Qualifications: </p>
+                                        {qualifications.map(q => 
                                         <Link
+                                            key={q.id}
                                             to={"/licenses"}
                                             className="round-link">
-                                            AFT
+                                            {q.name}
                                             <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
+                                        )}
                                         <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                            options={this.state.qualifications.map(l => (
+                                            options={this.state.qualifications.map(q => (
                                                 {
-                                                    value: l.id,
-                                                    label: l.name
+                                                    value: q.id,
+                                                    label: q.name
                                                 })
                                             )}
-                                            onChange={(e) => { this.setState({ license: e.value }) }}
+                                            onChange={(e) => { this.setState({ qualification: e.value }) }}
                                             placeholder="Qualification"
                                             noOptionsMessage={() => "Qualification not found"} />
-                                        <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                            <FontAwesomeIcon icon={faSave} />
+                                        <span className="link-button" onClick={async (e) => { 
+                                            e.preventDefault(); 
+                                            let tmp = {
+                                                eid: this.state.selectedEmployeeId,
+                                                qid: this.state.qualification
+                                            };
+                                            if (!tmp.eid || !tmp.qid)
+                                                return;
+                                            await axios.post("http://localhost:8081/employee/" + tmp.eid + "/qualification/" + tmp.qid + "/add").then(_ => {
+                                            });
+                                            }}>
+                                            <FontAwesomeIcon icon={faPlus} />
                                         </span>
                                     </div>
 
                                     <div className="edit-list related-incidents">
                                         <p className="text-label">Incidents: </p>
-                                        <Link
-                                            to={"/license?id=3"}
-                                            className="round-link">
-                                            #225
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                                <FontAwesomeIcon icon={faTimesCircle} />
-                                            </span>
-                                        </Link>
+                                        {this.state.incidents.map(i => 
+                                            <Link
+                                                key={i.id}
+                                                to={"/incidents/" + i.id}
+                                                className="round-link">
+                                                #{i.id}
+                                            </Link>
+                                        )}
                                     </div>
                                 </Form>
                             )}

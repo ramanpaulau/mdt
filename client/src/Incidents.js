@@ -28,9 +28,13 @@ class Incidents extends React.Component {
             vehicles: [],
             boloCitizens: [],
             boloVehicles: [],
+            activeOfficers: [],
+            indictments: [],
             datetime: new Date(),
             citizen: undefined,
+            officer: undefined,
             plateNum: undefined,
+            employees: [],
             offset: 0,
             selectedIdx: -1,
             selectedPage: 0,
@@ -63,9 +67,18 @@ class Incidents extends React.Component {
         });
     }
 
+    loadEmployees = async () => {
+        await axios.get("http://localhost:8081/employees").then(res => {
+            this.setState({
+                employees: res.data
+            });
+        });
+    }
+
     componentDidMount = () => {
         this.loadIncidents();
         this.loadVehicles();
+        this.loadEmployees();
     }
 
     registerBOLOCitizen = async () => {
@@ -82,6 +95,11 @@ class Incidents extends React.Component {
             incidentId: this.state.incidents[this.state.selectedIdx].id
         }
         this.props.wsClient.publish({ destination: "/api/incident/bolo/vehicles", body: JSON.stringify(tmp) });
+    }
+
+    addActiveOfficer = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.post("http://localhost:8081/incident/" + id + "/officer/" + this.state.officer + "/add");
     }
 
     handlePageClick = (data) => {
@@ -116,6 +134,24 @@ class Incidents extends React.Component {
         });
     }
 
+    loadOfficers = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.get("http://localhost:8081/incident/" + id + "/officers").then(res => {
+            this.setState({
+                activeOfficers: res.data
+            });
+        });
+    }
+
+    loadIndictments = async () => {
+        let id = this.state.incidents[this.state.selectedIdx].id;
+        await axios.get("http://localhost:8081/incident/" + id + "/indictments").then(res => {
+            this.setState({
+                indictments: res.data
+            });
+        });
+    }
+
     render() {
         return (
             <div className="incidents">
@@ -132,13 +168,20 @@ class Incidents extends React.Component {
                                 <li className="id">#{o.id}</li>
                                 <li className="name">{o.title}</li>
                                 <li className="location">Location: {o.location}</li>
-                                <li className="superviser">Supervisor: {o.supervisor}</li>
+                                <li className="superviser">Supervisor:
+                                    <Link
+                                        style={{marginLeft: "5px"}}
+                                        to={"/employees/" + o.supervisor}
+                                        className="round-link">
+                                        {o.supervisor}
+                                    </Link>
+                                </li>
                                 <li className="dateTime">Date: {(new Date(o.dateTime)).toLocaleString()}</li>
                                 <Link
                                     to={"/incidents/" + (o.id)}
                                     className="edit-button round-link"
                                     onClick={() => {
-                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => { this.loadBoloCitizens(); this.loadBoloVehicles(); });
+                                        this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => { this.loadBoloCitizens(); this.loadBoloVehicles(); this.loadOfficers(); this.loadIndictments(); });
                                     }}>
                                     View
                                 </Link>
@@ -304,85 +347,42 @@ class Incidents extends React.Component {
                                     </span>
                                 </div>
 
-                                <div className="edit-list supervisor">
-                                    <p className="text-label">Supervisor: </p>
-                                    {[].map(v =>
-                                        <Link key={v.vin}
-                                            to={"/employees/" + v.plateNum}
-                                            className="round-link">
-                                            {v.plateNum + " / " + v.name}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                                <FontAwesomeIcon icon={faTimesCircle} />
-                                            </span>
-                                        </Link>
-                                    )}
-                                    <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                        options={[].map(l => (
-                                            {
-                                                value: l.plateNum,
-                                                label: l.plateNum
-                                            })
-                                        )}
-                                        onChange={(e) => { this.setState({ plateNum: e.value }) }}
-                                        placeholder="Employees"
-                                        noOptionsMessage={() => "Not found"} />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerBOLOCitizen(); }}>
-                                        <FontAwesomeIcon icon={faPlus} />
-                                    </span>
-                                </div>
-
                                 <div className="edit-list active-officers">
                                     <p className="text-label">Active officers: </p>
-                                    {[].map(v =>
-                                        <Link key={v.vin}
-                                            to={"/employees/" + v.plateNum}
+                                    {this.state.activeOfficers.map(e =>
+                                        <Link key={e.id}
+                                            to={"/employees/" + e.marking}
                                             className="round-link">
-                                            {v.plateNum + " / " + v.name}
+                                            {e.marking}
                                             <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
                                                 <FontAwesomeIcon icon={faTimesCircle} />
                                             </span>
                                         </Link>
                                     )}
                                     <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                        options={[].map(l => (
+                                        options={this.state.employees.map(e => (
                                             {
-                                                value: l.plateNum,
-                                                label: l.plateNum
+                                                value: e.id,
+                                                label: e.marking
                                             })
                                         )}
-                                        onChange={(e) => { this.setState({ plateNum: e.value }) }}
-                                        placeholder="Employees"
+                                        onChange={(e) => { this.setState({ officer: e.value }) }}
+                                        placeholder="Officers"
                                         noOptionsMessage={() => "Not found"} />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerBOLOCitizen(); }}>
+                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.addActiveOfficer(); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
 
                                 <div className="edit-list indictment-list">
                                     <p className="text-label">Indictments: </p>
-                                    {[].map(v =>
-                                        <Link key={v.vin}
-                                            to={"/indictments/" + v.plateNum}
+                                    {this.state.indictments.map(i =>
+                                        <Link key={i.id}
+                                            to={"/indictments/" + i.id}
                                             className="round-link">
-                                            {v.plateNum + " / " + v.name}
-                                            <span className="link-button" onClick={(e) => { e.preventDefault(); }}>
-                                                <FontAwesomeIcon icon={faTimesCircle} />
-                                            </span>
+                                            {i.id}
                                         </Link>
                                     )}
-                                    <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                        options={[].map(l => (
-                                            {
-                                                value: l.plateNum,
-                                                label: l.plateNum
-                                            })
-                                        )}
-                                        onChange={(e) => { this.setState({ plateNum: e.value }) }}
-                                        placeholder="Indictments"
-                                        noOptionsMessage={() => "Not found"} />
-                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerBOLOCitizen(); }}>
-                                        <FontAwesomeIcon icon={faPlus} />
-                                    </span>
                                 </div>
 
                                 <div className="edit-list witnesses">
@@ -398,10 +398,10 @@ class Incidents extends React.Component {
                                         </Link>
                                     )}
                                     <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                        options={[].map(l => (
+                                        options={this.props.citizens.map(c => (
                                             {
-                                                value: l.plateNum,
-                                                label: l.plateNum
+                                                value: c.regNum,
+                                                label: c.regNum
                                             })
                                         )}
                                         onChange={(e) => { this.setState({ plateNum: e.value }) }}
@@ -425,10 +425,10 @@ class Incidents extends React.Component {
                                         </Link>
                                     )}
                                     <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                        options={[].map(l => (
+                                        options={this.props.citizens.map(c => (
                                             {
-                                                value: l.plateNum,
-                                                label: l.plateNum
+                                                value: c.regNum,
+                                                label: c.regNum
                                             })
                                         )}
                                         onChange={(e) => { this.setState({ plateNum: e.value }) }}

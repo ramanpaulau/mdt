@@ -365,7 +365,7 @@ class Citizens extends React.Component {
                                         regNum: this.props.citizens[this.state.selectedIdx].regNum,
                                         lid: this.state.license
                                     };
-                                    if (!tmp.lid || !tmp.lid)
+                                    if (!tmp.regNum || !tmp.lid)
                                         return;
                                     this.props.wsClient.publish({ destination: "/api/person/license/add", body: JSON.stringify(tmp) });
                                 }}>

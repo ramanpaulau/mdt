@@ -1,13 +1,7 @@
 package com.example.mdtapi.rest;
 
-import com.example.mdtapi.models.Department;
-import com.example.mdtapi.models.Employee;
-import com.example.mdtapi.models.Person;
-import com.example.mdtapi.models.Rank;
-import com.example.mdtapi.repositories.DepartmentRepository;
-import com.example.mdtapi.repositories.EmployeeRepository;
-import com.example.mdtapi.repositories.PersonRepository;
-import com.example.mdtapi.repositories.RankRepository;
+import com.example.mdtapi.models.*;
+import com.example.mdtapi.repositories.*;
 import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.management.Query;
 import javax.xml.transform.Result;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class EmployeeRest {
@@ -33,11 +28,15 @@ public class EmployeeRest {
     @Autowired
     private final RankRepository rankRepository;
 
-    public EmployeeRest(EmployeeRepository employeeRepository, PersonRepository personRepository, DepartmentRepository departmentRepository, RankRepository rankRepository) {
+    @Autowired
+    private final QualificationRepository qualificationRepository;
+
+    public EmployeeRest(EmployeeRepository employeeRepository, PersonRepository personRepository, DepartmentRepository departmentRepository, RankRepository rankRepository, QualificationRepository qualificationRepository) {
         this.employeeRepository = employeeRepository;
         this.personRepository = personRepository;
         this.departmentRepository = departmentRepository;
         this.rankRepository = rankRepository;
+        this.qualificationRepository = qualificationRepository;
     }
 
     @GetMapping("/employees")
@@ -113,5 +112,17 @@ public class EmployeeRest {
             return false;
 
         return employeeRepository.existsByTagAndDepartmentCode(tag, department);
+    }
+
+    @PostMapping("/employee/{eid}/qualification/{qid}/add")
+    public void addQualification(@PathVariable int eid, @PathVariable int qid) {
+        Optional<Employee> employee = employeeRepository.findById(eid);
+        Optional<Qualification> qualification = qualificationRepository.findById(qid);
+
+        if (employee.isEmpty() || qualification.isEmpty())
+            return;
+
+        employee.get().getQualifications().add(qualification.get());
+        employeeRepository.save(employee.get());
     }
 }

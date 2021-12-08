@@ -120,4 +120,46 @@ public class IncidentRest {
         incidentRepository.save(incident);
         return res;
     }
+
+    @GetMapping("/incident/{iid}/indictments")
+    public Set<Indictment> getIndictments(@PathVariable int iid) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+
+        if (incident.isEmpty())
+            return null;
+
+        return incident.get().getIndictments();
+    }
+
+    @GetMapping("/incident/officer/{oid}")
+    public List<Incident> getIncidents(@PathVariable int oid) {
+        Optional<Employee> employee = employeeRepository.findById(oid);
+
+        if (employee.isEmpty())
+            return null;
+
+        return incidentRepository.findBySupervisor(employee.get());
+    }
+
+    @GetMapping("/incident/{iid}/officers")
+    public Set<Employee> getOfficer(@PathVariable int iid) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+
+        if (incident.isEmpty())
+            return null;
+
+        return incident.get().getOfficers();
+    }
+
+    @PostMapping("/incident/{iid}/officer/{oid}/add")
+    public void addOfficer(@PathVariable int iid, @PathVariable int oid) {
+        Optional<Incident> incident = incidentRepository.findById(iid);
+        Optional<Employee> employee = employeeRepository.findById(oid);
+
+        if (incident.isEmpty() || employee.isEmpty())
+            return;
+
+        incident.get().getOfficers().add(employee.get());
+        incidentRepository.save(incident.get());
+    }
 }

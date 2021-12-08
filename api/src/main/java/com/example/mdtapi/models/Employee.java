@@ -95,6 +95,14 @@ public class Employee {
         return rank.getSalary();
     }
 
+    public Set<Qualification> getQualifications() {
+        return qualifications;
+    }
+
+    public void setQualifications(Set<Qualification> qualifications) {
+        this.qualifications = qualifications;
+    }
+
     public Integer getTag() {
         return tag;
     }
