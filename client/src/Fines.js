@@ -19,6 +19,8 @@ class Fines extends React.Component {
         super(props);
 
         this.state = {
+            filter: '',
+            filteredData: [],
             pageData: [],
             fines: [],
             fine: 0,
@@ -44,9 +46,10 @@ class Fines extends React.Component {
     }
 
     getPageData = () => {
+        console.log(this.state.filter);
         this.setState({
-            pageData: this.state.fines.slice(this.state.offset, this.state.offset + FINES_ON_PAGE),
-            pageCount: Math.ceil(this.state.fines.length / FINES_ON_PAGE)
+            pageData: (this.state.filter) ? this.state.filteredData.slice(this.state.offset, this.state.offset + FINES_ON_PAGE) : this.state.fines.slice(this.state.offset, this.state.offset + FINES_ON_PAGE),
+            pageCount: (this.state.filter) ? Math.ceil(this.state.filteredData.length / FINES_ON_PAGE) : Math.ceil(this.state.fines.length / FINES_ON_PAGE)
         });
     }
 
@@ -71,6 +74,7 @@ class Fines extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
+                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.fines.filter(f => (f.person).includes(e.target.value.toUpperCase())) }, () => this.getPageData())} />
                         {this.state.pageData.map((o, i) =>
                             <ul className="fine-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="">{o.employee}</li>

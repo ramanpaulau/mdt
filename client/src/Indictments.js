@@ -108,7 +108,7 @@ class Indictments extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.indictments.filter(i => (i.id + '').includes(e.target.value)) }, () => this.getPageData())} />
+                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.indictments.filter(i => (i.id + '').includes(e.target.value) || i.person.includes(e.target.value.toUpperCase())) }, () => this.getPageData())} />
                         {this.state.pageData.map((o, i) =>
                             <ul className="indictment-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="id">#{o.id}</li>

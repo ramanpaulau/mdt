@@ -19,6 +19,10 @@
                 background-color: $secondary;
             }
         }
+        
+        .text-input {
+            width: calc(100% - 25px);
+        }
     }
 
     .fine-editor {

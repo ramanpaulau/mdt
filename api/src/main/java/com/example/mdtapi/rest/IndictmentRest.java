@@ -6,10 +6,7 @@ import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,6 +42,15 @@ public class IndictmentRest {
     @GetMapping("/indictments")
     public List<Indictment> all() {
         return indictmentRepository.findAll();
+    }
+
+    @GetMapping("/indictments/person/{regNum}")
+    public List<Indictment> byPerson(@PathVariable String regNum) {
+        Person person = personRepository.findByRegNum(regNum);
+        if (person == null)
+            return null;
+
+        return indictmentRepository.findByPerson(person);
     }
 
     @PostMapping("/indictment")
