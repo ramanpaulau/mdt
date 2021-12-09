@@ -123,6 +123,8 @@ class App extends React.Component {
                 });
 
                 this.client.subscribe('/ws/calls', call => {
+                    if (!call.body)
+                        return;
                     let callBody = JSON.parse(call.body);
                     if (this.state.calls.some(c => c.id === callBody.id)) {
                         this.setState({ calls: [...this.state.calls.filter(c => c.id !== callBody.id), callBody].sort((a, b) => (a.time > b.time) ? -1 : (a.time === b.time) ? 0 : 1) });

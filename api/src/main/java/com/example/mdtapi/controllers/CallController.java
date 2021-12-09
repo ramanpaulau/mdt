@@ -59,6 +59,30 @@ public class CallController {
         return call;
     }
 
+    @MessageMapping("/calls/panic")
+    @SendTo("/ws/calls")
+    private Call registerPanic(@RequestBody String request) {
+        String text = "", location = "";
+        int eid = 0;
+        JSONObject subchapter = new JSONObject(request);
+        try {
+            eid = subchapter.getInt("eid");
+        } catch (JSONException ignored) {}
+
+        Optional<Employee> employee = employeeRepository.findById(eid);
+        if (employee.isEmpty()) {
+            return null;
+        }
+
+        Call call = new Call();
+        call.setLocation("Panic " + employee.get().getMarking());
+        call.setPhone("Panic-Button");
+        call.setText("[System]");
+
+        callRepository.save(call);
+        return call;
+    }
+
     @MessageMapping("/call/officers")
     @SendTo("/ws/calls")
     private Call addOfficer(@RequestBody String request) {

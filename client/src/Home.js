@@ -184,7 +184,12 @@ class Home extends React.Component {
                     <div className="state-elem" onClick={() => { this.sendState("10-9"); }} ><p>10-9</p></div>
                     <div className="state-elem" onClick={() => { this.sendState("10-14"); }} ><p>10-14</p></div>
                     <div className="state-elem" onClick={() => { this.sendState("10-48"); }} ><p>10-48</p></div>
-                    <div className="state-elem"><p>Panic</p></div>
+                    <div className="state-elem" onClick={async () => {
+                        let tmp = {
+                            eid: this.props.store.employeeId
+                        };
+                        this.props.wsClient.publish({ destination: "/api/calls/panic", body: JSON.stringify(tmp) });
+                    }}><p>Panic</p></div>
                     <div className="state-elem">
                         <select className="marking">
                             <option>LINCOLN</option>
