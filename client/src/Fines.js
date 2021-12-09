@@ -29,7 +29,6 @@ class Fines extends React.Component {
             selectedPage: 0,
             selectedLaws: [],
             pageCount: 0,
-            state: { value: true, label: "Paid" }
         };
 
         this.sendButton = React.createRef();
@@ -41,12 +40,11 @@ class Fines extends React.Component {
 
     loadFines = async () => {
         await axios.get("http://localhost:8081/fines").then(res => {
-            this.setState({ fines: res.data }, () => { this.getPageData() });
+            this.setState({ fines: res.data.sort((a, b) => (a.date > b.date) ? 1 : (a.date === b.date) ? 0 : -1) }, () => { this.getPageData() });
         });
     }
 
     getPageData = () => {
-        console.log(this.state.filter);
         this.setState({
             pageData: (this.state.filter) ? this.state.filteredData.slice(this.state.offset, this.state.offset + FINES_ON_PAGE) : this.state.fines.slice(this.state.offset, this.state.offset + FINES_ON_PAGE),
             pageCount: (this.state.filter) ? Math.ceil(this.state.filteredData.length / FINES_ON_PAGE) : Math.ceil(this.state.fines.length / FINES_ON_PAGE)
@@ -74,7 +72,13 @@ class Fines extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.fines.filter(f => (f.person).includes(e.target.value.toUpperCase())) }, () => this.getPageData())} />
+                        <Translation>{t =>
+                            <input placeholder={t('Input Filter')}
+                                className="text-input"
+                                type="text"
+                                value={this.state.filter}
+                                onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.fines.filter(f => (f.person).includes(e.target.value.toUpperCase())) }, () => this.getPageData())} />
+                        }</Translation>
                         {this.state.pageData.map((o, i) =>
                             <ul className="fine-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="">{o.employee}</li>
@@ -157,17 +161,39 @@ class Fines extends React.Component {
                                                 })
                                             )}
                                             onChange={(e) => { this.setState({ citizen: e.value }) }}
-                                            placeholder="Citizen"
-                                            noOptionsMessage={() => "Not found"} />
+                                            placeholder=
+                                            {<Translation>
+                                                {
+                                                    t => t('Citizen')
+                                                }
+                                            </Translation>}
+                                            noOptionsMessage={() =>
+                                                <Translation>
+                                                    {
+                                                        t => t('Not found')
+                                                    }
+                                                </Translation>
+                                            } />
                                     </div>
                                     <div>
                                         <Field className="text-input" type="number" name="fine" />
                                         <ErrorMessage name="fine" className="error-label" component="div" />
-                                        <span className="floating-label active-label">Fine</span>
+                                        <span className="floating-label active-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Fine')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <SelectLaws callback={(laws) => this.saveLaws(laws)} />
                                     <div>
-                                        <p className="text-label">Selected laws: </p>
+                                        <p className="text-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Selected Laws')
+                                                }
+                                            </Translation>: </p>
                                         <div className="laws">
                                             {this.state.selectedLaws.map(l =>
                                                 <Link to="/penalcode" key={l.number} className="round-link" >
@@ -208,10 +234,15 @@ class State extends React.Component {
     render() {
         return (
             <div className="edit-list fine-state">
-                <select onChange={(e) => { this.setState({ value: e.target.value }); }} defaultValue={this.state.value} >
-                    <option value={true} >Paid</option>
-                    <option value={false} >Not paid</option>
-                </select>
+
+                <Translation>{t =>
+                    <select onChange={(e) => { this.setState({ value: e.target.value }); }} defaultValue={this.state.value} >
+                        <option value={true}
+                            label={t('Paid')} />
+                        <option value={false}
+                            label={t('Not Paid')} />
+                    </select>
+                }</Translation>
                 <span className="link-button" onClick={(e) => { e.preventDefault(); this.sendState(); }}>
                     <FontAwesomeIcon icon={faSave} />
                 </span>

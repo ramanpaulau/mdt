@@ -66,8 +66,9 @@
 
 .close-modal {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
 }
 @media screen and (min-width: 768px) {
     .indictments {

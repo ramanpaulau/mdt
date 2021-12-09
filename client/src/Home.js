@@ -4,6 +4,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { observer } from "mobx-react";
 import moment from "moment";
 import { Link } from 'react-router-dom';
+import { Translation } from 'react-i18next';
 
 class Home extends React.Component {
     constructor(props) {
@@ -38,9 +39,27 @@ class Home extends React.Component {
                         <div>
                             <ul className="table-head">
                                 <li>#</li>
-                                <li>Plate Number</li>
-                                <li>Model</li>
-                                <li>Indcident</li>
+                                <li>
+                                    <Translation>
+                                        {
+                                            t => t('Plate number')
+                                        }
+                                    </Translation>
+                                </li>
+                                <li>
+                                    <Translation>
+                                        {
+                                            t => t('Model')
+                                        }
+                                    </Translation>
+                                </li>
+                                <li>
+                                    <Translation>
+                                        {
+                                            t => t('Incident')
+                                        }
+                                    </Translation>
+                                </li>
                             </ul>
                         </div>}
                     {(this.state.bolo === "cars") &&
@@ -59,8 +78,20 @@ class Home extends React.Component {
                             <ul className="table-head">
                                 <li>#</li>
                                 <li>ID</li>
-                                <li>Name</li>
-                                <li>Indcident</li>
+                                <li>
+                                    <Translation>
+                                        {
+                                            t => t('Name')
+                                        }
+                                    </Translation>
+                                </li>
+                                <li>
+                                    <Translation>
+                                        {
+                                            t => t('Incident')
+                                        }
+                                    </Translation>
+                                </li>
                             </ul>
                         </div>}
                     {(this.state.bolo === "persons") &&
@@ -69,26 +100,68 @@ class Home extends React.Component {
                                 <ul className="bolo-item" key={i} onMouseDown={this.handleDrag}>
                                     <li>{i}</li>
                                     <li>{o.record.regNum}</li>
-                                    <li>{o.record.name}</li>
+                                    <li>{o.record.fullName}</li>
                                     <li>{o.incident.id}</li>
                                 </ul>
                             )}
                         </div>}
                     <div className="title">
-                        <h3 className="active" onClick={() => this.boloClick("cars")}>BOLO Cars</h3>
-                        <h3 onClick={() => this.boloClick("persons")}>BOLO Persons</h3>
+                        <Translation>
+                            {
+                                t => <h3 className="active" onClick={() => this.boloClick("cars")}>{t('Title BOLO Vehicles')}</h3>
+                            }
+                        </Translation>
+                        <Translation>
+                            {
+                                t => <h3 onClick={() => this.boloClick("persons")}>{t('Title BOLO Citizens')}</h3>
+                            }
+                        </Translation>
                     </div>
                 </div>
                 <div className="block active-units">
-                    <h3>ACTIVE UNITS</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Employees')}</h3>
+                        }
+                    </Translation>
                     <div>
                         <ul className="table-head">
                             <li>#</li>
-                            <li>Marking</li>
-                            <li>Name</li>
-                            <li>Department</li>
-                            <li>Rank</li>
-                            <li>State</li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('Marking')
+                                    }
+                                </Translation>
+                            </li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('Name')
+                                    }
+                                </Translation>
+                            </li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('Department')
+                                    }
+                                </Translation>
+                            </li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('Rank')
+                                    }
+                                </Translation>
+                            </li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('State')
+                                    }
+                                </Translation>
+                            </li>
                         </ul>
                     </div>
                     <div className="table-scroll">
@@ -122,46 +195,74 @@ class Home extends React.Component {
                     </div>
                 </div>
                 <div className="block active-calls">
-                    <h3>ACTIVE CALLS</h3>
+                    <Translation>
+                        {
+                            t => <h3>{t('Title Active calls')}</h3>
+                        }
+                    </Translation>
                     <div>
                         <ul className="table-head">
                             <li>ID</li>
-                            <li>Time</li>
-                            <li>Location</li>
-                            <li>Officers</li>
-                            <li>Action</li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('Time')
+                                    }
+                                </Translation>
+                            </li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('Location')
+                                    }
+                                </Translation>
+                            </li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('Officers')
+                                    }
+                                </Translation>
+                            </li>
+                            <li>
+                                <Translation>
+                                    {
+                                        t => t('Action')
+                                    }
+                                </Translation>
+                            </li>
                         </ul>
                     </div>
                     <div className="table-scroll">
                         {this.props.calls.map((o, i) =>
                             moment(new Date(o.time)).isAfter(moment().subtract(1, 'hours')) &&
-                            moment(new Date(o.time)).isBefore(moment()) ?
-                            <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
-                                <li>{o.id}</li>
-                                <li>{new Date(o.time).toLocaleTimeString()}</li>
-                                <li>{o.location}</li>
-                                <li>{o.employees.map((e, i) =>
-                                    <Link 
-                                        key={i}
-                                        className="round-link"
-                                        to={"/employees/" + e.marking}>
-                                        {e.marking}
-                                    </Link>
-                                )}</li>
-                                <li>
-                                    <span className="link-button" onClick={(e) => {
-                                        e.preventDefault();
-                                        let tmp = {
-                                            employeeId: this.props.store.employeeId,
-                                            callId: o.id
-                                        }
-                                        this.props.wsClient.publish({ destination: "/api/call/officers", body: JSON.stringify(tmp) });
-                                    }}>
-                                        <FontAwesomeIcon icon={faPlus} />
-                                    </span>
-                                </li>
-                            </ul>
-                            : ""
+                                moment(new Date(o.time)).isBefore(moment()) ?
+                                <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
+                                    <li>{o.id}</li>
+                                    <li>{new Date(o.time).toLocaleTimeString()}</li>
+                                    <li>{o.location}</li>
+                                    <li>{o.employees.map((e, i) =>
+                                        <Link
+                                            key={i}
+                                            className="round-link"
+                                            to={"/employees/" + e.marking}>
+                                            {e.marking}
+                                        </Link>
+                                    )}</li>
+                                    <li>
+                                        <span className="link-button" onClick={(e) => {
+                                            e.preventDefault();
+                                            let tmp = {
+                                                employeeId: this.props.store.employeeId,
+                                                callId: o.id
+                                            }
+                                            this.props.wsClient.publish({ destination: "/api/call/officers", body: JSON.stringify(tmp) });
+                                        }}>
+                                            <FontAwesomeIcon icon={faPlus} />
+                                        </span>
+                                    </li>
+                                </ul>
+                                : ""
                         )}
                     </div>
                 </div>

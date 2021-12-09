@@ -206,13 +206,30 @@ class Incidents extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.incidents.filter(i => (i.id + '').includes(e.target.value)) }, () => this.getPageData())} />
+                        <Translation>{t =>
+                            <input placeholder={t('Input Filter')}
+                                className="text-input"
+                                type="text"
+                                value={this.state.filter}
+                                onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.incidents.filter(i => (i.id + '').includes(e.target.value)) }, () => this.getPageData())} />
+                        }</Translation>
                         {this.state.pageData.map((o, i) =>
                             <ul className="incident-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="id">#{o.id}</li>
                                 <li className="name">{o.title}</li>
-                                <li className="location">Location: {o.location}</li>
-                                <li className="superviser">Supervisor:
+                                <li className="location">
+                                    <Translation>
+                                        {
+                                            t => t('Location')
+                                        }
+                                    </Translation>: {o.location}</li>
+                                <li className="superviser">
+                                    <Translation>
+                                        {
+                                            t => t('Supervisor')
+                                        }
+                                    </Translation>
+                                    :
                                     <Link
                                         style={{ marginLeft: "5px" }}
                                         to={"/employees/" + o.supervisor}
@@ -220,14 +237,24 @@ class Incidents extends React.Component {
                                         {o.supervisor}
                                     </Link>
                                 </li>
-                                <li className="dateTime">Date: {(new Date(o.dateTime)).toLocaleString()}</li>
+                                <li className="dateTime">
+                                    <Translation>
+                                        {
+                                            t => t('Time')
+                                        }
+                                    </Translation>
+                                    : {(new Date(o.dateTime)).toLocaleString()}</li>
                                 <Link
                                     to={"/incidents/" + (o.id)}
                                     className="edit-button round-link"
                                     onClick={() => {
                                         this.setState({ selectedIdx: i + this.state.selectedPage * INCIDENTS_ON_PAGE }, () => { this.loadData(); this.clearForm(); });
                                     }}>
-                                    View
+                                    <Translation>
+                                        {
+                                            t => t('Button View')
+                                        }
+                                    </Translation>
                                 </Link>
                             </ul>
                         )}
@@ -304,21 +331,45 @@ class Incidents extends React.Component {
                                     <div>
                                         <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
                                         <ErrorMessage name="title" className="error-label" component="div" />
-                                        <span className="floating-label">Title</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Title')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="location" />
                                         <ErrorMessage name="location" className="error-label" component="div" />
-                                        <span className="floating-label">Location</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Location')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div className="textarea">
                                         <Field className="text-input" type="text" as="textarea" name="details" />
                                         <ErrorMessage name="details" className="error-label" component="div" />
-                                        <span className="floating-label">Details</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Description')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div className="datetime">
                                         <Datetime value={this.state.datetime} onChange={(e) => { this.setState({ datetime: e }) }} />
-                                        <span className="floating-label active-label">Date & Time</span>
+                                        <span className="floating-label active-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Time')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
                                 </Form>
@@ -338,7 +389,13 @@ class Incidents extends React.Component {
                         {(this.state.selectedIdx === -1) ? "" :
                             <div>
                                 <div className="edit-list bolo-vehicle">
-                                    <p className="text-label">BOLO Vehicles: </p>
+                                    <p className="text-label">
+                                        <Translation>
+                                            {
+                                                t => t('Title BOLO Vehicles')
+                                            }
+                                        </Translation>
+                                        : </p>
                                     {this.state.boloVehicles.map(v =>
                                         <Link key={v.vin}
                                             to={"/vehicles/" + v.plateNum}
@@ -365,15 +422,28 @@ class Incidents extends React.Component {
                                         )}
                                         onChange={(e) => { this.setState({ vehicle: e }) }}
                                         value={this.state.vehicle}
-                                        placeholder="Vehicles"
-                                        noOptionsMessage={() => "Not found"} />
+                                        placeholder={<Translation>
+                                            {
+                                                t => t('Title Vehicles')
+                                            }
+                                        </Translation>}
+                                        noOptionsMessage={() => <Translation>
+                                            {
+                                                t => t('Not found')
+                                            }
+                                        </Translation>} />
                                     <span className="link-button" onClick={(e) => { e.preventDefault(); this.addBOLOVehicle(); this.setState({ vehicle: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
 
                                 <div className="edit-list bolo-citizen">
-                                    <p className="text-label">BOLO Citizen: </p>
+                                    <p className="text-label">
+                                        <Translation>
+                                            {
+                                                t => t('Title BOLO Citizens')
+                                            }
+                                        </Translation>: </p>
                                     {this.state.boloCitizens.map(c =>
                                         <Link key={c.regNum}
                                             to={"/citizens/" + c.regNum}
@@ -400,15 +470,29 @@ class Incidents extends React.Component {
                                         )}
                                         onChange={(e) => { this.setState({ citizen: e }) }}
                                         value={this.state.citizen}
-                                        placeholder="Citizen"
-                                        noOptionsMessage={() => "Not found"} />
+                                        placeholder={<Translation>
+                                            {
+                                                t => t('Title Citizens')
+                                            }
+                                        </Translation>}
+                                        noOptionsMessage={() => <Translation>
+                                            {
+                                                t => t('Not found')
+                                            }
+                                        </Translation>} />
                                     <span className="link-button" onClick={(e) => { e.preventDefault(); this.addBOLOCitizen(); this.setState({ citizen: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
 
                                 <div className="edit-list active-officers">
-                                    <p className="text-label">Active officers: </p>
+                                    <p className="text-label">
+                                        <Translation>
+                                            {
+                                                t => t('Officers')
+                                            }
+                                        </Translation>
+                                        : </p>
                                     {this.state.activeOfficers.map(o =>
                                         <Link key={o.id}
                                             to={"/employees/" + o.marking}
@@ -432,15 +516,28 @@ class Incidents extends React.Component {
                                         )}
                                         onChange={(e) => { this.setState({ officer: e }) }}
                                         value={this.state.officer}
-                                        placeholder="Officers"
-                                        noOptionsMessage={() => "Not found"} />
+                                        placeholder={<Translation>
+                                            {
+                                                t => t('Officers')
+                                            }
+                                        </Translation>}
+                                        noOptionsMessage={() => <Translation>
+                                            {
+                                                t => t('Not found')
+                                            }
+                                        </Translation>} />
                                     <span className="link-button" onClick={(e) => { e.preventDefault(); this.addActiveOfficer(); this.setState({ officer: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
 
                                 <div className="edit-list indictment-list">
-                                    <p className="text-label">Indictments: </p>
+                                    <p className="text-label">
+                                        <Translation>
+                                            {
+                                                t => t('Title Indictments')
+                                            }
+                                        </Translation>: </p>
                                     {this.state.indictments.map(i =>
                                         <Link key={i.id}
                                             to={"/indictments/" + i.id}
@@ -451,7 +548,12 @@ class Incidents extends React.Component {
                                 </div>
 
                                 <div className="edit-list witnesses">
-                                    <p className="text-label">Witnesses: </p>
+                                    <p className="text-label">
+                                        <Translation>
+                                            {
+                                                t => t('Witnesses')
+                                            }
+                                        </Translation>: </p>
                                     {this.state.witnesses.map(c =>
                                         <Link key={c.regNum}
                                             to={"/citizens/" + c.regNum}
@@ -475,15 +577,29 @@ class Incidents extends React.Component {
                                         )}
                                         onChange={(e) => { this.setState({ witness: e }) }}
                                         value={this.state.witness}
-                                        placeholder="Witnesses"
-                                        noOptionsMessage={() => "Not found"} />
+                                        placeholder=
+                                        {<Translation>
+                                            {
+                                                t => t('Witnesses')
+                                            }
+                                        </Translation>}
+                                        noOptionsMessage={() => <Translation>
+                                            {
+                                                t => t('Not found')
+                                            }
+                                        </Translation>} />
                                     <span className="link-button" onClick={(e) => { e.preventDefault(); this.addWitness(); this.setState({ witness: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>
                                 </div>
 
                                 <div className="edit-list suspect">
-                                    <p className="text-label">Suspect: </p>
+                                    <p className="text-label">
+                                        <Translation>
+                                            {
+                                                t => t('Suspects')
+                                            }
+                                        </Translation>: </p>
                                     {this.state.suspects.map(c =>
                                         <Link key={c.regNum}
                                             to={"/citizens/" + c.regNum}
@@ -507,8 +623,17 @@ class Incidents extends React.Component {
                                         )}
                                         onChange={(e) => { this.setState({ suspect: e }) }}
                                         value={this.state.suspect}
-                                        placeholder="Suspect"
-                                        noOptionsMessage={() => "Not found"} />
+                                        placeholder=
+                                        {<Translation>
+                                            {
+                                                t => t('Suspects')
+                                            }
+                                        </Translation>}
+                                        noOptionsMessage={() => <Translation>
+                                            {
+                                                t => t('Not found')
+                                            }
+                                        </Translation>} />
                                     <span className="link-button" onClick={(e) => { e.preventDefault(); this.addSuspect(); this.setState({ suspect: null }); }}>
                                         <FontAwesomeIcon icon={faPlus} />
                                     </span>

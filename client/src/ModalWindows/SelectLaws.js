@@ -3,6 +3,7 @@ import ReactModal from 'react-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import { Translation } from 'react-i18next';
 
 const customStyles = {
     content: {
@@ -70,7 +71,13 @@ class AddChapter extends React.Component {
         let filteredPenalCode = this.state.penalCode.filter(l => l.text.toLowerCase().includes(this.state.filterStr.toLowerCase()));
         return (
             <div>
-                <span onClick={this.handleOpenModal} className="round-link" >Select laws</span>
+                <span onClick={this.handleOpenModal} className="round-link" >
+                    <Translation>
+                        {
+                            t => t('Button Laws')
+                        }
+                    </Translation>
+                </span>
                 <ReactModal
                     isOpen={this.state.showModal}
                     ariaHideApp={false}

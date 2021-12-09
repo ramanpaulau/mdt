@@ -112,7 +112,13 @@ class Vehicles extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.vehicles.filter(v => v.plateNum.toLowerCase().includes(e.target.value.toLowerCase()) || (v.vin + '').toLowerCase().includes(e.target.value.toLowerCase())) }, () => this.loadPages())} />
+                        <Translation>{t =>
+                            <input placeholder={t('Input Filter')}
+                                className="text-input"
+                                type="text"
+                                value={this.state.filter}
+                                onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.vehicles.filter(v => v.plateNum.toLowerCase().includes(e.target.value.toLowerCase()) || (v.vin + '').toLowerCase().includes(e.target.value.toLowerCase())) }, () => this.loadPages())} />
+                        }</Translation>
                         {this.state.pageData.map((c, i) =>
                             <ul className="car-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="vin">{c.vin}</li>
@@ -123,7 +129,11 @@ class Vehicles extends React.Component {
                                     to={"/vehicles/" + (c.plateNum)}
                                     className="edit-button round-link"
                                     onClick={() => this.setState({ selectedIdx: i + this.state.selectedPage * VEHICLES_ON_PAGE, department: this.state.vehicles[i + this.state.selectedPage * VEHICLES_ON_PAGE].department })}>
-                                    View
+                                    <Translation>
+                                        {
+                                            t => t('Button View')
+                                        }
+                                    </Translation>
                                 </Link>
                             </ul>
                         )}
@@ -223,12 +233,24 @@ class Vehicles extends React.Component {
                                     <div>
                                         <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1) ? false : true} style={{ textTransform: "capitalize" }} name="name" />
                                         <ErrorMessage name="name" className="error-label" component="div" />
-                                        <span className="floating-label">Model name</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Model')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1) ? false : true} style={{ textTransform: "capitalize" }} name="plateNum" />
                                         <ErrorMessage name="plateNum" className="error-label" component="div" />
-                                        <span className="floating-label">Plate number</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Plate number')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1) ? false : true} name="vin" />
@@ -238,11 +260,23 @@ class Vehicles extends React.Component {
                                     <div>
                                         <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1) ? false : true} name="price" />
                                         <ErrorMessage name="price" className="error-label" component="div" />
-                                        <span className="floating-label">Price</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Price')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     {(this.state.selectedIdx !== -1) ?
                                         <div className="edit-list department" style={{ display: "flex", flexDirection: "column" }}>
-                                            <p className="text-label">Confiscated: </p>
+                                            <p className="text-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Confiscation')
+                                                    }
+                                                </Translation>
+                                                : </p>
                                             <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
                                                 options={this.state.departments.map(d => (
                                                     {
@@ -251,9 +285,19 @@ class Vehicles extends React.Component {
                                                     })
                                                 )}
                                                 onChange={(e) => { this.setState({ department: e.value }) }}
-                                                value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : {}}
-                                                placeholder="Department"
-                                                noOptionsMessage={() => "Not found"} />
+                                                value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : null}
+                                                placeholder=
+                                                {<Translation>
+                                                    {
+                                                        t => t('Department')
+                                                    }
+                                                </Translation>}
+                                                noOptionsMessage={() =>
+                                                    <Translation>
+                                                        {
+                                                            t => t('Not found')
+                                                        }
+                                                    </Translation>} />
                                             <div>
                                                 <span className="link-button" onClick={(e) => { e.preventDefault(); this.sendDepartment(); }}>
                                                     <FontAwesomeIcon icon={faSave} />

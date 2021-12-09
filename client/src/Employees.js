@@ -225,8 +225,18 @@ class Employees extends React.Component {
                                     )}
                                     value={this.state.department}
                                     onChange={(e) => { this.setState({ department: e }); this.clearForm() }}
-                                    placeholder="Department"
-                                    noOptionsMessage={() => "Department not found"} />
+                                    placeholder=
+                                    {<Translation>
+                                        {
+                                            t => t('Department')
+                                        }
+                                    </Translation>}
+                                    noOptionsMessage={() =>
+                                        <Translation>
+                                            {
+                                                t => t('Not found')
+                                            }
+                                        </Translation>} />
                             </Link>
                         </div>
                     </div>
@@ -248,7 +258,13 @@ class Employees extends React.Component {
                                         this.setState({ selectedEmployeeId: e.id }, () => { this.loadWorkHours(); this.loadIncidents(); });
                                     }}
                                     className="edit-button round-link">
-                                    <li>View</li>
+                                    <li>
+                                        <Translation>
+                                            {
+                                                t => t('Button View')
+                                            }
+                                        </Translation>
+                                    </li>
                                 </Link>
                             </ul>
                         )}
@@ -289,9 +305,26 @@ class Employees extends React.Component {
                                             )}
                                             value={this.state.selectedCitizens}
                                             onChange={(e) => this.setState({ selectedCitizens: e })}
-                                            placeholder="Person"
-                                            noOptionsMessage={() => "Citizen not found"} />
-                                        <span className="floating-label active-label">Person</span>
+                                            placeholder={
+                                                <Translation>
+                                                    {
+                                                        t => t('Citizen')
+                                                    }
+                                                </Translation>
+                                            }
+                                            noOptionsMessage={() =>
+                                                <Translation>
+                                                    {
+                                                        t => t('Not found')
+                                                    }
+                                                </Translation>} />
+                                        <span className="floating-label active-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Citizen')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Select styles={customStyles}
@@ -303,19 +336,46 @@ class Employees extends React.Component {
                                             )}
                                             value={this.state.selectedRank}
                                             onChange={(e) => this.setState({ selectedRank: e })}
-                                            placeholder="Rank"
-                                            noOptionsMessage={() => "Rank not found"} />
-                                        <span className="floating-label active-label">Rank</span>
+                                            placeholder=
+                                            {<Translation>
+                                                {
+                                                    t => t('Rank')
+                                                }
+                                            </Translation>}
+                                            noOptionsMessage={() =>
+                                                <Translation>
+                                                    {
+                                                        t => t('Not found')
+                                                    }
+                                                </Translation>} />
+                                        <span className="floating-label active-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Rank')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="number" name="tag" value={this.state.tag} onChange={(e) => this.setState({ tag: e.target.value })} />
                                         <ErrorMessage name="tag" className="error-label" component="div" />
-                                        <span className="floating-label active-label">Tag</span>
+                                        <span className="floating-label active-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Tag')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
 
                                     <div className="edit-list licenses">
-                                        <p className="text-label">Qualifications: </p>
+                                        <p className="text-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Qualifications')
+                                                }
+                                            </Translation>: </p>
                                         {qualifications.map(q =>
                                             <Link
                                                 key={q.id}
@@ -342,8 +402,18 @@ class Employees extends React.Component {
                                             )}
                                             value={this.state.qualification}
                                             onChange={(e) => { this.setState({ qualification: e }) }}
-                                            placeholder="Qualification"
-                                            noOptionsMessage={() => "Qualification not found"} />
+                                            placeholder=
+                                            {<Translation>
+                                                {
+                                                    t => t('Qualification')
+                                                }
+                                            </Translation>}
+                                            noOptionsMessage={() =>
+                                                <Translation>
+                                                    {
+                                                        t => t('Not found')
+                                                    }
+                                                </Translation>} />
                                         <span className="link-button" onClick={async (e) => {
                                             e.preventDefault();
                                             let tmp = {
@@ -362,7 +432,12 @@ class Employees extends React.Component {
                                     </div>
 
                                     <div className="edit-list related-incidents">
-                                        <p className="text-label">Incidents: </p>
+                                        <p className="text-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Title Incidents')
+                                                }
+                                            </Translation>: </p>
                                         {this.state.incidents.map(i =>
                                             <Link
                                                 key={i.id}

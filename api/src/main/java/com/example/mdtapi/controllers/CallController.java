@@ -75,8 +75,7 @@ public class CallController {
         Optional<Employee> employee = employeeRepository.findById(employeeId);
         if (call.isEmpty() || employee.isEmpty())
             return null;
-
-
+        
         call.get().getEmployees().add(employee.get());
         callRepository.save(call.get());
         call = callRepository.findById(callId);

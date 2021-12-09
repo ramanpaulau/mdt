@@ -83,28 +83,54 @@ class Licenses extends React.Component {
                                             <div>
                                                 <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="name" />
                                                 <ErrorMessage name="name" className="error-label" component="div" />
-                                                <span className="floating-label">Name</span>
+                                                <span className="floating-label">
+                                                    <Translation>
+                                                        {
+                                                            t => t('Form Name')
+                                                        }
+                                                    </Translation>
+                                                </span>
                                             </div>
                                         </li>
                                         <li className="type">
                                             <label>
                                                 <Field type="radio" name="type" value="license" />
-                                                License
+                                                <Translation>
+                                                    {
+                                                        t => t('License')
+                                                    }
+                                                </Translation>
                                             </label>
                                             <label>
                                                 <Field type="radio" name="type" value="qualification" />
-                                                Qualification
+                                                <Translation>
+                                                    {
+                                                        t => t('Qualification')
+                                                    }
+                                                </Translation>
                                             </label>
                                         </li>
                                         <li className="description">
                                             <div>
                                                 <Field className="text-input" type="text" name="description" />
                                                 <ErrorMessage name="description" className="error-label" component="div" />
-                                                <span className="floating-label active-label">Description</span>
+                                                <span className="floating-label active-label">
+                                                    <Translation>
+                                                        {
+                                                            t => t('Form Description')
+                                                        }
+                                                    </Translation>
+                                                </span>
                                             </div>
                                         </li>
                                         <li className="button">
-                                            <button ref={this.sendButton} className="round-link" type="submit">Send</button>
+                                            <button ref={this.sendButton} className="round-link" type="submit">
+                                                <Translation>
+                                                    {
+                                                        t => t('Title Send')
+                                                    }
+                                                </Translation>
+                                            </button>
                                         </li>
                                     </Form>
                                 )}
@@ -119,7 +145,18 @@ class Licenses extends React.Component {
                                     {e.details}
                                 </li>
                                 <li className="type">
-                                    {e.type}
+                                    {(e.type === "License") ?
+                                        <Translation>
+                                            {
+                                                t => t('License')
+                                            }
+                                        </Translation>
+                                        :
+                                        <Translation>
+                                            {
+                                                t => t('Qualification')
+                                            }
+                                        </Translation>}
                                 </li>
                                 <li className="button">
                                     <span className="link-button" onClick={async () => {

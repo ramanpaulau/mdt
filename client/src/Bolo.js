@@ -23,11 +23,20 @@ class Bolo extends React.Component {
                         {this.props.boloCitizens.map((o, i) =>
                             <ul className="citizen-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="fullname">{o.record.name + " " + o.record.surname}</li>
-                                <li className="phone">Phone: {o.record.phoneNumber}</li>
+                                <li className="phone">
+                                    <Translation>
+                                        {
+                                            t => t('Form Phone')
+                                        }
+                                    </Translation>: {o.record.phoneNumber}</li>
                                 <Link
                                     to={"/incidents/" + o.incident.id}
                                     className="edit-button round-link">
-                                    Incident: {o.incident.id}
+                                    <Translation>
+                                        {
+                                            t => t('Incident')
+                                        }
+                                    </Translation>: {o.incident.id}
                                 </Link>
                                 <Link
                                     to={"/citizens/" + (o.record.regNum)}

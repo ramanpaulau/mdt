@@ -3,6 +3,7 @@ import ReactModal from 'react-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Translation } from 'react-i18next';
 
 const customStyles = {
     content: {
@@ -68,7 +69,13 @@ class AddChapter extends React.Component {
                                 <div>
                                     <Field className="text-input" type="text" name="title" />
                                     <ErrorMessage name="title" className="error-label" component="div" />
-                                    <span className="floating-label">Title</span>
+                                    <span className="floating-label">
+                                        <Translation>
+                                            {
+                                                t => t('Form Title')
+                                            }
+                                        </Translation>
+                                    </span>
                                 </div>
                                 <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
                             </Form>

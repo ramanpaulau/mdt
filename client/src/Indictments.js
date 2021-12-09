@@ -108,13 +108,35 @@ class Indictments extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.indictments.filter(i => (i.id + '').includes(e.target.value) || i.person.includes(e.target.value.toUpperCase())) }, () => this.getPageData())} />
+
+                        <Translation>{t =>
+                            <input placeholder={t('Input Filter')}
+                                className="text-input"
+                                type="text"
+                                value={this.state.filter}
+                                onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.indictments.filter(i => (i.id + '').includes(e.target.value) || i.person.includes(e.target.value.toUpperCase())) }, () => this.getPageData())} />
+                        }</Translation>
                         {this.state.pageData.map((o, i) =>
                             <ul className="indictment-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="id">#{o.id}</li>
-                                <li className="">Start time: {new Date(o.startTime).toLocaleString()}</li>
-                                <li className="">End time: {new Date(o.endTime).toLocaleString()}</li>
-                                <li className="">Created: {o.employee}</li>
+                                <li className="">
+                                    <Translation>
+                                        {
+                                            t => t('Start Time')
+                                        }
+                                    </Translation>: {new Date(o.startTime).toLocaleString()}</li>
+                                <li className="">
+                                    <Translation>
+                                        {
+                                            t => t('End Time')
+                                        }
+                                    </Translation>: {new Date(o.endTime).toLocaleString()}</li>
+                                <li className="">
+                                    <Translation>
+                                        {
+                                            t => t('Created')
+                                        }
+                                    </Translation>: {o.employee}</li>
                                 <li className="">{o.laws}</li>
                                 <Link
                                     to={"/citizens/" + (o.person)}
@@ -203,73 +225,75 @@ class Indictments extends React.Component {
                             }}
                         >
                             {({ isSubmitting }) => (
-                                <Form>
-                                    <div className="edit-list incident">
-                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                            options={this.state.incidents.map(i => (
-                                                {
-                                                    value: i.id,
-                                                    label: i.id
-                                                })
-                                            )}
-                                            onChange={(e) => { this.setState({ incident: e.value }) }}
-                                            placeholder="Incident"
-                                            noOptionsMessage={() => "Not found"} />
-                                    </div>
-                                    <div className="edit-list department">
-                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                            options={this.state.departments.map(d => (
-                                                {
-                                                    value: d.code,
-                                                    label: d.shortTitle
-                                                })
-                                            )}
-                                            onChange={(e) => { this.setState({ department: e.value }) }}
-                                            placeholder="Department"
-                                            noOptionsMessage={() => "Not found"} />
-                                    </div>
-                                    <div className="edit-list citizen">
-                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                            options={this.props.citizens.map(c => (
-                                                {
-                                                    value: c.regNum,
-                                                    label: c.regNum
-                                                })
-                                            )}
-                                            onChange={(e) => { this.setState({ citizen: e.value }) }}
-                                            placeholder="Citizen"
-                                            noOptionsMessage={() => "Not found"} />
-                                    </div>
-                                    <div className="start-date">
-                                        <Datetime value={this.state.startTime} onChange={(e) => { this.setState({ startTime: new Date(e) }) }} />
-                                        <span className="floating-label active-label">Start</span>
-                                    </div>
-                                    <div className="end-fate">
-                                        <p className="text-label">End: {this.state.endTime.toLocaleString()}</p>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="number" name="detention" />
-                                        <ErrorMessage name="detention" className="error-label" component="div" />
-                                        <span className="floating-label active-label">Detention</span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="number" name="fine" />
-                                        <ErrorMessage name="fine" className="error-label" component="div" />
-                                        <span className="floating-label active-label">Fine</span>
-                                    </div>
-                                    <SelectLaws callback={(laws) => this.saveLaws(laws)} />
-                                    <div>
-                                        <p className="text-label">Selected laws: </p>
-                                        <div className="laws">
-                                            {this.state.selectedLaws.map(l =>
-                                                <Link to="/penalcode" key={l.number} className="round-link" >
-                                                    {l.number}
-                                                </Link>
-                                            )}
+                                <Translation>{t =>
+                                    <Form>
+                                        <div className="edit-list incident">
+                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                options={this.state.incidents.map(i => (
+                                                    {
+                                                        value: i.id,
+                                                        label: i.id
+                                                    })
+                                                )}
+                                                onChange={(e) => { this.setState({ incident: e.value }) }}
+                                                placeholder={t('Incident')}
+                                                noOptionsMessage={() => t('Not found')} />
                                         </div>
-                                    </div>
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                </Form>
+                                        <div className="edit-list department">
+                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                options={this.state.departments.map(d => (
+                                                    {
+                                                        value: d.code,
+                                                        label: d.shortTitle
+                                                    })
+                                                )}
+                                                onChange={(e) => { this.setState({ department: e.value }) }}
+                                                placeholder={t('Department')}
+                                                noOptionsMessage={() => t('Not found')} />
+                                        </div>
+                                        <div className="edit-list citizen">
+                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                options={this.props.citizens.map(c => (
+                                                    {
+                                                        value: c.regNum,
+                                                        label: c.regNum
+                                                    })
+                                                )}
+                                                onChange={(e) => { this.setState({ citizen: e.value }) }}
+                                                placeholder={t('Citizen')}
+                                                noOptionsMessage={() => t('Not found')} />
+                                        </div>
+                                        <div className="start-date">
+                                            <Datetime value={this.state.startTime} onChange={(e) => { this.setState({ startTime: new Date(e) }) }} />
+                                            <span className="floating-label active-label">{t('Start Time')}</span>
+                                        </div>
+                                        <div className="end-fate">
+                                            <p className="text-label">{t('End Time')}: {this.state.endTime.toLocaleString()}</p>
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="number" name="detention" />
+                                            <ErrorMessage name="detention" className="error-label" component="div" />
+                                            <span className="floating-label active-label">{t('Detention')}</span>
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="number" name="fine" />
+                                            <ErrorMessage name="fine" className="error-label" component="div" />
+                                            <span className="floating-label active-label">{t('Fine')}</span>
+                                        </div>
+                                        <SelectLaws callback={(laws) => this.saveLaws(laws)} />
+                                        <div>
+                                            <p className="text-label">{t('Form Selected Laws')}: </p>
+                                            <div className="laws">
+                                                {this.state.selectedLaws.map(l =>
+                                                    <Link to="/penalcode" key={l.number} className="round-link" >
+                                                        {l.number}
+                                                    </Link>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                    </Form>
+                                }</Translation>
                             )}
                         </Formik>
                     </div>

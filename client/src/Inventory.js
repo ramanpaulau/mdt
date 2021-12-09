@@ -130,8 +130,18 @@ class Inventory extends React.Component {
                                     })
                                 )}
                                 onChange={(e) => { this.setState({ department: e.value }) }}
-                                placeholder="Department"
-                                noOptionsMessage={() => "Department not found"} />
+                                placeholder=
+                                {<Translation>
+                                    {
+                                        t => t('Department')
+                                    }
+                                </Translation>}
+                                noOptionsMessage={() =>
+                                    <Translation>
+                                        {
+                                            t => t('Not found')
+                                        }
+                                    </Translation>} />
                         </div>
                     </div>
                     <div className="table-scroll">
@@ -214,12 +224,23 @@ class Inventory extends React.Component {
                                     <div className="textarea">
                                         <Field className="text-input" type="text" as="textarea" name="description" />
                                         <ErrorMessage name="description" className="error-label" component="div" />
-                                        <span className="floating-label">Description</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Description')
+                                                }
+                                            </Translation></span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="number" name="amount" />
                                         <ErrorMessage name="amount" className="error-label" component="div" />
-                                        <span className="floating-label active-label">Amount</span>
+                                        <span className="floating-label active-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Amount')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
                                 </Form>
@@ -315,7 +336,13 @@ class SelectAmount extends React.Component {
                             <div>
                                 <Field className="text-input" type="number" name="amount" />
                                 <ErrorMessage name="amount" className="error-label" component="div" />
-                                <span className="floating-label active-label">Amount</span>
+                                <span className="floating-label active-label">
+                                    <Translation>
+                                        {
+                                            t => t('Form Amount')
+                                        }
+                                    </Translation>
+                                </span>
                             </div>
                         </Form>
                     )}

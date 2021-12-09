@@ -133,13 +133,22 @@ class Departments extends React.Component {
                         {this.state.pageData.map((o, i) =>
                             <ul className="department-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="short">{o.shortTitle}</li>
-                                <li className="code">Code: {o.code}</li>
+                                <li className="code">
+                                    <Translation>
+                                        {
+                                            t => t('Code')
+                                        }
+                                    </Translation>: {o.code}</li>
                                 <li className="title-value">{o.title}</li>
                                 <Link
                                     to={"/departments/" + o.code}
                                     className="edit-button round-link"
                                     onClick={() => this.setState({ selectedDep: i + this.state.selectedPage * DEPARTMENTS_ON_PAGE, password: "" }, () => { this.getSelectedRanks(); this.getSelectedUnits(); })}>
-                                    View
+                                    <Translation>
+                                        {
+                                            t => t('Button View')
+                                        }
+                                    </Translation>
                                 </Link>
                             </ul>
                         )}
@@ -242,22 +251,46 @@ class Departments extends React.Component {
                                         <div>
                                             <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="shortTitle" />
                                             <ErrorMessage name="shortTitle" className="error-label" component="div" />
-                                            <span className="floating-label">Short title</span>
+                                            <span className="floating-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Form Short Title')
+                                                    }
+                                                </Translation>
+                                            </span>
                                         </div>
                                         <div>
                                             <Field className="text-input" type="number" name="code" />
                                             <ErrorMessage name="code" className="error-label" component="div" />
-                                            <span className="floating-label active-label">Code</span>
+                                            <span className="floating-label active-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Code')
+                                                    }
+                                                </Translation>
+                                            </span>
                                         </div>
                                         <div className="title-input">
                                             <Field className="text-input" type="text" name="title" />
                                             <ErrorMessage name="title" className="error-label" component="div" />
-                                            <span className="floating-label">Title</span>
+                                            <span className="floating-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Form Title')
+                                                    }
+                                                </Translation>
+                                            </span>
                                         </div>
                                         <div className="textarea">
                                             <Field className="text-input" type="text" as="textarea" name="description" />
                                             <ErrorMessage name="description" className="error-label" component="div" />
-                                            <span className="floating-label">Description</span>
+                                            <span className="floating-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Form Description')
+                                                    }
+                                                </Translation>
+                                            </span>
                                         </div>
                                         <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
                                     </Form>
@@ -324,12 +357,26 @@ class Departments extends React.Component {
                                             <div>
                                                 <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
                                                 <ErrorMessage name="title" className="error-label" component="div" />
-                                                <span className="floating-label">Title</span>
+                                                <span className="floating-label">
+                                                    <Translation>
+                                                        {
+                                                            t => t('Form Title')
+                                                        }
+                                                    </Translation>
+                                                </span>
                                             </div>
                                             <div>
                                                 <Field className="text-input" type="number" name="salary" />
                                                 <ErrorMessage name="salary" className="error-label" component="div" />
-                                                <span className="floating-label active-label">Salary - $/hour</span>
+                                                <span className="floating-label active-label"><Translation>
+                                                    {
+                                                        t => t('Form Salary')
+                                                    }
+                                                </Translation> - $/<Translation>
+                                                        {
+                                                            t => t('Form Hour')
+                                                        }
+                                                    </Translation></span>
                                             </div>
                                             <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
                                         </Form>
@@ -339,9 +386,19 @@ class Departments extends React.Component {
                             {this.state.selectedRanks.map((o, i) =>
                                 <ul className="rank" key={i}>
                                     <li>{o.title}</li>
-                                    <li>{o.salary} $/hour</li>
+                                    <li>{o.salary} $/<Translation>
+                                        {
+                                            t => t('Form Hour')
+                                        }
+                                    </Translation></li>
                                     <li className="controls">
-                                        <button className="round-link" type="submit" onClick={() => this.setState({ selectedRank: i })}>Edit</button>
+                                        <button className="round-link" type="submit" onClick={() => this.setState({ selectedRank: i })}>
+                                            <Translation>
+                                                {
+                                                    t => t('Button Edit')
+                                                }
+                                            </Translation>
+                                        </button>
                                         <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
                                     </li>
                                 </ul>
@@ -407,17 +464,35 @@ class Departments extends React.Component {
                                             <div>
                                                 <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
                                                 <ErrorMessage name="title" className="error-label" component="div" />
-                                                <span className="floating-label">Title</span>
+                                                <span className="floating-label">
+                                                    <Translation>
+                                                        {
+                                                            t => t('Form Title')
+                                                        }
+                                                    </Translation>
+                                                </span>
                                             </div>
                                             <div>
                                                 <Field className="text-input" type="text" name="abbreviation" />
                                                 <ErrorMessage name="abbreviation" className="error-label" component="div" />
-                                                <span className="floating-label active-label">Abbreviation</span>
+                                                <span className="floating-label active-label">
+                                                    <Translation>
+                                                        {
+                                                            t => t('Form Abbreviation')
+                                                        }
+                                                    </Translation>
+                                                </span>
                                             </div>
                                             <div>
                                                 <Field className="text-input" type="text" name="description" />
                                                 <ErrorMessage name="description" className="error-label" component="div" />
-                                                <span className="floating-label active-label">Description</span>
+                                                <span className="floating-label active-label">
+                                                    <Translation>
+                                                        {
+                                                            t => t('Form Description')
+                                                        }
+                                                    </Translation>
+                                                </span>
                                             </div>
                                             <button className="round-link" type="submit"><FontAwesomeIcon icon={faPlus} /></button>
                                         </Form>
@@ -427,11 +502,28 @@ class Departments extends React.Component {
                             {this.state.selectedUnits.map((o, i) =>
                                 <ul className="rank" key={i}>
                                     <li>{o.title}</li>
-                                    <li>Abbreviation: {o.abbreviation}</li>
+                                    <li>
+                                        <Translation>
+                                            {
+                                                t => t('Form Abbreviation')
+                                            }
+                                        </Translation>: {o.abbreviation}</li>
                                     <li>{o.description}</li>
                                     <li className="controls">
-                                        <button className="round-link" type="submit" onClick={() => { this.setMain(o.abbreviation); }}>Main</button>
-                                        <button className="round-link" type="submit" onClick={() => this.setState({ selectedUnit: i })}>Edit</button>
+                                        <button className="round-link" type="submit" onClick={() => { this.setMain(o.abbreviation); }}>
+                                            <Translation>
+                                                {
+                                                    t => t('Button Main')
+                                                }
+                                            </Translation>
+                                        </button>
+                                        <button className="round-link" type="submit" onClick={() => this.setState({ selectedUnit: i })}>
+                                            <Translation>
+                                                {
+                                                    t => t('Button Edit')
+                                                }
+                                            </Translation>
+                                        </button>
                                         <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
                                     </li>
                                 </ul>

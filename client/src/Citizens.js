@@ -177,9 +177,9 @@ class Citizens extends React.Component {
     }
 
     loadData = () => {
-        this.getCitizenVehicles(); 
-        this.getCitizenFines(); 
-        this.getCitizenIndictments(); 
+        this.getCitizenVehicles();
+        this.getCitizenFines();
+        this.getCitizenIndictments();
         this.getCitizenRecords();
     }
 
@@ -193,19 +193,34 @@ class Citizens extends React.Component {
                         }
                     </Translation>
                     <div className="table-scroll">
-                        <input placeholder="Filter" className="text-input" type="text" value={this.state.filter} onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.props.citizens.filter(c => c.regNum.toLowerCase().includes(e.target.value.toLowerCase()) || (c.name.toLowerCase() + ' ' + c.surname.toLowerCase()).includes(e.target.value.toLowerCase())) }, () => this.loadCitizens())} />
+                        <Translation>{t =>
+                            <input placeholder={t('Input Filter')}
+                                className="text-input" 
+                                type="text" 
+                                value={this.state.filter} 
+                                onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.props.citizens.filter(c => c.regNum.toLowerCase().includes(e.target.value.toLowerCase()) || (c.name.toLowerCase() + ' ' + c.surname.toLowerCase()).includes(e.target.value.toLowerCase())) }, () => this.loadCitizens())} />
+                        }</Translation>
                         {this.state.pageData.map((o, i) =>
                             <ul className="citizen-item" key={i} onMouseDown={this.handleDrag}>
                                 <li className="regnum">{o.regNum}</li>
                                 <li className="fullname">{o.name + " " + o.surname}</li>
-                                <li className="phone">Phone: {o.phoneNumber}</li>
+                                <li className="phone">
+                                    <Translation>
+                                        {
+                                            t => t('Form Phone')
+                                        }
+                                    </Translation>: {o.phoneNumber}</li>
                                 <Link
                                     to={"/citizens/" + (o.regNum)}
                                     className="edit-button round-link"
                                     onClick={() => {
                                         this.setState({ selectedIdx: i + this.state.selectedPage * CITIZENS_ON_PAGE, password: "" }, () => { this.loadData(); this.clearForm(); });
                                     }}>
-                                    View
+                                    <Translation>
+                                        {
+                                            t => t('Button View')
+                                        }
+                                    </Translation>
                                 </Link>
                             </ul>
                         )}
@@ -306,31 +321,67 @@ class Citizens extends React.Component {
                                     <div>
                                         <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="name" />
                                         <ErrorMessage name="name" className="error-label" component="div" />
-                                        <span className="floating-label">Name</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Name')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="surname" />
                                         <ErrorMessage name="surname" className="error-label" component="div" />
-                                        <span className="floating-label">Surname</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Surname')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="text" name="phoneNumber" />
                                         <ErrorMessage name="phoneNumber" className="error-label" component="div" />
-                                        <span className="floating-label">Phone</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Phone')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <DatePickerField className="datePicker" name="birthdate" />
                                         <ErrorMessage name="birthdate" className="error-label" component="div" />
-                                        <span className="floating-label active-label">Birth date</span>
+                                        <span className="floating-label active-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Birth Date')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="regNum" />
                                         <ErrorMessage name="regNum" className="error-label" component="div" />
-                                        <span className="floating-label">Registration number</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Reg. num')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div className="password-link">
                                         <input disabled type="text" className="text-input" value={this.state.password} />
-                                        <span className="floating-label active-label">Get password link</span>
+                                        <span className="floating-label active-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Get Password Link')
+                                                }
+                                            </Translation>
+                                        </span>
                                         <span onClick={this.getPassword} className="get-label"><FontAwesomeIcon icon={faDownload} /></span>
                                         <CopyToClipboard text={this.state.password} onCopy={this.onCopy}>
                                             <span className="copy-label" ref={this.copyLabel}><FontAwesomeIcon icon={faCopy} /></span>
@@ -353,7 +404,13 @@ class Citizens extends React.Component {
                     {(this.state.selectedIdx === -1) ? "" :
                         <div className="table-scroll">
                             <div className="edit-list licenses">
-                                <p className="text-label">Licenses: </p>
+                                <p className="text-label">
+                                    <Translation>
+                                        {
+                                            t => t('Title Licenses')
+                                        }
+                                    </Translation>
+                                    : </p>
                                 {this.props.citizens[this.state.selectedIdx].licenses.map((l, i) =>
                                     <Link
                                         key={i}
@@ -384,7 +441,12 @@ class Citizens extends React.Component {
                                     )}
                                     onChange={(e) => { this.setState({ license: e }) }}
                                     value={this.state.license}
-                                    placeholder="License"
+                                    placeholder=
+                                    {<Translation>
+                                        {
+                                            t => t('Title Licenses')
+                                        }
+                                    </Translation>}
                                     noOptionsMessage={() => "Not found"} />
                                 <span className="link-button" onClick={(e) => {
                                     e.preventDefault();
@@ -401,7 +463,13 @@ class Citizens extends React.Component {
                                 </span>
                             </div>
                             <div className="edit-list transport">
-                                <p className="text-label">Vehicles: </p>
+                                <p className="text-label">
+                                    <Translation>
+                                        {
+                                            t => t('Title Vehicles')
+                                        }
+                                    </Translation>
+                                    : </p>
                                 {this.state.citizenVehicles.map(v =>
                                     <Link key={v.vin}
                                         to={"/vehicles/" + v.plateNum}
@@ -428,7 +496,12 @@ class Citizens extends React.Component {
                                     )}
                                     onChange={(e) => { this.setState({ vehicle: e }) }}
                                     value={this.state.vehicle}
-                                    placeholder="Vehicles"
+                                    placeholder=
+                                    {<Translation>
+                                        {
+                                            t => t('Title Vehicles')
+                                        }
+                                    </Translation>}
                                     noOptionsMessage={() => "Not found"} />
                                 <span className="link-button" onClick={(e) => { e.preventDefault(); this.registerVehicle(); }}>
                                     <FontAwesomeIcon icon={faPlus} />
@@ -436,7 +509,13 @@ class Citizens extends React.Component {
                             </div>
 
                             <div className="edit-list">
-                                <p className="text-label">Fines: </p>
+                                <p className="text-label">
+                                    <Translation>
+                                        {
+                                            t => t('Title Fines')
+                                        }
+                                    </Translation>
+                                    : </p>
                                 {this.state.citizenFines.map(f =>
                                     (f.state) ? "" :
                                         <Link key={f.id}
@@ -448,7 +527,13 @@ class Citizens extends React.Component {
                             </div>
 
                             <div className="edit-list related-incidents">
-                                <p className="text-label">Related incidents: </p>
+                                <p className="text-label">
+                                    <Translation>
+                                        {
+                                            t => t('Title Incidents')
+                                        }
+                                    </Translation>
+                                    : </p>
                                 {this.state.citizenRecords.map(i =>
                                     <Link key={i}
                                         to={"/incidents/" + i}
@@ -459,7 +544,13 @@ class Citizens extends React.Component {
                             </div>
 
                             <div className="edit-list criminal">
-                                <p className="text-label">Criminal records: </p>
+                                <p className="text-label">
+                                    <Translation>
+                                        {
+                                            t => t('Criminal Records')
+                                        }
+                                    </Translation>
+                                    : </p>
                                 {this.state.citizenIndictments.map(i =>
                                     <Link key={i.id}
                                         to={"/indictments/" + i.id}

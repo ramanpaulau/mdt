@@ -97,18 +97,40 @@ class Calls extends React.Component {
                         <div className="table-scroll">
                             {this.state.pageData.map((o, i) =>
                                 <ul className="call-item" key={i} onMouseDown={this.handleDrag}>
-                                    <li className="call-location">Location: {o.location}</li>
+                                    <li className="call-location">
+                                        <Translation>
+                                            {
+                                                t => t('Form Location')
+                                            }
+                                        </Translation>
+                                        : {o.location}</li>
                                     <li className="call-id">#{o.id}</li>
-                                    <li className="call-time">Time: {(new Date(o.time)).toLocaleString()}</li>
+                                    <li className="call-time">
+                                        <Translation>
+                                            {
+                                                t => t('Time')
+                                            }
+                                        </Translation>
+                                        : {(new Date(o.time)).toLocaleString()}</li>
                                     <li></li>
-                                    <li className="call-phone">Phone: {o.phone}</li>
+                                    <li className="call-phone">
+                                        <Translation>
+                                            {
+                                                t => t('Form Phone')
+                                            }
+                                        </Translation>
+                                        : {o.phone}</li>
                                     <Link
                                         to={"/calls/" + o.id}
                                         className="edit-button round-link"
                                         onClick={() => {
                                             this.setState({ selectedIdx: i + this.state.selectedPage * CALLS_ON_PAGE });
                                         }}>
-                                        View
+                                        <Translation>
+                                            {
+                                                t => t('Button View')
+                                            }
+                                        </Translation>
                                     </Link>
                                 </ul>
                             )}
@@ -181,24 +203,48 @@ class Calls extends React.Component {
                                     <div>
                                         <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="location" />
                                         <ErrorMessage name="location" className="error-label" component="div" />
-                                        <span className="floating-label">Location</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Location')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div>
                                         <Field className="text-input" type="text" name="phone" />
                                         <ErrorMessage name="phone" className="error-label" component="div" />
-                                        <span className="floating-label">Phone</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Phone')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <div className="textarea">
                                         <Field className="text-input" type="text" as="textarea" name="text" />
                                         <ErrorMessage name="text" className="error-label" component="div" />
-                                        <span className="floating-label">Text</span>
+                                        <span className="floating-label">
+                                            <Translation>
+                                                {
+                                                    t => t('Form Text')
+                                                }
+                                            </Translation>
+                                        </span>
                                     </div>
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
 
 
                                     {(this.state.selectedIdx === -1) ? "" :
                                         <div className="edit-list officers">
-                                            <p className="text-label">Officers: </p>
+                                            <p className="text-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Officers')
+                                                    }
+                                                </Translation>
+                                                : </p>
                                             {this.props.calls[this.state.selectedIdx].employees.map((e, i) =>
                                                 <Link
                                                     key={i}
@@ -212,7 +258,13 @@ class Calls extends React.Component {
 
                                     {(this.state.selectedIdx === -1) ? "" :
                                         <div className="edit-list report">
-                                            <p className="text-label">Report: </p>
+                                            <p className="text-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Title Incidents')
+                                                    }
+                                                </Translation>
+                                                : </p>
                                             {(incidentId) ?
                                                 <Link
                                                     to={"/incidents/" + incidentId}
@@ -237,7 +289,12 @@ class Calls extends React.Component {
                                                     })
                                                 )}
                                                 onChange={(e) => { this.setState({ report: e.value }) }}
-                                                placeholder="Report ID"
+                                                placeholder=
+                                                {<Translation>
+                                                    {
+                                                        t => t('Incident')
+                                                    }
+                                                </Translation>}
                                                 noOptionsMessage={() => "Not found"} />
                                             <span className="link-button" onClick={async (e) => {
                                                 e.preventDefault();
