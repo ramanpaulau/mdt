@@ -20,8 +20,8 @@ public class Call {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "call_officers",
-            joinColumns = { @JoinColumn(name = "employee_id") },
-            inverseJoinColumns = { @JoinColumn(name = "call_id") }
+            joinColumns = { @JoinColumn(name = "call_id") },
+            inverseJoinColumns = { @JoinColumn(name = "employee_id") }
     )
     private Set<Employee> employees = new HashSet<>();
 
