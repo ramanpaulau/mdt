@@ -96,7 +96,8 @@ class Vehicles extends React.Component {
                 console.log(res.data.message);
             await axios.get("http://localhost:8081/vehicles").then(res => {
                 this.setState({
-                    vehicles: res.data
+                    vehicles: res.data, 
+                    department: 0
                 })
             });
         });
@@ -191,7 +192,7 @@ class Vehicles extends React.Component {
                                 if (!values.plateNum) {
                                     errors.plateNum = 'Required';
                                 } else if (!/^[A-Z0-9]{4}$/i.test(values.plateNum)) {
-                                    errors.plateNum = 'Invalid plate number';
+                                    errors.plateNum = 'Format: XXXX';
                                 } else {
                                     await axios.get("http://localhost:8081/vehicles/is_plateNum_available/" + values.plateNum.toUpperCase()).then((res) => {
                                         if (!res.data.success)
@@ -202,7 +203,7 @@ class Vehicles extends React.Component {
                                 if (!values.vin) {
                                     errors.vin = 'Required';
                                 } else if (!/^[0-9]{6}$/i.test(values.vin)) {
-                                    errors.vin = 'Format: six numbers';
+                                    errors.vin = 'Format: XXXXXX';
                                 } else {
                                     await axios.get("http://localhost:8081/vehicles/is_vin_available/" + values.vin).then((res) => {
                                         if (!res.data.success)

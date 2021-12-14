@@ -26,7 +26,7 @@ public class VehicleRest {
 
     @GetMapping("/vehicles")
     public List<Vehicle> all() {
-        return vehicleRepository.findAll();
+        return vehicleRepository.findAllByOrderByNameAsc();
     }
 
     @GetMapping("/vehicles/free")

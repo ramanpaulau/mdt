@@ -11,6 +11,8 @@ import java.util.List;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Integer> {
+    List<Vehicle> findAllByOrderByNameAsc();
+
     boolean existsByPlateNum(String plateNum);
 
     boolean existsByVin(Integer vin);
