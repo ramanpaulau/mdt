@@ -20,7 +20,11 @@ public class Employee {
     @JoinColumn(name = "rank_title")
     private Rank rank;
 
-    @ManyToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Unit.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "unit_abbreviation")
+    private Unit unit;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "employee_qualification",
             joinColumns = { @JoinColumn(name = "qualification_id") },
@@ -39,12 +43,16 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(Integer id, Person person, Department department, Rank rank, Integer tag) {
+    public Employee(Integer id, Person person, Department department, Rank rank, Unit unit, Set<Qualification> qualifications, Integer tag, boolean leader, String marking) {
         this.id = id;
         this.person = person;
         this.department = department;
         this.rank = rank;
+        this.unit = unit;
+        this.qualifications = qualifications;
         this.tag = tag;
+        this.leader = leader;
+        this.marking = marking;
     }
 
     public Integer getId() {
@@ -91,6 +99,14 @@ public class Employee {
         this.rank = rank;
     }
 
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
+
     public Short getSalary() {
         return rank.getSalary();
     }
@@ -116,6 +132,6 @@ public class Employee {
     }
 
     public String getMarking() {
-        return department.getCode() + department.getUnit() + "-" + getTag();
+        return department.getCode() + ((unit != null) ? unit.getAbbreviation() : department.getUnit()) + "-" + getTag();
     }
 }

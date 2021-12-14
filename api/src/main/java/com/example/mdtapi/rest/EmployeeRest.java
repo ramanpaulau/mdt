@@ -31,12 +31,16 @@ public class EmployeeRest {
     @Autowired
     private final QualificationRepository qualificationRepository;
 
-    public EmployeeRest(EmployeeRepository employeeRepository, PersonRepository personRepository, DepartmentRepository departmentRepository, RankRepository rankRepository, QualificationRepository qualificationRepository) {
+    @Autowired
+    private final UnitRepository unitRepository;
+
+    public EmployeeRest(EmployeeRepository employeeRepository, PersonRepository personRepository, DepartmentRepository departmentRepository, RankRepository rankRepository, QualificationRepository qualificationRepository, UnitRepository unitRepository) {
         this.employeeRepository = employeeRepository;
         this.personRepository = personRepository;
         this.departmentRepository = departmentRepository;
         this.rankRepository = rankRepository;
         this.qualificationRepository = qualificationRepository;
+        this.unitRepository = unitRepository;
     }
 
     @GetMapping("/employees")
@@ -135,6 +139,29 @@ public class EmployeeRest {
             return;
 
         employee.get().getQualifications().remove(qualification.get());
+        employeeRepository.save(employee.get());
+    }
+
+    @PostMapping("/employee/{eid}/unit/{abbr}/set")
+    public void addUnit(@PathVariable int eid, @PathVariable String abbr) {
+        Optional<Employee> employee = employeeRepository.findById(eid);
+        Optional<Unit> unit = unitRepository.getByAbbreviation(abbr);
+
+        if (employee.isEmpty() || unit.isEmpty())
+            return;
+
+        employee.get().setUnit(unit.get());
+        employeeRepository.save(employee.get());
+    }
+
+    @DeleteMapping("/employee/{eid}/unit")
+    public void removeUnit(@PathVariable int eid) {
+        Optional<Employee> employee = employeeRepository.findById(eid);
+
+        if (employee.isEmpty())
+            return;
+
+        employee.get().setUnit(null);
         employeeRepository.save(employee.get());
     }
 }

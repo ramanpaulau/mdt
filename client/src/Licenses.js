@@ -51,6 +51,23 @@ class Licenses extends React.Component {
                                 enableReinitialize={true}
                                 validate={async values => {
                                     const errors = {};
+
+                                    if (!values.name) {
+                                        errors.name = 'Required';
+                                    } else if (!/^[A-Za-z ]{2,}$/i.test(values.name)) {
+                                        errors.name = 'Invalid name';
+                                    }
+
+                                    if (!values.description) {
+                                        errors.description = 'Required';
+                                    } else if (!/^[A-Za-z ]{2,}$/i.test(values.description)) {
+                                        errors.description = 'Invalid description';
+                                    }
+
+                                    if (!values.type) {
+                                        errors.type = 'Required';
+                                    }
+
                                     return errors;
                                 }}
                                 onSubmit={async (values) => {
@@ -61,7 +78,7 @@ class Licenses extends React.Component {
                                     if (values.type === "license") {
                                         await axios.post("http://localhost:8081/license", tmp).then(res => {
                                             if (!res.data.success)
-                                                console.log(res.data.message);
+                                                alert(res.data.message);
                                             else
                                                 this.loadData();
                                         });
@@ -70,7 +87,7 @@ class Licenses extends React.Component {
                                     if (values.type === "qualification") {
                                         await axios.post("http://localhost:8081/qualification", tmp).then(res => {
                                             if (!res.data.success)
-                                                console.log(res.data.message);
+                                                alert(res.data.message);
                                             else
                                                 this.loadData();
                                         });
@@ -93,22 +110,25 @@ class Licenses extends React.Component {
                                             </div>
                                         </li>
                                         <li className="type">
-                                            <label>
-                                                <Field type="radio" name="type" value="license" />
-                                                <Translation>
-                                                    {
-                                                        t => t('License')
-                                                    }
-                                                </Translation>
-                                            </label>
-                                            <label>
-                                                <Field type="radio" name="type" value="qualification" />
-                                                <Translation>
-                                                    {
-                                                        t => t('Qualification')
-                                                    }
-                                                </Translation>
-                                            </label>
+                                            <div>
+                                                <label>
+                                                    <Field type="radio" name="type" value="license" />
+                                                    <Translation>
+                                                        {
+                                                            t => t('License')
+                                                        }
+                                                    </Translation>
+                                                </label>
+                                                <label>
+                                                    <Field type="radio" name="type" value="qualification" />
+                                                    <Translation>
+                                                        {
+                                                            t => t('Qualification')
+                                                        }
+                                                    </Translation>
+                                                </label>
+                                            </div>
+                                            <ErrorMessage name="type" className="error-text" component="div" />
                                         </li>
                                         <li className="description">
                                             <div>
@@ -160,7 +180,8 @@ class Licenses extends React.Component {
                                 </li>
                                 <li className="button">
                                     <span className="link-button" onClick={async () => {
-                                        await axios.delete("http://localhost:8081/license/" + e.id).then(res => {
+                                        let tmp = (e.type === "License") ? "license" : "qualification";
+                                        await axios.delete("http://localhost:8081/" + tmp + "/" + e.id).then(res => {
                                             if (!res.data.success)
                                                 alert(res.data.message);
                                             else

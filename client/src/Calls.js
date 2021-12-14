@@ -181,10 +181,18 @@ class Calls extends React.Component {
                             validate={async values => {
                                 const errors = {};
 
+                                if (!values.location) {
+                                    errors.location = 'Required';
+                                }
+
                                 if (!values.phone) {
                                     errors.phone = 'Required';
                                 } else if (!/^\d{3}-\d{4}$/i.test(values.phone)) {
                                     errors.phone = 'Invalid phone number';
+                                }
+
+                                if (!values.text) {
+                                    errors.text = 'Required';
                                 }
 
                                 return errors;

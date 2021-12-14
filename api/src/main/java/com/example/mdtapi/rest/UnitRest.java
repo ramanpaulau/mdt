@@ -8,10 +8,7 @@ import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,6 +29,14 @@ public class UnitRest {
     @GetMapping("/units")
     public List<Unit> all() {
         return unitRepository.findAll();
+    }
+
+    @GetMapping("/units/department/{code}")
+    public List<Unit> getUnits(@PathVariable Integer code) {
+        Department department = departmentRepository.findByCode(code);
+        if (department == null)
+            return null;
+        return unitRepository.findByDepartment(department);
     }
 
     @PostMapping("/unit")

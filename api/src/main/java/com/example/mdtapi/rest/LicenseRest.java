@@ -47,13 +47,19 @@ public class LicenseRest {
             return res;
         }
 
+        if (licenseRepository.existsByName(name)) {
+            res.setSuccess(false);
+            res.setMessage("Name occupied");
+            return res;
+        }
+
         License license = new License(name, description);
         licenseRepository.save(license);
         return res;
     }
 
     @DeleteMapping ("/license/{id}")
-    public ResponseMessage insert(@PathVariable Integer id) {
+    public ResponseMessage remove(@PathVariable Integer id) {
         ResponseMessage res = ResponseMessage.OKMessage();
 
         Optional<License> license = licenseRepository.findById(id);

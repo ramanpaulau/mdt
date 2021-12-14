@@ -4,17 +4,17 @@ import axios from 'axios';
 export class User {
     regNum = '';
     admin = false;
-    //employee = {};
     employeeId = 0;
     department = '';
+    departmentId = 0;
 
     constructor() {
         makeObservable(this,
             {
                 regNum: observable,
-                //employee: observable,
                 employeeId: observable,
                 department: observable,
+                departmentId: observable,
                 admin: observable,
                 clear: action,
                 loadUser: action
@@ -67,6 +67,7 @@ export class User {
                         if (res.data) {
                             this.employeeId = res.data.id;
                             this.department = res.data.departmentFullTitle;
+                            this.departmentId = res.data.department;
                         } else
                             this.employeeId = 0;
                     }));

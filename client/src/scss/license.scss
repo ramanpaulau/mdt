@@ -17,6 +17,11 @@
                 .button, .type {
                     text-align: center;
                 }
+
+                .type {
+                    display: flex;
+                    flex-direction: column;
+                }
             }
         }
 

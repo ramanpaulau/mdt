@@ -65,6 +65,11 @@ form div {
     color: $error;
 }
 
+.error-text {
+    font-size: 12px;
+    color: $error;
+}
+
 .text-input:focus ~ .floating-label,
 .text-input:not(:focus):valid ~ .floating-label,
 .text-input:disabled ~ .floating-label,

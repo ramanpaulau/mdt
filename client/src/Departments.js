@@ -92,6 +92,10 @@ class Departments extends React.Component {
         this.loadDepartments();
         this.loadRanks();
         this.loadUnits();
+        if (this.props.match.params.code) {
+            this.getSelectedRanks(); 
+            this.getSelectedUnits();
+        }
     }
 
     handlePageClick = (data) => {

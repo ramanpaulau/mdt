@@ -284,13 +284,13 @@ class Citizens extends React.Component {
                                 if (!values.phoneNumber) {
                                     errors.phoneNumber = 'Required';
                                 } else if (!/^\d{3}-\d{4}$/i.test(values.phoneNumber)) {
-                                    errors.phoneNumber = 'Invalid phone number';
+                                    errors.phoneNumber = 'Format: XXX-XXXX';
                                 }
 
                                 if (!values.regNum) {
                                     errors.regNum = 'Required';
                                 } else if (!/^[A-Z0-9]{4}$/i.test(values.regNum)) {
-                                    errors.regNum = 'Invalid registration number';
+                                    errors.regNum = 'Format: XXXX';
                                 } else {
                                     await axios.get("http://localhost:8081/is_regNum_available/" + values.regNum.toUpperCase()).then((res) => {
                                         if (!res.data)

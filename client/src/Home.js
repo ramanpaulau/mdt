@@ -5,6 +5,7 @@ import { observer } from "mobx-react";
 import moment from "moment";
 import { Link } from 'react-router-dom';
 import { Translation } from 'react-i18next';
+import axios from "axios";
 
 class Home extends React.Component {
     constructor(props) {
@@ -12,11 +13,30 @@ class Home extends React.Component {
 
         this.state = {
             bolo: "cars",
-            activeOfficers: []
+            activeOfficers: [],
+            units: [],
+            unit: null
         };
     }
 
+    changeUnit = async (e) => {
+        let id = this.props.store.employeeId;
+        console.log("http://localhost:8081/employee/" + id + "/unit/" + e.target.value + "/set");
+        await axios.post("http://localhost:8081/employee/" + id + "/unit/" + e.target.value + "/set").then(res => {
+            this.setState({ unit: e.target.value });
+        });
+    }
+
     componentDidMount = () => {
+        this.loadData();
+    }
+
+    loadData = async () => {
+        if (!this.props.store.departmentId)
+            return;
+        await axios.get("http://localhost:8081/units/department/" + this.props.store.departmentId).then(res => {
+            this.setState({ units: res.data });
+        });
     }
 
     sendState = async (state) => {
@@ -25,6 +45,9 @@ class Home extends React.Component {
             state: state
         }
         this.props.wsClient.publish({ destination: "/api/employees/state", body: JSON.stringify(tmp) });
+
+        if (state === "10-7")
+            await axios.delete("http://localhost:8081/employee/" + tmp.id + "/unit");
     }
 
     boloClick = (type) => {
@@ -191,11 +214,10 @@ class Home extends React.Component {
                         this.props.wsClient.publish({ destination: "/api/calls/panic", body: JSON.stringify(tmp) });
                     }}><p>Panic</p></div>
                     <div className="state-elem">
-                        <select className="marking">
-                            <option>LINCOLN</option>
-                            <option>TOM</option>
-                            <option>ADAM</option>
-                            <option>NOVA</option>
+                        <select className="marking" onChange={this.changeUnit} value={this.state.units.abbreviation}>
+                            {this.state.units.map(u =>
+                                <option value={u.abbreviation} key={u.abbreviation}>{u.title}</option>
+                            )}
                         </select>
                     </div>
                 </div>
