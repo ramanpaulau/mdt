@@ -132,7 +132,7 @@ class Incidents extends React.Component {
         let offset = Math.ceil(selected * INCIDENTS_ON_PAGE);
 
         this.setState({ offset: offset, selectedPage: selected }, () => {
-            this.loadCitizens();
+            this.getPageData();
         });
     };
 
@@ -304,21 +304,39 @@ class Incidents extends React.Component {
                             validate={async values => {
                                 const errors = {};
 
+                                if (!values.title) {
+                                    errors.title = 'Required';
+                                }
+
+                                if (!values.location) {
+                                    errors.location = 'Required';
+                                }
+
+                                if (!values.details) {
+                                    errors.details = 'Required';
+                                }
+
                                 return errors;
                             }}
+
                             onSubmit={async (values) => {
                                 let tmp = {
+                                    id: (this.state.selectedIdx === -1) ? 0 : this.state.incidents[this.state.selectedIdx].id,
                                     supervisor: this.props.store.employeeId,
                                     title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
                                     location: values.location,
                                     datetime: this.state.datetime.toLocaleString(),
                                     details: values.details
                                 };
-                                await axios.post("http://localhost:8081/incident", tmp).then(res => {
+
+                                await axios.post("http://localhost:8081/incident", tmp).then(async res => {
                                     if (!res.data.success)
                                         console.log(res.data.message);
                                     else {
-                                        this.setState({ incidents: [...this.state.incidents, tmp] }, () => { this.getPageData() });
+                                        await axios.get("http://localhost:8081/incidents").then(res => {
+                                            this.setState({ incidents: res.data });
+                                            this.getPageData();
+                                        });
                                     }
                                 });
                             }}
@@ -362,7 +380,7 @@ class Incidents extends React.Component {
                                         </span>
                                     </div>
                                     <div className="datetime">
-                                        <Datetime value={this.state.datetime} onChange={(e) => { this.setState({ datetime: e }) }} />
+                                        <Datetime inputProps={{ disabled: (this.state.selectedIdx !== -1) }} value={this.state.datetime} onChange={(e) => { this.setState({ datetime: e }) }} />
                                         <span className="floating-label active-label">
                                             <Translation>
                                                 {

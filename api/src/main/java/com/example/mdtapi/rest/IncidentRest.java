@@ -39,7 +39,7 @@ public class IncidentRest {
 
     @GetMapping("/incidents")
     public List<Incident> all() {
-        return incidentRepository.findAll();
+        return incidentRepository.findAllByOrderByIdDesc();
     }
 
     @GetMapping("/incident/{id}/persons")
@@ -110,13 +110,14 @@ public class IncidentRest {
         ResponseMessage res = ResponseMessage.OKMessage();
 
         String title, details, location, datetime;
-        int supervisorId;
+        int id, supervisorId;
         JSONObject subchapter = new JSONObject(request);
         try {
             title = subchapter.getString("title");
             details = subchapter.getString("details");
             location = subchapter.getString("location");
             datetime = subchapter.getString("datetime");
+            id = subchapter.getInt("id");
             supervisorId = subchapter.getInt("supervisor");
             if (supervisorId <= 0)
                 throw new JSONException("Negative value");
@@ -136,11 +137,18 @@ public class IncidentRest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm:ss");
 
         Incident incident = new Incident();
+
+        Optional<Incident> tmp = incidentRepository.findById(id);
+        if (id != 0 && tmp.isPresent())
+            incident = tmp.get();
+
         incident.setTitle(title);
         incident.setLocation(location);
         incident.setDetails(details);
-        incident.setSupervisor(supervisor.get());
-        incident.setDateTime(LocalDateTime.parse(datetime, formatter));
+        if (id == 0) {
+            incident.setSupervisor(supervisor.get());
+            incident.setDateTime(LocalDateTime.parse(datetime, formatter));
+        }
 
         incidentRepository.save(incident);
         return res;
