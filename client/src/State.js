@@ -24,7 +24,7 @@ class State extends React.Component {
         return(
             <div className="state">
                 <p>{this.props.store.department}</p>
-                <p className="notification">{ this.props.notification }</p>
+                <p className="notification"></p>
                 <p>{this.props.store.regNum}</p>
                 <p>{this.state.time.toLocaleString()}</p>
             </div>

@@ -37,8 +37,7 @@ class App extends React.Component {
             boloVehicles: [],
             activeOfficers: [],
             calls: [],
-            isLoading: true,
-            notification: ""
+            isLoading: true
         }
     }
 
@@ -82,7 +81,6 @@ class App extends React.Component {
                         this.setState({ citizens: [...this.state.citizens.filter(c => c.regNum !== citizenBody.regNum), citizenBody].sort((a, b) => (a.regNum > b.regNum) ? 1 : (a.regNum === b.regNum) ? 0 : -1) });
                     } else {
                         this.setState({ citizens: [...this.state.citizens, citizenBody] });
-                        this.setNotification("Citizens database has been updated.");
                     }
                 });
 
@@ -96,7 +94,6 @@ class App extends React.Component {
                     } else if (citizen.action === "delete") {
                         this.setState({ boloCitizens: [...this.state.boloCitizens.filter(c => c.record.regNum !== citizen.body.record.regNum)] });
                     }
-                    this.setNotification("BOLO list has been updated.");
                 });
 
                 this.client.subscribe('/ws/bolo/vehicles', vehicle => {
@@ -109,7 +106,6 @@ class App extends React.Component {
                     } else if (vehicle.action === "delete") {
                         this.setState({ boloVehicles: [...this.state.boloVehicles.filter(v => v.record.vin !== vehicle.body.record.vin)] });
                     }
-                    this.setNotification("BOLO list has been updated.");
                 });
 
                 this.client.subscribe('/ws/active/employees', res => {
@@ -131,7 +127,6 @@ class App extends React.Component {
                         this.setState({ calls: [callBody, ...this.state.calls.filter(c => c.id !== callBody.id)].sort((a, b) => (a.time > b.time) ? -1 : (a.time === b.time) ? 0 : 1) });
                     } else {
                         this.setState({ calls: [callBody, ...this.state.calls] });
-                        this.setNotification("Calls list has been updated.");
                     }
                 });
             },
@@ -150,13 +145,6 @@ class App extends React.Component {
         this.client = null;
     }
 
-    setNotification(text) {
-        if (this.timeoutID)
-            clearTimeout(this.timeoutID);
-        this.setState({ notification: text });
-        this.timeoutID = setTimeout(() => this.setState({ notification: "" }), 7000);
-    }
-
     componentWillUnmount = () => {
         this.wsDisconnect();
         clearTimeout(this.timeoutID);
@@ -171,7 +159,7 @@ class App extends React.Component {
                 <React.Fragment>
                     <div className="app">
                         <Header store={user} wsDisconnect={this.wsDisconnect} />
-                        <State store={user} notification={this.state.notification} />
+                        <State store={user} />
                         <main>
                             <Switch>
                                 <Route exact path="/" component={RequireAuth((props) => <Home {...props} store={user} wsClient={this.client} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} calls={this.state.calls} activeOfficers={this.state.activeOfficers} />, user)} />
