@@ -12,12 +12,15 @@ public class EmployeeState {
 
     private String state;
 
+    private String unit;
+
     public EmployeeState() {
     }
 
-    public EmployeeState(Employee employee, String state) {
+    public EmployeeState(Employee employee, String state, String unit) {
         this.employee = employee;
         this.state = state;
+        this.unit = unit;
     }
 
     public Employee getEmployee() {
@@ -38,5 +41,13 @@ public class EmployeeState {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

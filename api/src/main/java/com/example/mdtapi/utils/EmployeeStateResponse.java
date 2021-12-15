@@ -6,6 +6,7 @@ public class EmployeeStateResponse {
     private String action;
     private Employee employee;
     private String state;
+    private String unit;
 
     public String getAction() {
         return action;
@@ -29,5 +30,13 @@ public class EmployeeStateResponse {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }

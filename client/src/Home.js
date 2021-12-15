@@ -20,15 +20,17 @@ class Home extends React.Component {
     }
 
     changeUnit = async (e) => {
-        let id = this.props.store.employeeId;
-        console.log("http://localhost:8081/employee/" + id + "/unit/" + e.target.value + "/set");
-        await axios.post("http://localhost:8081/employee/" + id + "/unit/" + e.target.value + "/set").then(res => {
-            this.setState({ unit: e.target.value });
-        });
+        let tmp = {
+            id: this.props.store.employeeId,
+            unit: e.target.value
+        }
+        this.props.wsClient.publish({ destination: "/api/employee/unit/set", body: JSON.stringify(tmp) });
     }
 
     componentDidMount = () => {
         this.loadData();
+
+        //this.props.activeOfficers;
     }
 
     loadData = async () => {
@@ -55,6 +57,7 @@ class Home extends React.Component {
     }
 
     render() {
+        let tmp = this.props.activeOfficers.filter(o => o.employee.id === this.props.store.employeeId)[0];
         return (
             <div className="home" onMouseMove={this.handleMove} onMouseUp={this.handleDrop} >
                 <div className="block active-bolo">
@@ -191,7 +194,7 @@ class Home extends React.Component {
                         {this.props.activeOfficers.map((o, i) =>
                             <ul className="unit-item" key={i} onMouseDown={this.handleDrag}>
                                 <li>{i + 1}</li>
-                                <li>{o.employee.marking}</li>
+                                <li>{(o.unit) ? o.employee.department + o.unit + "-" + o.employee.tag : o.employee.marking}</li>
                                 <li>{o.employee.fullName}</li>
                                 <li>{o.employee.departmentTitle}</li>
                                 <li>{o.employee.rank}</li>
@@ -214,7 +217,7 @@ class Home extends React.Component {
                         this.props.wsClient.publish({ destination: "/api/calls/panic", body: JSON.stringify(tmp) });
                     }}><p>Panic</p></div>
                     <div className="state-elem">
-                        <select className="marking" onChange={this.changeUnit} value={this.state.units.abbreviation}>
+                        <select className="marking" onChange={this.changeUnit} value={(tmp && tmp.unit)?tmp.unit:this.state.units.abbreviation}>
                             {this.state.units.map(u =>
                                 <option value={u.abbreviation} key={u.abbreviation}>{u.title}</option>
                             )}

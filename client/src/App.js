@@ -118,7 +118,7 @@ class App extends React.Component {
                     } else if (data.action === "delete") {
                         this.setState({ activeOfficers: [...this.state.activeOfficers.filter(o => o.employee.id !== data.employee.id)] });
                     } else {
-                        this.setState({ activeOfficers: [...this.state.activeOfficers.filter(o => o.employee.id !== data.employee.id), { employee: data.employee, state: data.state }] });
+                        this.setState({ activeOfficers: [...this.state.activeOfficers.filter(o => o.employee.id !== data.employee.id), { employee: data.employee, state: data.state, unit: data.unit }] });
                     }
                 });
 
@@ -127,9 +127,9 @@ class App extends React.Component {
                         return;
                     let callBody = JSON.parse(call.body);
                     if (this.state.calls.some(c => c.id === callBody.id)) {
-                        this.setState({ calls: [...this.state.calls.filter(c => c.id !== callBody.id), callBody].sort((a, b) => (a.time > b.time) ? -1 : (a.time === b.time) ? 0 : 1) });
+                        this.setState({ calls: [callBody, ...this.state.calls.filter(c => c.id !== callBody.id)].sort((a, b) => (a.time > b.time) ? -1 : (a.time === b.time) ? 0 : 1) });
                     } else {
-                        this.setState({ calls: [...this.state.calls, callBody] });
+                        this.setState({ calls: [callBody, ...this.state.calls] });
                         this.setNotification("Calls list has been updated.");
                     }
                 });

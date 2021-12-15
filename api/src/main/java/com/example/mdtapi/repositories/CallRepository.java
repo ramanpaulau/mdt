@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface CallRepository extends JpaRepository<Call, Integer> {
     @Query(value = "SELECT * FROM call ORDER BY time DESC", nativeQuery = true)
     List<Call> findAllOrderByTime();
+
+    List<Call> findAllByOrderByIdDesc();
 }

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
@@ -58,6 +60,8 @@ public class EmployeeStateController {
         if (employeeState == null) {
             employeeState = new EmployeeState();
             employeeState.setEmployee(employee.get());
+        } else if (state.compareTo("10-8") == 0) {
+            return null;
         }
         employeeState.setState(state);
 
@@ -88,6 +92,38 @@ public class EmployeeStateController {
         employeeStateResponse.setEmployee(employee.get());
         employeeStateResponse.setState(state);
 
+        return employeeStateResponse;
+    }
+
+    @MessageMapping("/employee/unit/set")
+    @SendTo("/ws/active/employees")
+    public EmployeeStateResponse addUnit(@RequestBody String request) {
+        int employeeId = 0;
+        String unit = "";
+        JSONObject subchapter = new JSONObject(request);
+        try {
+            employeeId = subchapter.getInt("id");
+            if (employeeId < 0)
+                throw new JSONException("Negative value");
+            unit = subchapter.getString("unit");
+        } catch (JSONException ignored) {}
+
+        Optional<Employee> employee = employeeRepository.findById(employeeId);
+        if (employee.isEmpty())  {
+            return null;
+        }
+
+        EmployeeState employeeState = employeeStateRepository.findByEmployee(employee.get());
+        if (employeeState == null)
+            return null;
+
+        employeeState.setUnit(unit);
+        employeeStateRepository.save(employeeState);
+        EmployeeStateResponse employeeStateResponse = new EmployeeStateResponse();
+        employeeStateResponse.setAction("change");
+        employeeStateResponse.setEmployee(employeeState.getEmployee());
+        employeeStateResponse.setState(employeeState.getState());
+        employeeStateResponse.setUnit(unit);
         return employeeStateResponse;
     }
 

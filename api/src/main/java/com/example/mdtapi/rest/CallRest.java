@@ -21,6 +21,6 @@ public class CallRest {
 
     @GetMapping("/calls")
     private List<Call> all() {
-        return callRepository.findAllOrderByTime();
+        return callRepository.findAllByOrderByIdDesc();
     }
 }

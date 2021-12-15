@@ -142,18 +142,6 @@ public class EmployeeRest {
         employeeRepository.save(employee.get());
     }
 
-    @PostMapping("/employee/{eid}/unit/{abbr}/set")
-    public void addUnit(@PathVariable int eid, @PathVariable String abbr) {
-        Optional<Employee> employee = employeeRepository.findById(eid);
-        Optional<Unit> unit = unitRepository.getByAbbreviation(abbr);
-
-        if (employee.isEmpty() || unit.isEmpty())
-            return;
-
-        employee.get().setUnit(unit.get());
-        employeeRepository.save(employee.get());
-    }
-
     @DeleteMapping("/employee/{eid}/unit")
     public void removeUnit(@PathVariable int eid) {
         Optional<Employee> employee = employeeRepository.findById(eid);
