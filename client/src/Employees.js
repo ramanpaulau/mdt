@@ -5,6 +5,7 @@ import Select from 'react-select'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import moment from "moment";
 import { Translation } from 'react-i18next';
 
 export const customStyles = {
@@ -138,25 +139,12 @@ class Employees extends React.Component {
     }
 
     addEmployee = () => {
-        let tmp = {
-            regNum: this.state.selectedCitizens.value,
-            rank: this.state.selectedRank.value,
-            tag: this.state.tag,
-            department: this.state.department.value
-        };
-        axios.post("http://localhost:8081/employee",
-            JSON.stringify(tmp),
-            { headers: { 'Content-Type': 'text/plain' } })
-            .then(res => {
-                if (res.data.success)
-                    this.loadEmployees();
-                else
-                    console.log(res.data.message);
-            });
+        if (this.sendButton.current)
+            this.sendButton.current.click();
     }
 
     clearForm = () => {
-        this.setState({ selectedCitizens: null, selectedRank: null, tag: 0 });
+        this.setState({ selectedCitizens: null, selectedRank: null, tag: 0, selectedEmployeeId: 0 });
         this.clearData();
     }
 
@@ -187,12 +175,13 @@ class Employees extends React.Component {
     }
 
     render() {
-        let diff = 0;
-        this.state.workHours.map(w => diff += (w.endTime === null) ? 0 : Math.abs(new Date(w.endTime) - new Date(w.startTime)) / 1000)
-        const hours = Math.floor(diff / 3600) % 24;
-        diff -= hours * 3600;
-        const minutes = Math.floor(diff / 60) % 60;
-        diff -= minutes * 60;
+        let currTotal = 0, prevTotal = 0;
+        this.state.workHours.forEach((w, i) => {
+            if (moment(new Date(w.startTime)).isAfter(moment().subtract(7, 'days'))) 
+                currTotal += Math.abs(new Date(w.endTime) - new Date(w.startTime)) / 36e5;
+            else if (moment(new Date(w.startTime)).isBefore(moment().subtract(7, 'days')) && moment(new Date(w.startTime)).isAfter(moment().subtract(14, 'days')))
+                prevTotal += Math.abs(new Date(w.endTime) - new Date(w.startTime)) / 36e5;
+        })
 
         let filteredRanks = [];
         let filteredEmployees = [];
@@ -292,7 +281,44 @@ class Employees extends React.Component {
                         </Translation>
                     </div>
                     <div className="table-scroll">
-                        <Formik>
+                        <Formik
+                            initialValues={{ tag: this.state.tag }}
+                            enableReinitialize={true}
+                            validate={async values => {
+                                const errors = {};
+
+                                if (!this.state.selectedCitizens) {
+                                    errors.selectedCitizens = 'Required';
+                                }
+
+                                if (!this.state.selectedRank) {
+                                    errors.selectedRank = 'Required';
+                                }
+
+                                if (!values.tag) {
+                                    errors.tag = 'Required';
+                                } else if (parseInt(values.tag) < 0) {
+                                    errors.tag = 'Must be positive';
+                                }
+
+                                return errors;
+                            }}
+                            onSubmit={async (values) => {
+                                let tmp = {
+                                    regNum: this.state.selectedCitizens.value,
+                                    rank: this.state.selectedRank.value,
+                                    tag: values.tag,
+                                    department: this.state.department.value
+                                };
+                                await axios.post("http://localhost:8081/employee", tmp)
+                                    .then(res => {
+                                        if (!res.data.success)
+                                            console.log(res.data.message);
+                                        else
+                                            this.loadEmployees();
+                                    });
+                            }}
+                        >
                             {() => (
                                 <Form>
                                     <div>
@@ -357,7 +383,7 @@ class Employees extends React.Component {
                                         </span>
                                     </div>
                                     <div>
-                                        <Field className="text-input" type="number" name="tag" value={this.state.tag} onChange={(e) => this.setState({ tag: e.target.value })} />
+                                        <Field className="text-input" type="number" name="tag" onChange={(e) => this.setState({ tag: e.target.value })} />
                                         <ErrorMessage name="tag" className="error-label" component="div" />
                                         <span className="floating-label active-label">
                                             <Translation>
@@ -369,84 +395,90 @@ class Employees extends React.Component {
                                     </div>
                                     <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
 
-                                    <div className="edit-list licenses">
-                                        <p className="text-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Qualifications')
-                                                }
-                                            </Translation>: </p>
-                                        {qualifications.map(q =>
-                                            <Link
-                                                key={q.id}
-                                                to={"/licenses"}
-                                                className="round-link">
-                                                {q.name}
+                                    {this.state.selectedEmployeeId !== 0 &&
+                                        <div className="edit-list licenses">
+                                            <p className="text-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Qualifications')
+                                                    }
+                                                </Translation>: </p>
+                                            {qualifications.map(q =>
+                                                <Link
+                                                    key={q.id}
+                                                    to={"/licenses"}
+                                                    className="round-link">
+                                                    {q.name}
+                                                    <span className="link-button" onClick={async (e) => {
+                                                        e.preventDefault();
+                                                        await axios.delete("http://localhost:8081/employee/" + this.state.selectedEmployeeId + "/qualification/" + q.id + "/delete").then(_ => {
+                                                            this.loadEmployees()
+                                                            this.clearData();
+                                                        });
+                                                    }}>
+                                                        <FontAwesomeIcon icon={faTimesCircle} />
+                                                    </span>
+                                                </Link>
+                                            )}
+                                            <div className="control">
+                                                <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
+                                                    options={this.state.qualifications.map(q => (
+                                                        {
+                                                            value: q.id,
+                                                            label: q.name
+                                                        })
+                                                    )}
+                                                    value={this.state.qualification}
+                                                    onChange={(e) => { this.setState({ qualification: e }) }}
+                                                    placeholder=
+                                                    {<Translation>
+                                                        {
+                                                            t => t('Qualification')
+                                                        }
+                                                    </Translation>}
+                                                    noOptionsMessage={() =>
+                                                        <Translation>
+                                                            {
+                                                                t => t('Not found')
+                                                            }
+                                                        </Translation>} />
                                                 <span className="link-button" onClick={async (e) => {
                                                     e.preventDefault();
-                                                    await axios.delete("http://localhost:8081/employee/" + this.state.selectedEmployeeId + "/qualification/" + q.id + "/delete").then(_ => {
+                                                    let tmp = {
+                                                        eid: this.state.selectedEmployeeId,
+                                                        qid: this.state.qualification.value
+                                                    };
+                                                    if (!tmp.eid || !tmp.qid)
+                                                        return;
+                                                    await axios.post("http://localhost:8081/employee/" + tmp.eid + "/qualification/" + tmp.qid + "/add").then(_ => {
                                                         this.loadEmployees()
                                                         this.clearData();
                                                     });
                                                 }}>
-                                                    <FontAwesomeIcon icon={faTimesCircle} />
+                                                    <FontAwesomeIcon icon={faPlus} />
                                                 </span>
-                                            </Link>
-                                        )}
-                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                            options={this.state.qualifications.map(q => (
-                                                {
-                                                    value: q.id,
-                                                    label: q.name
-                                                })
-                                            )}
-                                            value={this.state.qualification}
-                                            onChange={(e) => { this.setState({ qualification: e }) }}
-                                            placeholder=
-                                            {<Translation>
-                                                {
-                                                    t => t('Qualification')
-                                                }
-                                            </Translation>}
-                                            noOptionsMessage={() =>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    {this.state.selectedEmployeeId !== 0 &&
+                                        <div className="edit-list related-incidents">
+                                            <p className="text-label">
                                                 <Translation>
                                                     {
-                                                        t => t('Not found')
+                                                        t => t('Title Incidents')
                                                     }
-                                                </Translation>} />
-                                        <span className="link-button" onClick={async (e) => {
-                                            e.preventDefault();
-                                            let tmp = {
-                                                eid: this.state.selectedEmployeeId,
-                                                qid: this.state.qualification.value
-                                            };
-                                            if (!tmp.eid || !tmp.qid)
-                                                return;
-                                            await axios.post("http://localhost:8081/employee/" + tmp.eid + "/qualification/" + tmp.qid + "/add").then(_ => {
-                                                this.loadEmployees()
-                                                this.clearData();
-                                            });
-                                        }}>
-                                            <FontAwesomeIcon icon={faPlus} />
-                                        </span>
-                                    </div>
-
-                                    <div className="edit-list related-incidents">
-                                        <p className="text-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Title Incidents')
-                                                }
-                                            </Translation>: </p>
-                                        {this.state.incidents.map(i =>
-                                            <Link
-                                                key={i.id}
-                                                to={"/incidents/" + i.id}
-                                                className="round-link">
-                                                #{i.id}
-                                            </Link>
-                                        )}
-                                    </div>
+                                                </Translation>: </p>
+                                            {this.state.incidents.map(i =>
+                                                <Link
+                                                    key={i.id}
+                                                    to={"/incidents/" + i.id}
+                                                    className="round-link">
+                                                    #{i.id}
+                                                </Link>
+                                            )}
+                                        </div>
+                                    }
                                 </Form>
                             )}
                         </Formik>
@@ -462,24 +494,18 @@ class Employees extends React.Component {
                         {(this.state.selectedEmployeeId) ?
                             <div>
                                 <p className="text-label">
-                                    Worked this week:
-                                    {" " + hours + "h " + minutes + "m, salary: " + Math.floor(minutes / 60 * 220) + "$"}
+                                    Salary this week: {Math.round(currTotal * ((this.state.selectedEmployeeId) ? this.state.employees.filter(e => e.id === this.state.selectedEmployeeId)[0].salary : 0))}$
                                 </p>
                                 <p className="text-label">
-                                    Worked previous week:
-                                    {" " + 0 + "h " + 0 + "m, salary: " + Math.floor(0 / 60 * 220) + "$"}
+                                    Salary previous week: {Math.round(prevTotal * ((this.state.selectedEmployeeId) ? this.state.employees.filter(e => e.id === this.state.selectedEmployeeId)[0].salary : 0))}$
                                 </p>
-                                {
-                                    /*this.state.workHours.map(w => {
-                                        let diff = (w.endTime === null) ? 0 : Math.abs(new Date(w.endTime) - new Date(w.startTime)) / 1000;
-                                        let hours = Math.floor(diff / 3600) % 24;
-                                        diff -= hours * 3600;
-                                
-                                        let minutes = Math.floor(diff / 60) % 60;
-                                        diff -= minutes * 60;
-                                        return <p className="text-label">{hours + "h " + minutes + "m, salary: " + Math.floor(minutes / 60 * w.salary) + "$"}</p>;
-                                    })*/
-                                }
+                                <ul>
+                                    {
+                                        this.state.workHours.map((w, i) => {
+                                            return <li key={i}>{"Session " + i + ": from - " + new Date(w.endTime).toLocaleString() + ", to - " + new Date(w.startTime).toLocaleString()}</li>;
+                                        })
+                                    }
+                                </ul>
                             </div>
                             : ""
                         }

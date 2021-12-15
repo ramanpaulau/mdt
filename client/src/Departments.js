@@ -88,14 +88,23 @@ class Departments extends React.Component {
         this.setState({ selectedUnits: (this.state.selectedDep === -1) ? [] : this.state.units.filter(e => e.department === this.state.pageData[this.state.selectedDep].code) });
     }
 
-    componentDidMount = () => {
-        this.loadDepartments();
-        this.loadRanks();
-        this.loadUnits();
-        if (this.props.match.params.code) {
-            this.getSelectedRanks(); 
-            this.getSelectedUnits();
-        }
+    componentDidMount = async () => {
+        await axios.all([
+            axios.get("http://localhost:8081/departments"),
+            axios.get("http://localhost:8081/ranks"),
+            axios.get("http://localhost:8081/units")])
+            .then(axios.spread((firstResponse, secondResponse, thirdResponse) => {
+                this.setState({
+                    departments: firstResponse.data,
+                    ranks: secondResponse.data,
+                    units: thirdResponse.data
+                }, () => {
+                    this.getSelectedRanks();
+                    this.getSelectedUnits();
+                    this.getPageData();
+                })
+            }))
+            .catch(error => console.log(error));
     }
 
     handlePageClick = (data) => {
@@ -121,6 +130,7 @@ class Departments extends React.Component {
         await axios.post("http://localhost:8081/department/" + code + "/main/" + abbreviation).then(res => {
             if (!res.data.success)
                 console.log(res.data.message);
+            this.loadDepartments();
         });
     }
 
@@ -184,7 +194,7 @@ class Departments extends React.Component {
                                             <Link
                                                 to={"/departments"}
                                                 className="link"
-                                                onClick={() => { this.setState({ selectedDep: -1 }, () => this.getSelectedRanks()); }}>
+                                                onClick={() => { this.setState({ selectedDep: -1 }, () => {this.getSelectedRanks(); this.getSelectedUnits();}); }}>
                                                 {t('Title New')}
                                             </Link>
                                     }
@@ -426,17 +436,22 @@ class Departments extends React.Component {
                                     enableReinitialize={true}
                                     validate={async values => {
                                         const errors = {};
-                                        /*if (!values.title) {
+
+                                        if (!values.title) {
                                             errors.title = 'Required';
                                         } else if (!/^[A-Za-z ]+$/i.test(values.title)) {
                                             errors.title = 'Only letters allowed';
                                         }
-                                        console.log(parseInt(values.salary));
-                                        if (!values.salary) {
-                                            errors.salary = 'Wrong format';
-                                        } else if (parseInt(values.salary) < 0 || 32767 < parseInt(values.salary)) {
-                                            errors.salary = 'Must be in range [0, 32767]';
-                                        }*/
+
+                                        if (!values.abbreviation) {
+                                            errors.abbreviation = 'Required';
+                                        } else if (!/^[A-Za-z ]+$/i.test(values.abbreviation)) {
+                                            errors.abbreviation = 'Only letters allowed';
+                                        }
+
+                                        if (!values.description) {
+                                            errors.description = 'Required';
+                                        }
 
                                         return errors;
                                     }}
@@ -451,7 +466,7 @@ class Departments extends React.Component {
                                         };
                                         await axios.post("http://localhost:8081/unit", tmp).then((res) => {
                                             if (!res.data.success) {
-                                                console.log("Server error: " + res.data.message);
+                                                console.log(res.data.message);
                                                 return;
                                             }
 
@@ -477,7 +492,7 @@ class Departments extends React.Component {
                                                 </span>
                                             </div>
                                             <div>
-                                                <Field className="text-input" type="text" name="abbreviation" />
+                                                <Field className="text-input" type="text" name="abbreviation" style={{ textTransform: "uppercase" }} />
                                                 <ErrorMessage name="abbreviation" className="error-label" component="div" />
                                                 <span className="floating-label active-label">
                                                     <Translation>
@@ -514,13 +529,15 @@ class Departments extends React.Component {
                                         </Translation>: {o.abbreviation}</li>
                                     <li>{o.description}</li>
                                     <li className="controls">
-                                        <button className="round-link" type="submit" onClick={() => { this.setMain(o.abbreviation); }}>
-                                            <Translation>
-                                                {
-                                                    t => t('Button Main')
-                                                }
-                                            </Translation>
-                                        </button>
+                                        {this.state.pageData[this.state.selectedDep] && this.state.pageData[this.state.selectedDep].unit !== o.abbreviation &&
+                                            <button className="round-link" type="submit" onClick={() => { this.setMain(o.abbreviation); }}>
+                                                <Translation>
+                                                    {
+                                                        t => t('Button Main')
+                                                    }
+                                                </Translation>
+                                            </button>
+                                        }
                                         <button className="round-link" type="submit" onClick={() => this.setState({ selectedUnit: i })}>
                                             <Translation>
                                                 {

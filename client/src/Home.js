@@ -29,8 +29,6 @@ class Home extends React.Component {
 
     componentDidMount = () => {
         this.loadData();
-
-        //this.props.activeOfficers;
     }
 
     loadData = async () => {

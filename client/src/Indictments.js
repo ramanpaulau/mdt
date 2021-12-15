@@ -20,8 +20,12 @@ class Indictments extends React.Component {
     constructor(props) {
         super(props);
 
+        let filter = "";
+        if (this.props.match.params.id)
+            filter += this.props.match.params.id;
+
         this.state = {
-            filter: '',
+            filter: filter,
             filteredData: [],
             pageData: [],
             indictments: [],
@@ -73,7 +77,8 @@ class Indictments extends React.Component {
     loadIndictments = async () => {
         await axios.get("http://localhost:8081/indictments").then(res => {
             this.setState({
-                indictments: res.data
+                indictments: res.data,
+                filteredData: (this.state.filter) ? res.data.filter(i => (i.id + '').includes(this.state.filter)) : []
             }, () => { this.getPageData() });
         });
     }
@@ -170,9 +175,18 @@ class Indictments extends React.Component {
                                 {
                                     t =>
                                         <Link
-                                            to={"/indicments"}
+                                            to={"/indictments"}
                                             className="link"
-                                            onClick={() => { this.setState({ selectedIdx: -1 }); }}>
+                                            onClick={() => {
+                                                this.setState({
+                                                    selectedIdx: -1,
+                                                    incident: -1,
+                                                    department: -1,
+                                                    citizen: "",
+                                                    startTime: new Date(),
+                                                    selectedLaws: []
+                                                });
+                                            }}>
                                             {t('Title New')}
                                         </Link>
                                 }
@@ -194,10 +208,27 @@ class Indictments extends React.Component {
                             validate={async values => {
                                 const errors = {};
 
-                                if (values.detention <= 0)
+                                if (values.detention < 0)
                                     errors.detention = "Value must be > 0";
                                 else
                                     this.setState({ endTime: new Date(this.state.startTime.getTime() + values.detention * 60000) })
+
+                                if (values.fine < 0)
+                                    errors.fine = "Value must be > 0";
+
+                                if (values.fine <= 0 && values.detention <= 0) {
+                                    errors.detention = "One of values must be positive";
+                                    errors.fine = "One of values must be positive";
+                                }
+
+                                if (this.state.incident === -1)
+                                    errors.incident = "Select value";
+
+                                if (this.state.department === -1)
+                                    errors.department = "Select value";
+
+                                if (this.state.citizen.length <= 0)
+                                    errors.citizen = "Select value";
 
                                 return errors;
                             }}
@@ -211,17 +242,15 @@ class Indictments extends React.Component {
                                     employee: this.props.store.employeeId,
                                     laws: this.state.selectedLaws.map(l => l.number).join(',')
                                 };
-                                await axios.post("http://localhost:8081/indictment", tmp).then(res => {
-                                    if (!res.data.success)
-                                        console.log(res.data.message);
-                                    else {
-                                        this.setState({ indictments: [...this.state.indictments, tmp] }, () => { this.getPageData() });
-                                    }
-                                });
-                                await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
-                                    if (!res.data.success)
-                                        console.log(res.data.message);
-                                });
+
+                                this.props.wsClient.publish({ destination: "/api/call/indictment/add", body: JSON.stringify(tmp) });
+                                this.setState({ indictments: [tmp, ...this.state.indictments] }, () => { this.getPageData() });
+
+                                if (values.fine > 0)
+                                    await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
+                                        if (!res.data.success)
+                                            console.log(res.data.message);
+                                    });
                             }}
                         >
                             {({ isSubmitting }) => (
@@ -236,6 +265,7 @@ class Indictments extends React.Component {
                                                     })
                                                 )}
                                                 onChange={(e) => { this.setState({ incident: e.value }) }}
+                                                value={(this.state.incidents.filter(i => i.id === this.state.incident)[0]) ? { value: this.state.incident, label: this.state.incident } : null}
                                                 placeholder={t('Incident')}
                                                 noOptionsMessage={() => t('Not found')} />
                                         </div>
@@ -248,6 +278,7 @@ class Indictments extends React.Component {
                                                     })
                                                 )}
                                                 onChange={(e) => { this.setState({ department: e.value }) }}
+                                                value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : null}
                                                 placeholder={t('Department')}
                                                 noOptionsMessage={() => t('Not found')} />
                                         </div>
@@ -260,6 +291,7 @@ class Indictments extends React.Component {
                                                     })
                                                 )}
                                                 onChange={(e) => { this.setState({ citizen: e.value }) }}
+                                                value={(this.props.citizens.filter(c => c.regNum === this.state.citizen)[0]) ? { value: this.state.citizen, label: this.state.citizen } : null}
                                                 placeholder={t('Citizen')}
                                                 noOptionsMessage={() => t('Not found')} />
                                         </div>

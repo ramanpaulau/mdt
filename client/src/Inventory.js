@@ -1,6 +1,5 @@
 import React from "react";
-import Select from 'react-select'
-import { Link } from 'react-router-dom';
+import Select from 'react-select';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronCircleDown, faChevronCircleUp, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
@@ -34,9 +33,18 @@ class Inventory extends React.Component {
     }
 
     componentDidMount = async () => {
-        this.loadDepartments();
-        this.loadInventory();
-        this.loadHistory();
+        await axios.all([
+            axios.get("http://localhost:8081/departments"),
+            axios.get("http://localhost:8081/inventory"),
+            axios.get("http://localhost:8081/history")])
+            .then(axios.spread((firstResponse, secondResponse, thirdResponse) => {
+                this.setState({
+                    departments: firstResponse.data,
+                    inventory: secondResponse.data,
+                    history: thirdResponse.data
+                }, () => this.getPageData())
+            }))
+            .catch(error => console.log(error));
     }
 
     loadDepartments = async () => {
@@ -55,7 +63,7 @@ class Inventory extends React.Component {
         });
     }
 
-    clearForm = async () => {
+    clearForm = () => {
     }
 
     sendItem = () => {
@@ -90,8 +98,6 @@ class Inventory extends React.Component {
             department: this.state.department
         }
 
-        console.log(tmp);
-
         await axios.post("http://localhost:8081/history", tmp).then(res => {
             if (!res.data.success)
                 console.log(res.data.message);
@@ -105,7 +111,7 @@ class Inventory extends React.Component {
         let offset = Math.ceil(selected * HISTORY_ON_PAGE);
 
         this.setState({ offset: offset, selectedPage: selected }, () => {
-            this.loadCitizens();
+            this.loadHistory();
         });
     };
 
@@ -167,17 +173,6 @@ class Inventory extends React.Component {
                 <div className="block inventory-editor">
                     <div className="title">
                         <h3>
-                            <Translation>
-                                {
-                                    t =>
-                                        <Link
-                                            to={"/inventory"}
-                                            className="link"
-                                            onClick={() => this.clearForm()}>
-                                            {t('Title New')}
-                                        </Link>
-                                }
-                            </Translation>
                         </h3>
                         <Translation>
                             {

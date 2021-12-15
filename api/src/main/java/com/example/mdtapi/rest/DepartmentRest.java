@@ -39,7 +39,15 @@ public class DepartmentRest {
 
     @PostMapping ("/department")
     public void insert(@RequestBody Department department) {
-        System.out.println(department);
+        Department department1 = departmentRepository.findByCode(department.getCode());
+
+        if (department1 != null) {
+            department1.setDescription(department.getDescription());
+            department1.setTitle(department.getTitle());
+            department1.setShortTitle(department.getShortTitle());
+            departmentRepository.save(department1);
+            return;
+        }
         departmentRepository.save(department);
     }
 

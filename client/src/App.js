@@ -180,7 +180,7 @@ class App extends React.Component {
                                 <Route exact path="/bolo" component={RequireAuth((props) => <Bolo {...props} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} />, user)} />
                                 <Route exact path="/fines" component={RequireAuth((props) => <Fines {...props} citizens={this.state.citizens} store={user} />, user)} />
                                 <Route exact path="/incidents/:id?" component={RequireAuth((props) => <Incidents {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />
-                                <Route exact path="/indictments/:id?" component={RequireAuth((props) => <Indictments {...props} citizens={this.state.citizens} store={user} />, user)} />
+                                <Route exact path="/indictments/:id?" component={RequireAuth((props) => <Indictments {...props} wsClient={this.client} citizens={this.state.citizens} store={user} />, user)} />
                                 <Route exact path="/employees/:marking?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} />, user)} />
                                 <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} store={user} />, user)} />
                                 <Route exact path="/citizens/:regNum?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />

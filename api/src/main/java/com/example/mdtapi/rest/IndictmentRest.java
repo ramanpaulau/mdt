@@ -41,7 +41,7 @@ public class IndictmentRest {
 
     @GetMapping("/indictments")
     public List<Indictment> all() {
-        return indictmentRepository.findAll();
+        return indictmentRepository.findAllByOrderByIdDesc();
     }
 
     @GetMapping("/indictments/person/{regNum}")
@@ -53,11 +53,9 @@ public class IndictmentRest {
         return indictmentRepository.findByPersonOrderByIdAsc(person);
     }
 
-    @PostMapping("/indictment")
+    /*@PostMapping("/indictment")
     public ResponseMessage insert(@RequestBody String request) {
         ResponseMessage res = ResponseMessage.OKMessage();
-
-        System.out.println(request);
 
         int incidentId, departmentCode, employeeId;
         String personRegNum, startTime, endTime, laws;
@@ -120,5 +118,5 @@ public class IndictmentRest {
         incident.get().getIndictments().add(indictment);
         incidentRepository.save(incident.get());
         return res;
-    }
+    }*/
 }

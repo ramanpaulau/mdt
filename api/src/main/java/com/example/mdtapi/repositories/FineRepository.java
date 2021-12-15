@@ -9,5 +9,7 @@ import java.util.List;
 
 @Repository
 public interface FineRepository extends JpaRepository<Fine, Integer> {
+    List<Fine> findAllByOrderByIdDesc();
+
     List<Fine> findByPerson(Person person);
 }

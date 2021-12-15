@@ -34,7 +34,7 @@ public class FineRest {
 
     @GetMapping("/fines")
     public List<Fine> all() {
-        return fineRepository.findAll();
+        return fineRepository.findAllByOrderByIdDesc();
     }
 
     @PostMapping("/fine")

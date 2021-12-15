@@ -40,7 +40,7 @@ class Fines extends React.Component {
 
     loadFines = async () => {
         await axios.get("http://localhost:8081/fines").then(res => {
-            this.setState({ fines: res.data.sort((a, b) => (a.date > b.date) ? 1 : (a.date === b.date) ? 0 : -1) }, () => { this.getPageData() });
+            this.setState({ fines: res.data.sort((a, b) => (a.id > b.id) ? -1 : (a.id === b.id) ? 0 : 1) }, () => { this.getPageData() });
         });
     }
 
@@ -50,6 +50,15 @@ class Fines extends React.Component {
             pageCount: (this.state.filter) ? Math.ceil(this.state.filteredData.length / FINES_ON_PAGE) : Math.ceil(this.state.fines.length / FINES_ON_PAGE)
         });
     }
+
+    handlePageClick = (data) => {
+        let selected = data.selected;
+        let offset = Math.ceil(selected * FINES_ON_PAGE);
+
+        this.setState({ offset: offset, selectedPage: selected }, () => {
+            this.getPageData();
+        });
+    };
 
     saveLaws = (laws) => {
         let fine = 0;
@@ -121,7 +130,14 @@ class Fines extends React.Component {
                                         <Link
                                             to={"/fines"}
                                             className="link"
-                                            onClick={() => { this.setState({ selectedIdx: -1 }); }}>
+                                            onClick={() => {
+                                                this.setState({
+                                                    selectedIdx: -1,
+                                                    selectedLaws: [],
+                                                    citizen: "",
+                                                    fine: 0
+                                                });
+                                            }}>
                                             {t('Title New')}
                                         </Link>
                                 }
@@ -141,6 +157,13 @@ class Fines extends React.Component {
                             enableReinitialize={true}
                             validate={async values => {
                                 const errors = {};
+
+                                if (values.fine <= 0)
+                                    errors.fine = "Value must be > 0";
+
+                                if (this.state.citizen.length <= 0)
+                                    errors.citizen = "Select value";
+
                                 return errors;
                             }}
                             onSubmit={async (values) => {
@@ -161,6 +184,7 @@ class Fines extends React.Component {
                                                 })
                                             )}
                                             onChange={(e) => { this.setState({ citizen: e.value }) }}
+                                            value={(this.props.citizens.filter(c => c.regNum === this.state.citizen)[0]) ? { value: this.state.citizen, label: this.state.citizen } : null}
                                             placeholder=
                                             {<Translation>
                                                 {

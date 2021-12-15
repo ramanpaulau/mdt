@@ -32,6 +32,11 @@
 
         .table-scroll {
             justify-content: center;
+
+            .control {
+                display: flex;
+                align-items: center;
+            }
         }
     }
 

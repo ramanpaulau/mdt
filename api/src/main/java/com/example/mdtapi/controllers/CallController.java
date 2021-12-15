@@ -1,11 +1,8 @@
 package com.example.mdtapi.controllers;
 
-import com.example.mdtapi.models.Call;
-import com.example.mdtapi.models.Employee;
-import com.example.mdtapi.models.Incident;
-import com.example.mdtapi.repositories.CallRepository;
-import com.example.mdtapi.repositories.EmployeeRepository;
-import com.example.mdtapi.repositories.IncidentRepository;
+import com.example.mdtapi.models.*;
+import com.example.mdtapi.repositories.*;
+import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Optional;
 
 @Controller
@@ -33,10 +31,22 @@ public class CallController {
     @Autowired
     private final IncidentRepository incidentRepository;
 
-    public CallController(CallRepository callRepository, EmployeeRepository employeeRepository, IncidentRepository incidentRepository) {
+    @Autowired
+    private final PersonRepository personRepository;
+
+    @Autowired
+    private final DepartmentRepository departmentRepository;
+
+    @Autowired
+    private final IndictmentRepository indictmentRepository;
+
+    public CallController(CallRepository callRepository, EmployeeRepository employeeRepository, IncidentRepository incidentRepository, PersonRepository personRepository, DepartmentRepository departmentRepository, IndictmentRepository indictmentRepository) {
         this.callRepository = callRepository;
         this.employeeRepository = employeeRepository;
         this.incidentRepository = incidentRepository;
+        this.personRepository = personRepository;
+        this.departmentRepository = departmentRepository;
+        this.indictmentRepository = indictmentRepository;
     }
 
     @MessageMapping("/calls")
@@ -147,5 +157,58 @@ public class CallController {
         call.get().setIncident(null);
         callRepository.save(call.get());
         return call.get();
+    }
+
+    @MessageMapping("/call/indictment/add")
+    @SendTo("/ws/calls")
+    public Call addIndictment(@RequestBody String request) {
+        ResponseMessage res = ResponseMessage.OKMessage();
+
+        int incidentId, departmentCode, employeeId;
+        String personRegNum, startTime, endTime, laws;
+        JSONObject subchapter = new JSONObject(request);
+        try {
+            incidentId = subchapter.getInt("incident");
+            departmentCode = subchapter.getInt("department");
+            employeeId = subchapter.getInt("employee");
+            if (incidentId < 0 || departmentCode < 0 || employeeId < 0)
+                throw new JSONException("Negative value");
+            personRegNum = subchapter.getString("citizen");
+            startTime = subchapter.getString("startTime");
+            endTime = subchapter.getString("endTime");
+            laws = subchapter.getString("laws");
+        } catch (JSONException ignored) {
+            return null;
+        }
+
+        Department department = departmentRepository.findByCode(departmentCode);
+        Person person = personRepository.findByRegNum(personRegNum);
+        Optional<Employee> employee = employeeRepository.findById(employeeId);
+        Optional<Incident> incident = incidentRepository.findById(incidentId);
+        if (department == null || person == null || employee.isEmpty() || incident.isEmpty())
+            return null;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH:mm:ss");
+
+        Indictment indictment = new Indictment();
+        indictment.setDepartment(department);
+        indictment.setPerson(person);
+        indictment.setStartTime(LocalDateTime.parse(startTime, formatter));
+        indictment.setEndTime(LocalDateTime.parse(endTime, formatter));
+        indictment.setEmployee(employee.get());
+        indictment.setLaws(laws);
+
+        indictmentRepository.save(indictment);
+        incident.get().getIndictments().add(indictment);
+        incidentRepository.save(incident.get());
+
+        Call call = new Call();
+        call.setLocation("Detention end: " + department.getShortTitle());
+        call.setPhone(personRegNum);
+        call.setText("[System]");
+        call.setTime(indictment.getEndTime());
+
+        callRepository.save(call);
+        return call;
     }
 }
