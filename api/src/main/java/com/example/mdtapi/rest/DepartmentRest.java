@@ -1,9 +1,11 @@
 package com.example.mdtapi.rest;
 
 import com.example.mdtapi.models.Department;
+import com.example.mdtapi.models.Employee;
 import com.example.mdtapi.models.Person;
 import com.example.mdtapi.models.Unit;
 import com.example.mdtapi.repositories.DepartmentRepository;
+import com.example.mdtapi.repositories.EmployeeRepository;
 import com.example.mdtapi.repositories.PersonRepository;
 import com.example.mdtapi.repositories.UnitRepository;
 import com.example.mdtapi.utils.ResponseMessage;
@@ -26,10 +28,14 @@ public class DepartmentRest {
     @Autowired
     private final UnitRepository unitRepository;
 
-    public DepartmentRest(DepartmentRepository departmentRepository, PersonRepository personRepository, UnitRepository unitRepository) {
+    @Autowired
+    private final EmployeeRepository employeeRepository;
+
+    public DepartmentRest(DepartmentRepository departmentRepository, PersonRepository personRepository, UnitRepository unitRepository, EmployeeRepository employeeRepository) {
         this.departmentRepository = departmentRepository;
         this.personRepository = personRepository;
         this.unitRepository = unitRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @GetMapping("/departments")
@@ -79,6 +85,17 @@ public class DepartmentRest {
         return res;
     }
 
+    @PostMapping("/department/{code}/leader/{eid}")
+    public void setLeader(@PathVariable int code, @PathVariable int eid) {
+        Department department = departmentRepository.findByCode(code);
+        Optional<Employee> employee = employeeRepository.findById(eid);
+        if (department == null || employee.isEmpty())
+            return;
+
+        department.setLeader(employee.get());
+        departmentRepository.save(department);
+    }
+
     @GetMapping("/is_depCode_available/{code}")
     public boolean isDepCodeAvailable(@PathVariable Integer code) {
         return !departmentRepository.existsByCode(code);
@@ -89,7 +106,7 @@ public class DepartmentRest {
         return !departmentRepository.existsByShortTitle(shortTitle);
     }
 
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         Department dep = new Department();
         dep.setCode(1);
@@ -102,5 +119,5 @@ public class DepartmentRest {
         personRepository.save(leader);
         dep.setLeader(leader);
         departmentRepository.save(dep);
-    }
+    }*/
 }

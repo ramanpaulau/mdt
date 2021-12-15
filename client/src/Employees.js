@@ -86,10 +86,11 @@ class Employees extends React.Component {
             .then(axios.spread((firstResponse, secondResponse, thirdResponse) => {
                 let departmentCode, tag = 0, dep, emp;
                 let marking = this.props.match.params.marking;
-                if (marking && /^[1-9]-[1-9][0-9]?$/i.test(marking)) {
-                    [departmentCode, tag] = marking.split('-').map(Number);
+                let result = marking ? marking.match(new RegExp("^([1-9])[A-Z]{2}-([1-9][0-9]?)$")) : null;
+                if (result) {
+                    [departmentCode, tag] = [parseInt(result[1]), parseInt(result[2])];
                     dep = firstResponse.data.find(d => d.code === departmentCode);
-                    emp = secondResponse.data.find(e => e.tag === tag && e.department === departmentCode)
+                    emp = secondResponse.data.find(e => e.tag === tag && e.department === departmentCode);
                 }
                 this.setState({
                     departments: firstResponse.data,
@@ -240,7 +241,7 @@ class Employees extends React.Component {
                                     <li>{e.person}</li>
                                 </Link>
                                 <Link
-                                    to={"/employees/" + this.state.department.value + "-" + e.tag}
+                                    to={"/employees/" + e.marking}
                                     onClick={() => {
                                         this.handleView(e);
                                         this.clearData();

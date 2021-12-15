@@ -133,24 +133,32 @@ class Citizens extends React.Component {
     }
 
     getCitizenFines = async () => {
+        if (this.state.selectedIdx === -1)
+            return;
         await axios.get("http://localhost:8081/person/" + this.props.citizens[this.state.selectedIdx].regNum + "/fines").then(res => {
             this.setState({ citizenFines: res.data });
         });
     }
 
     getCitizenVehicles = async () => {
+        if (this.state.selectedIdx === -1)
+            return;
         await axios.get("http://localhost:8081/person/" + this.props.citizens[this.state.selectedIdx].regNum + "/vehicles").then(res => {
             this.setState({ citizenVehicles: res.data });
         });
     }
 
     getCitizenIndictments = async () => {
+        if (this.state.selectedIdx === -1)
+            return;
         await axios.get("http://localhost:8081/indictments/person/" + this.props.citizens[this.state.selectedIdx].regNum).then(res => {
             this.setState({ citizenIndictments: res.data });
         });
     }
 
     getCitizenRecords = async () => {
+        if (this.state.selectedIdx === -1)
+            return;
         await axios.get("http://localhost:8081/incidents/person/" + this.props.citizens[this.state.selectedIdx].regNum).then(res => {
             this.setState({ citizenRecords: res.data });
         });

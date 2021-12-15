@@ -2,9 +2,12 @@ import React from "react";
 import { Link } from 'react-router-dom';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimesCircle, faPlus, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faPlus, faChevronLeft, faChevronRight, faSave } from '@fortawesome/free-solid-svg-icons';
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from 'axios';
+import { observer } from "mobx-react";
+import Select from 'react-select';
+import { customStyles } from "./Employees";
 import { Translation } from 'react-i18next';
 
 const DEPARTMENTS_ON_PAGE = 5;
@@ -23,6 +26,8 @@ class Departments extends React.Component {
             pageData: [],
             ranks: [],
             units: [],
+            employees: [],
+            leader: null,
             selectedRanks: [],
             selectedUnits: [],
             offset: 0,
@@ -85,7 +90,18 @@ class Departments extends React.Component {
     }
 
     getSelectedUnits = () => {
-        this.setState({ selectedUnits: (this.state.selectedDep === -1) ? [] : this.state.units.filter(e => e.department === this.state.pageData[this.state.selectedDep].code) });
+        this.setState({ selectedUnits: (this.state.selectedDep === -1) ? [] : this.state.units.filter(e => e.department === this.state.departments[this.state.selectedDep].code) });
+    }
+
+    getEmployees = async () => {
+        if (this.state.selectedDep === -1)
+            return;
+        await axios.get("http://localhost:8081/employees/department/" + this.state.departments[this.state.selectedDep].code).then(res => {
+            this.setState({
+                employees: res.data,
+                leader: this.state.departments[this.state.selectedDep].leader
+            });
+        });
     }
 
     componentDidMount = async () => {
@@ -94,14 +110,17 @@ class Departments extends React.Component {
             axios.get("http://localhost:8081/ranks"),
             axios.get("http://localhost:8081/units")])
             .then(axios.spread((firstResponse, secondResponse, thirdResponse) => {
+                let dep = parseInt(this.props.match.params.code);
                 this.setState({
                     departments: firstResponse.data,
                     ranks: secondResponse.data,
-                    units: thirdResponse.data
+                    units: thirdResponse.data,
+                    selectedDep: (dep) ? firstResponse.data.findIndex(d => d.code === dep) : -1
                 }, () => {
                     this.getSelectedRanks();
                     this.getSelectedUnits();
                     this.getPageData();
+                    this.getEmployees();
                 })
             }))
             .catch(error => console.log(error));
@@ -134,6 +153,11 @@ class Departments extends React.Component {
         });
     }
 
+    sendLeader = async () => {
+        let code = this.state.departments[this.state.selectedDep].code;
+        await axios.post("http://localhost:8081/department/" + code + "/leader/" + this.state.leader);
+    }
+
     render() {
         return (
             <div className="departments">
@@ -157,7 +181,7 @@ class Departments extends React.Component {
                                 <Link
                                     to={"/departments/" + o.code}
                                     className="edit-button round-link"
-                                    onClick={() => this.setState({ selectedDep: i + this.state.selectedPage * DEPARTMENTS_ON_PAGE, password: "" }, () => { this.getSelectedRanks(); this.getSelectedUnits(); })}>
+                                    onClick={() => this.setState({ selectedDep: i + this.state.selectedPage * DEPARTMENTS_ON_PAGE }, () => { this.getSelectedRanks(); this.getSelectedUnits(); this.getEmployees(); })}>
                                     <Translation>
                                         {
                                             t => t('Button View')
@@ -194,7 +218,7 @@ class Departments extends React.Component {
                                             <Link
                                                 to={"/departments"}
                                                 className="link"
-                                                onClick={() => { this.setState({ selectedDep: -1 }, () => {this.getSelectedRanks(); this.getSelectedUnits();}); }}>
+                                                onClick={() => { this.setState({ selectedDep: -1 }, () => { this.getSelectedRanks(); this.getSelectedUnits(); }); }}>
                                                 {t('Title New')}
                                             </Link>
                                     }
@@ -310,6 +334,42 @@ class Departments extends React.Component {
                                     </Form>
                                 )}
                             </Formik>
+                            {(this.state.selectedDep !== -1) ?
+                                <div className="edit-list department" style={{ display: "flex", flexDirection: "column" }}>
+                                    <p className="text-label">
+                                        <Translation>
+                                            {
+                                                t => t('Leader')
+                                            }
+                                        </Translation>
+                                        : </p>
+                                    <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                        options={this.state.employees.map(e => (
+                                            {
+                                                value: e.id,
+                                                label: e.fullName
+                                            })
+                                        )}
+                                        onChange={(e) => { this.setState({ leader: e.value }) }}
+                                        value={(this.state.employees.filter(e => e.id === this.state.leader)[0]) ? { value: this.state.leader, label: this.state.employees.filter(e => e.id === this.state.leader)[0].fullName } : null}
+                                        placeholder=
+                                        {<Translation>
+                                            {
+                                                t => t('Title Employees')
+                                            }
+                                        </Translation>}
+                                        noOptionsMessage={() =>
+                                            <Translation>
+                                                {
+                                                    t => t('Not found')
+                                                }
+                                            </Translation>} />
+                                    <div>
+                                        <span className="link-button" onClick={(e) => { e.preventDefault(); this.sendLeader(); }}>
+                                            <FontAwesomeIcon icon={faSave} />
+                                        </span>
+                                    </div>
+                                </div> : ""}
                         </div>
                     </div>
                     : ""}
@@ -349,7 +409,7 @@ class Departments extends React.Component {
                                         let tmp = {
                                             title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
                                             salary: parseInt(values.salary),
-                                            department: this.state.pageData[this.state.selectedDep].code
+                                            department: this.state.departments[this.state.selectedDep].code
                                         };
                                         await axios.post("http://localhost:8081/rank",
                                             JSON.stringify(tmp),
@@ -462,7 +522,7 @@ class Departments extends React.Component {
                                             title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
                                             abbreviation: values.abbreviation.toUpperCase(),
                                             description: values.description,
-                                            department: this.state.pageData[this.state.selectedDep].code
+                                            department: this.state.departments[this.state.selectedDep].code
                                         };
                                         await axios.post("http://localhost:8081/unit", tmp).then((res) => {
                                             if (!res.data.success) {
@@ -529,7 +589,7 @@ class Departments extends React.Component {
                                         </Translation>: {o.abbreviation}</li>
                                     <li>{o.description}</li>
                                     <li className="controls">
-                                        {this.state.pageData[this.state.selectedDep] && this.state.pageData[this.state.selectedDep].unit !== o.abbreviation &&
+                                        {this.state.departments[this.state.selectedDep] && this.state.departments[this.state.selectedDep].unit !== o.abbreviation &&
                                             <button className="round-link" type="submit" onClick={() => { this.setMain(o.abbreviation); }}>
                                                 <Translation>
                                                     {
@@ -557,4 +617,4 @@ class Departments extends React.Component {
     }
 }
 
-export default Departments;
+export default observer(Departments);

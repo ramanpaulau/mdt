@@ -18,8 +18,12 @@ class Fines extends React.Component {
     constructor(props) {
         super(props);
 
+        let filter = "";
+        if (this.props.match.params.regNum)
+            filter += this.props.match.params.regNum;
+
         this.state = {
-            filter: '',
+            filter: filter,
             filteredData: [],
             pageData: [],
             fines: [],
@@ -40,7 +44,12 @@ class Fines extends React.Component {
 
     loadFines = async () => {
         await axios.get("http://localhost:8081/fines").then(res => {
-            this.setState({ fines: res.data.sort((a, b) => (a.id > b.id) ? -1 : (a.id === b.id) ? 0 : 1) }, () => { this.getPageData() });
+            this.setState({
+                fines: res.data.sort((a, b) => (a.id > b.id) ? -1 : (a.id === b.id) ? 0 : 1),
+                filteredData: (this.state.filter) ? res.data.filter(f => (f.person).includes(this.state.filter.toUpperCase())) : []
+            }, () => {
+                this.getPageData()
+            });
         });
     }
 

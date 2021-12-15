@@ -10,9 +10,9 @@ public class Department {
     private String title;
     private String description;
 
-    @OneToOne(targetEntity = Person.class, fetch = FetchType.EAGER)
-    @JoinColumn(name = "person_regNum")
-    private Person leader;
+    @OneToOne(targetEntity = Employee.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "employee_regNum")
+    private Employee leader;
 
     @OneToOne(targetEntity = Unit.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "unit_abbreviation")
@@ -60,11 +60,11 @@ public class Department {
         this.description = description;
     }
 
-    public String getLeader() {
-        return (leader == null) ? "" : leader.getRegNum();
+    public Integer getLeader() {
+        return (leader == null) ? 0 : leader.getId();
     }
 
-    public void setLeader(Person leader) {
+    public void setLeader(Employee leader) {
         this.leader = leader;
     }
 

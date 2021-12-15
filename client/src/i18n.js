@@ -39,6 +39,7 @@ const resources = {
       "Marking": "Marking",
       "Name": "Name",
       "Department": "Department",
+      "Leader": "Leader",
       "Rank": "Rank",
       "State": "State",
       "Time": "Time",

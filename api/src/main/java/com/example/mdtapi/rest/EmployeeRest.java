@@ -110,6 +110,14 @@ public class EmployeeRest {
         return res;
     }
 
+    @GetMapping("/employees/department/{dcode}")
+    private List<Employee> getByDepartment(@PathVariable int dcode) {
+        Department department = departmentRepository.findByCode(dcode);
+
+        return (department == null) ? null : employeeRepository.findByDepartment(department);
+    }
+
+
     @GetMapping("/employee/exists/{department}/{tag}")
     private boolean existsByTag(@PathVariable Integer department, @PathVariable Integer tag) {
         if (tag == null)
