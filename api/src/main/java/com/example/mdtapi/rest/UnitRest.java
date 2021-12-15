@@ -71,4 +71,13 @@ public class UnitRest {
         unitRepository.save(unit);
         return res;
     }
+
+    @DeleteMapping("/unit/{abbreviation}/department/{departmentCode}")
+    public void removeUnits(@PathVariable String abbreviation, @PathVariable int departmentCode) {
+        Department department = departmentRepository.findByCode(departmentCode);
+        if (department == null)
+            return;
+        Unit unit = unitRepository.findByDepartmentAndAbbreviation(department, abbreviation);
+        unitRepository.delete(unit);
+    }
 }

@@ -106,18 +106,13 @@ public class DepartmentRest {
         return !departmentRepository.existsByShortTitle(shortTitle);
     }
 
-    /*@PostConstruct
+    @PostConstruct
     public void init() {
         Department dep = new Department();
         dep.setCode(1);
         dep.setShortTitle("SAHP");
         dep.setTitle("San Andreas Highway Patrol");
         dep.setDescription("Fast cars.");
-        Person leader = new Person();
-        leader.setRegNum("1111");
-        leader.setSurname("asdasd");
-        personRepository.save(leader);
-        dep.setLeader(leader);
         departmentRepository.save(dep);
-    }*/
+    }
 }

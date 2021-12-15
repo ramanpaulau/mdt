@@ -177,15 +177,15 @@ class App extends React.Component {
                                 <Route exact path="/" component={RequireAuth((props) => <Home {...props} store={user} wsClient={this.client} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} calls={this.state.calls} activeOfficers={this.state.activeOfficers} />, user)} />
                                 <Route exact path="/calls/:id?" component={RequireAuth((props) => <Calls {...props} wsClient={this.client} calls={this.state.calls} store={user} />, user)} />
                                 <Route exact path="/vehicles/:plateNum?" component={RequireAuth((props) => <Vehicles {...props} store={user} />, user)} />
-                                <Route exact path="/licenses" component={(user.leader === true || user.admin === true ) && RequireAuth((props) => <Licenses {...props} />, user)} />
-                                <Route exact path="/bolo" component={user.employeeId !== 0 && RequireAuth((props) => <Bolo {...props} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} />, user)} />
+                                <Route exact path="/licenses" component={RequireAuth((props) => <Licenses {...props} store={user} />, user)} />
+                                <Route exact path="/bolo" component={RequireAuth((props) => <Bolo {...props} boloCitizens={this.state.boloCitizens} boloVehicles={this.state.boloVehicles} />, user)} />
                                 <Route exact path="/fines/:regNum?" component={RequireAuth((props) => <Fines {...props} citizens={this.state.citizens} store={user} />, user)} />
-                                <Route exact path="/incidents/:id?" component={user.employeeId !== 0 && RequireAuth((props) => <Incidents {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />
-                                <Route exact path="/indictments/:id?" component={user.employeeId !== 0 && RequireAuth((props) => <Indictments {...props} wsClient={this.client} citizens={this.state.citizens} store={user} />, user)} />
+                                <Route exact path="/incidents/:id?" component={RequireAuth((props) => <Incidents {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />
+                                <Route exact path="/indictments/:id?" component={RequireAuth((props) => <Indictments {...props} wsClient={this.client} citizens={this.state.citizens} store={user} />, user)} />
                                 <Route exact path="/employees/:marking?" component={RequireAuth((props) => <Employees  {...props} citizens={this.state.citizens} store={user} />, user)} />
                                 <Route exact path="/departments/:code?" component={RequireAuth((props) => <Departments {...props} store={user} />, user)} />
-                                <Route exact path="/citizens/:regNum?" component={user.employeeId !== 0 && RequireAuth((props) => <Citizens {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />
-                                <Route exact path="/inventory" component={user.employeeId !== 0 && user.employeeId !== 0 && RequireAuth(() => <Inventory />, user)} />
+                                <Route exact path="/citizens/:regNum?" component={RequireAuth((props) => <Citizens {...props} wsClient={this.client} store={user} citizens={this.state.citizens} />, user)} />
+                                <Route exact path="/inventory" component={RequireAuth(() => <Inventory />, user)} />
                                 <Route exact path="/penalcode" component={RequireAuth(() => <PenalCode store={user} />, user)} />
                                 <Route path="*" component={RequireAuth(Error404, user)} />
                             </Switch>

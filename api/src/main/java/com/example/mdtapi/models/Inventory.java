@@ -43,13 +43,4 @@ public class Inventory {
     public void setDepartment(Department department) {
         this.department = department;
     }
-
-    @Override
-    public String toString() {
-        return "Inventory{" +
-                "description='" + description + '\'' +
-                ", amount=" + amount +
-                ", department=" + department +
-                '}';
-    }
 }

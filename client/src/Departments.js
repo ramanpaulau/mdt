@@ -226,10 +226,10 @@ class Departments extends React.Component {
                             </h3>
                             <Translation>
                                 {
-                                    t => <h3 onClick={() => { 
+                                    t => <h3 onClick={() => {
                                         if (this.props.store.admin)
                                             this.sendDepartment();
-                                     }}>{t('Title Send')}</h3>
+                                    }}>{t('Title Send')}</h3>
                                 }
                             </Translation>
                         </div>
@@ -476,7 +476,13 @@ class Departments extends React.Component {
                                                 }
                                             </Translation>
                                         </button>
-                                        <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
+                                        <button className="round-link" type="submit" onClick={async () => {
+                                                let tmp = {
+                                                    title: o.title,
+                                                    dep: this.state.departments[this.state.selectedDep].code
+                                                }
+                                                await await axios.delete("http://localhost:8081/rank/" + tmp.title + "/department/" + tmp.dep).then(() => this.loadRanks());
+                                         }}><FontAwesomeIcon icon={faTimesCircle} /></button>
                                     </li>
                                 </ul>
                             )}
@@ -608,7 +614,15 @@ class Departments extends React.Component {
                                                 }
                                             </Translation>
                                         </button>
-                                        <button className="round-link" type="submit" onClick={() => { }}><FontAwesomeIcon icon={faTimesCircle} /></button>
+                                        {this.state.departments[this.state.selectedDep] && this.state.departments[this.state.selectedDep].unit !== o.abbreviation &&
+                                            <button className="round-link" type="submit" onClick={async () => {
+                                                let tmp = {
+                                                    abbr: o.abbreviation,
+                                                    dep: this.state.departments[this.state.selectedDep].code
+                                                }
+                                                await await axios.delete("http://localhost:8081/unit/" + tmp.abbr + "/department/" + tmp.dep).then(() => this.loadUnits());
+                                            }}><FontAwesomeIcon icon={faTimesCircle} /></button>
+                                        }
                                     </li>
                                 </ul>
                             )}

@@ -13,4 +13,6 @@ public interface UnitRepository extends JpaRepository<Unit, String> {
     Optional<Unit> getByAbbreviation(String abbreviation);
 
     List<Unit> findByDepartment(Department department);
+
+    Unit findByDepartmentAndAbbreviation(Department department, String abbreviation);
 }

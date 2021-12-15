@@ -134,7 +134,7 @@ class Fines extends React.Component {
                         hrefAllControls
                     />
                 </div>
-                {this.props.store.employeeId !== 0 &&
+                {(this.props.store.employeeId !== 0 || this.props.store.admin) &&
                     <div className="block fine-editor">
                         <div className="title">
                             <h3>

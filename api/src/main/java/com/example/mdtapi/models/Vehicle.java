@@ -77,15 +77,4 @@ public class Vehicle {
     public int hashCode() {
         return Objects.hash(vin, plateNum, name, price, department);
     }
-
-    @Override
-    public String toString() {
-        return "Vehicle{" +
-                "vin=" + vin +
-                ", plateNum='" + plateNum + '\'' +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", department=" + department +
-                '}';
-    }
 }

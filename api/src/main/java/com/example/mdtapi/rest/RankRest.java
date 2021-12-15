@@ -1,17 +1,17 @@
 package com.example.mdtapi.rest;
 
 import com.example.mdtapi.models.Department;
+import com.example.mdtapi.models.Employee;
 import com.example.mdtapi.models.Rank;
+import com.example.mdtapi.models.Unit;
 import com.example.mdtapi.repositories.DepartmentRepository;
+import com.example.mdtapi.repositories.EmployeeRepository;
 import com.example.mdtapi.repositories.RankRepository;
 import com.example.mdtapi.utils.ResponseMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,9 +24,13 @@ public class RankRest {
     @Autowired
     private final DepartmentRepository departmentRepository;
 
-    public RankRest(RankRepository rankRepository, DepartmentRepository departmentRepository) {
+    @Autowired
+    private final EmployeeRepository employeeRepository;
+
+    public RankRest(RankRepository rankRepository, DepartmentRepository departmentRepository, EmployeeRepository employeeRepository) {
         this.rankRepository = rankRepository;
         this.departmentRepository = departmentRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @GetMapping("/ranks")
@@ -64,5 +68,25 @@ public class RankRest {
         Rank rank = new Rank(title, salary, department);
         rankRepository.save(rank);
         return res;
+    }
+
+
+    @DeleteMapping("/rank/{title}/department/{departmentCode}")
+    public void removeUnits(@PathVariable String title, @PathVariable int departmentCode) {
+        Department department = departmentRepository.findByCode(departmentCode);
+        if (department == null)
+            return;
+
+        Rank rank = rankRepository.findByDepartmentAndTitle(department, title);
+        if (rank == null)
+            return;
+
+        List<Employee> employees = employeeRepository.findAll();
+        for (Employee e : employees) {
+            if (e.getRank().equals(title))
+                return;
+        }
+
+        rankRepository.delete(rank);
     }
 }
