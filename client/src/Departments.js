@@ -226,7 +226,10 @@ class Departments extends React.Component {
                             </h3>
                             <Translation>
                                 {
-                                    t => <h3 onClick={() => { this.sendDepartment() }}>{t('Title Send')}</h3>
+                                    t => <h3 onClick={() => { 
+                                        if (this.props.store.admin)
+                                            this.sendDepartment();
+                                     }}>{t('Title Send')}</h3>
                                 }
                             </Translation>
                         </div>
@@ -334,7 +337,7 @@ class Departments extends React.Component {
                                     </Form>
                                 )}
                             </Formik>
-                            {(this.state.selectedDep !== -1) ?
+                            {(this.props.store.admin && this.state.selectedDep !== -1) ?
                                 <div className="edit-list department" style={{ display: "flex", flexDirection: "column" }}>
                                     <p className="text-label">
                                         <Translation>
@@ -373,7 +376,7 @@ class Departments extends React.Component {
                         </div>
                     </div>
                     : ""}
-                {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                {((this.props.store.leader) || (this.props.store.admin)) ?
                     <div className="block department-ranks">
                         <Translation>
                             {
@@ -480,7 +483,7 @@ class Departments extends React.Component {
                         </div>
                     </div>
                     : ""}
-                {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                {((this.props.store.leader) || (this.props.store.admin)) ?
                     <div className="block department-units">
                         <Translation>
                             {

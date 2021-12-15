@@ -35,15 +35,12 @@ public class Employee {
     private Integer tag;
 
     @Transient
-    private boolean leader;
-
-    @Transient
     private String marking;
 
     public Employee() {
     }
 
-    public Employee(Integer id, Person person, Department department, Rank rank, Unit unit, Set<Qualification> qualifications, Integer tag, boolean leader, String marking) {
+    public Employee(Integer id, Person person, Department department, Rank rank, Unit unit, Set<Qualification> qualifications, Integer tag, String marking) {
         this.id = id;
         this.person = person;
         this.department = department;
@@ -51,7 +48,6 @@ public class Employee {
         this.unit = unit;
         this.qualifications = qualifications;
         this.tag = tag;
-        this.leader = leader;
         this.marking = marking;
     }
 
@@ -128,7 +124,7 @@ public class Employee {
     }
 
     public boolean isLeader() {
-        return leader;
+        return this.department.getLeader().equals(this.id);
     }
 
     public String getMarking() {

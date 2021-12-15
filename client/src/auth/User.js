@@ -4,6 +4,7 @@ import axios from 'axios';
 export class User {
     regNum = '';
     admin = false;
+    leader = false;
     employeeId = 0;
     department = '';
     departmentId = 0;
@@ -16,6 +17,7 @@ export class User {
                 department: observable,
                 departmentId: observable,
                 admin: observable,
+                leader: observable,
                 clear: action,
                 loadUser: action
             }
@@ -53,7 +55,7 @@ export class User {
                         this.regNum = res.data.regNum;
                         this.admin = res.data.admin;
                         if (this.admin)
-                            this.employee = 1;
+                            this.employeeId = 1;
                     } else {
                         axios.post("http://localhost:8081/refresh_token", regNum, { headers: { 'Content-Type': 'text/plain' } })
                             .then(res => {
@@ -68,6 +70,7 @@ export class User {
                             this.employeeId = res.data.id;
                             this.department = res.data.departmentFullTitle;
                             this.departmentId = res.data.department;
+                            this.leader = res.data.leader;
                         } else
                             this.employeeId = 0;
                     }));

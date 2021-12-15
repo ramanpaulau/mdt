@@ -22,6 +22,9 @@ class Fines extends React.Component {
         if (this.props.match.params.regNum)
             filter += this.props.match.params.regNum;
 
+        if (!this.props.store.employeeId)
+            filter = this.props.store.regNum;
+
         this.state = {
             filter: filter,
             filteredData: [],
@@ -94,6 +97,7 @@ class Fines extends React.Component {
                             <input placeholder={t('Input Filter')}
                                 className="text-input"
                                 type="text"
+                                disabled={!this.props.store.employeeId}
                                 value={this.state.filter}
                                 onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.fines.filter(f => (f.person).includes(e.target.value.toUpperCase())) }, () => this.getPageData())} />
                         }</Translation>
@@ -130,117 +134,119 @@ class Fines extends React.Component {
                         hrefAllControls
                     />
                 </div>
-                <div className="block fine-editor">
-                    <div className="title">
-                        <h3>
+                {this.props.store.employeeId !== 0 &&
+                    <div className="block fine-editor">
+                        <div className="title">
+                            <h3>
+                                <Translation>
+                                    {
+                                        t =>
+                                            <Link
+                                                to={"/fines"}
+                                                className="link"
+                                                onClick={() => {
+                                                    this.setState({
+                                                        selectedIdx: -1,
+                                                        selectedLaws: [],
+                                                        citizen: "",
+                                                        fine: 0
+                                                    });
+                                                }}>
+                                                {t('Title New')}
+                                            </Link>
+                                    }
+                                </Translation>
+                            </h3>
                             <Translation>
                                 {
-                                    t =>
-                                        <Link
-                                            to={"/fines"}
-                                            className="link"
-                                            onClick={() => {
-                                                this.setState({
-                                                    selectedIdx: -1,
-                                                    selectedLaws: [],
-                                                    citizen: "",
-                                                    fine: 0
-                                                });
-                                            }}>
-                                            {t('Title New')}
-                                        </Link>
+                                    t => <h3 onClick={() => { this.sendFine() }}>{t('Title Send')}</h3>
                                 }
                             </Translation>
-                        </h3>
-                        <Translation>
-                            {
-                                t => <h3 onClick={() => { this.sendFine() }}>{t('Title Send')}</h3>
-                            }
-                        </Translation>
-                    </div>
-                    <div className="table-scroll">
-                        <Formik
-                            initialValues={{
-                                fine: this.state.fine
-                            }}
-                            enableReinitialize={true}
-                            validate={async values => {
-                                const errors = {};
+                        </div>
+                        <div className="table-scroll">
+                            <Formik
+                                initialValues={{
+                                    fine: this.state.fine
+                                }}
+                                enableReinitialize={true}
+                                validate={async values => {
+                                    const errors = {};
 
-                                if (values.fine <= 0)
-                                    errors.fine = "Value must be > 0";
+                                    if (values.fine <= 0)
+                                        errors.fine = "Value must be > 0";
 
-                                if (this.state.citizen.length <= 0)
-                                    errors.citizen = "Select value";
+                                    if (this.state.citizen.length <= 0)
+                                        errors.citizen = "Select value";
 
-                                return errors;
-                            }}
-                            onSubmit={async (values) => {
-                                await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
-                                    if (!res.data.success)
-                                        console.log(res.data.message);
-                                });
-                            }}
-                        >
-                            {({ isSubmitting }) => (
-                                <Form>
-                                    <div className="edit-list citizen">
-                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                            options={this.props.citizens.map(c => (
-                                                {
-                                                    value: c.regNum,
-                                                    label: c.regNum
-                                                })
-                                            )}
-                                            onChange={(e) => { this.setState({ citizen: e.value }) }}
-                                            value={(this.props.citizens.filter(c => c.regNum === this.state.citizen)[0]) ? { value: this.state.citizen, label: this.state.citizen } : null}
-                                            placeholder=
-                                            {<Translation>
-                                                {
-                                                    t => t('Citizen')
-                                                }
-                                            </Translation>}
-                                            noOptionsMessage={() =>
+                                    return errors;
+                                }}
+                                onSubmit={async (values) => {
+                                    await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
+                                        if (!res.data.success)
+                                            console.log(res.data.message);
+                                    });
+                                }}
+                            >
+                                {({ isSubmitting }) => (
+                                    <Form>
+                                        <div className="edit-list citizen">
+                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                options={this.props.citizens.map(c => (
+                                                    {
+                                                        value: c.regNum,
+                                                        label: c.regNum
+                                                    })
+                                                )}
+                                                onChange={(e) => { this.setState({ citizen: e.value }) }}
+                                                value={(this.props.citizens.filter(c => c.regNum === this.state.citizen)[0]) ? { value: this.state.citizen, label: this.state.citizen } : null}
+                                                placeholder=
+                                                {<Translation>
+                                                    {
+                                                        t => t('Citizen')
+                                                    }
+                                                </Translation>}
+                                                noOptionsMessage={() =>
+                                                    <Translation>
+                                                        {
+                                                            t => t('Not found')
+                                                        }
+                                                    </Translation>
+                                                } />
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="number" name="fine" />
+                                            <ErrorMessage name="fine" className="error-label" component="div" />
+                                            <span className="floating-label active-label">
                                                 <Translation>
                                                     {
-                                                        t => t('Not found')
+                                                        t => t('Fine')
                                                     }
                                                 </Translation>
-                                            } />
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="number" name="fine" />
-                                        <ErrorMessage name="fine" className="error-label" component="div" />
-                                        <span className="floating-label active-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Fine')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <SelectLaws callback={(laws) => this.saveLaws(laws)} />
-                                    <div>
-                                        <p className="text-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Selected Laws')
-                                                }
-                                            </Translation>: </p>
-                                        <div className="laws">
-                                            {this.state.selectedLaws.map(l =>
-                                                <Link to="/penalcode" key={l.number} className="round-link" >
-                                                    {l.number}
-                                                </Link>
-                                            )}
+                                            </span>
                                         </div>
-                                    </div>
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                </Form>
-                            )}
-                        </Formik>
+                                        <SelectLaws callback={(laws) => this.saveLaws(laws)} />
+                                        <div>
+                                            <p className="text-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Form Selected Laws')
+                                                    }
+                                                </Translation>: </p>
+                                            <div className="laws">
+                                                {this.state.selectedLaws.map(l =>
+                                                    <Link to="/penalcode" key={l.number} className="round-link" >
+                                                        {l.number}
+                                                    </Link>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
                     </div>
-                </div>
+                }
             </div >
         )
     }

@@ -87,7 +87,7 @@ class Header extends React.Component {
                                 </NavLink>
                             </li>
                             : ""}
-                        {((this.props.store.employeeId) || (this.props.store.admin)) ?
+                        {((this.props.store.leader) || (this.props.store.admin)) ?
                             <li className="nav-li">
                                 <NavLink
                                     exact

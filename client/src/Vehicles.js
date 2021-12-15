@@ -18,9 +18,14 @@ class Vehicles extends React.Component {
 
     constructor(props) {
         super(props);
+        
+        let filter = "";
+
+        if (!this.props.store.employeeId)
+            filter = this.props.store.regNum;
 
         this.state = {
-            filter: '',
+            filter: filter,
             filteredData: [],
             pageData: [],
             vehicles: [],
@@ -96,7 +101,7 @@ class Vehicles extends React.Component {
                 console.log(res.data.message);
             await axios.get("http://localhost:8081/vehicles").then(res => {
                 this.setState({
-                    vehicles: res.data, 
+                    vehicles: res.data,
                     department: 0
                 })
             });
@@ -117,6 +122,7 @@ class Vehicles extends React.Component {
                             <input placeholder={t('Input Filter')}
                                 className="text-input"
                                 type="text"
+                                disabled={!this.props.store.employeeId}
                                 value={this.state.filter}
                                 onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.state.vehicles.filter(v => v.plateNum.toLowerCase().includes(e.target.value.toLowerCase()) || (v.vin + '').toLowerCase().includes(e.target.value.toLowerCase())) }, () => this.loadPages())} />
                         }</Translation>
@@ -156,164 +162,168 @@ class Vehicles extends React.Component {
                         hrefAllControls
                     />
                 </div>
-                <div className="block car-editor">
-                    <div className="title">
-                        <h3>
+
+
+                {this.props.store.employeeId !== 0 &&
+                    <div className="block car-editor">
+                        <div className="title">
+                            <h3>
+                                <Translation>
+                                    {
+                                        t =>
+                                            <Link
+                                                to={"/vehicles"}
+                                                className="link"
+                                                onClick={() => { this.setState({ selectedIdx: -1 }); }}>
+                                                {t('Title New')}
+                                            </Link>
+                                    }
+                                </Translation>
+                            </h3>
                             <Translation>
                                 {
-                                    t =>
-                                        <Link
-                                            to={"/vehicles"}
-                                            className="link"
-                                            onClick={() => { this.setState({ selectedIdx: -1 }); }}>
-                                            {t('Title New')}
-                                        </Link>
+                                    t => <h3 onClick={(this.state.selectedIdx === -1) ? () => { this.sendCar() } : () => { }}>{t('Title Send')}</h3>
                                 }
                             </Translation>
-                        </h3>
-                        <Translation>
-                            {
-                                t => <h3 onClick={(this.state.selectedIdx === -1) ? () => { this.sendCar() } : () => { }}>{t('Title Send')}</h3>
-                            }
-                        </Translation>
-                    </div>
-                    <div className="table-scroll">
-                        <Formik
-                            initialValues={(this.state.selectedIdx === -1) ? this.emptyCar : this.state.vehicles[this.state.selectedIdx]}
-                            enableReinitialize={true}
-                            validate={async values => {
-                                const errors = {};
-                                if (!values.name) {
-                                    errors.name = 'Required';
-                                } else if (!/^[A-Za-z ]{2,}$/i.test(values.name)) {
-                                    errors.name = 'Invalid name';
-                                }
+                        </div>
+                        <div className="table-scroll">
+                            <Formik
+                                initialValues={(this.state.selectedIdx === -1) ? this.emptyCar : this.state.vehicles[this.state.selectedIdx]}
+                                enableReinitialize={true}
+                                validate={async values => {
+                                    const errors = {};
+                                    if (!values.name) {
+                                        errors.name = 'Required';
+                                    } else if (!/^[A-Za-z ]{2,}$/i.test(values.name)) {
+                                        errors.name = 'Invalid name';
+                                    }
 
-                                if (!values.plateNum) {
-                                    errors.plateNum = 'Required';
-                                } else if (!/^[A-Z0-9]{4}$/i.test(values.plateNum)) {
-                                    errors.plateNum = 'Format: XXXX';
-                                } else {
-                                    await axios.get("http://localhost:8081/vehicles/is_plateNum_available/" + values.plateNum.toUpperCase()).then((res) => {
-                                        if (!res.data.success)
-                                            errors.plateNum = 'Occupied';
-                                    });
-                                }
+                                    if (!values.plateNum) {
+                                        errors.plateNum = 'Required';
+                                    } else if (!/^[A-Z0-9]{4}$/i.test(values.plateNum)) {
+                                        errors.plateNum = 'Format: XXXX';
+                                    } else {
+                                        await axios.get("http://localhost:8081/vehicles/is_plateNum_available/" + values.plateNum.toUpperCase()).then((res) => {
+                                            if (!res.data.success)
+                                                errors.plateNum = 'Occupied';
+                                        });
+                                    }
 
-                                if (!values.vin) {
-                                    errors.vin = 'Required';
-                                } else if (!/^[0-9]{6}$/i.test(values.vin)) {
-                                    errors.vin = 'Format: XXXXXX';
-                                } else {
-                                    await axios.get("http://localhost:8081/vehicles/is_vin_available/" + values.vin).then((res) => {
-                                        if (!res.data.success)
-                                            errors.vin = 'Occupied';
-                                    });
-                                }
+                                    if (!values.vin) {
+                                        errors.vin = 'Required';
+                                    } else if (!/^[0-9]{6}$/i.test(values.vin)) {
+                                        errors.vin = 'Format: XXXXXX';
+                                    } else {
+                                        await axios.get("http://localhost:8081/vehicles/is_vin_available/" + values.vin).then((res) => {
+                                            if (!res.data.success)
+                                                errors.vin = 'Occupied';
+                                        });
+                                    }
 
-                                return errors;
-                            }}
-                            onSubmit={async (values) => {
-                                let tmp = {
-                                    plateNum: values.plateNum.toUpperCase(),
-                                    vin: values.vin,
-                                    name: values.name.charAt(0).toUpperCase() + values.name.slice(1),
-                                    price: values.price
-                                };
-                                await axios.post("http://localhost:8081/vehicle", tmp)
-                                    .then((res) => {
-                                        if (res.data.success)
-                                            this.setState({ cars: [...this.state.vehicles, tmp] }, () => this.loadPages());
-                                        else
-                                            console.log(res.data.message);
-                                    });
-                            }}
-                        >
-                            {({ isSubmitting }) => (
-                                <Form>
-                                    <div>
-                                        <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1) ? false : true} style={{ textTransform: "capitalize" }} name="name" />
-                                        <ErrorMessage name="name" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Model')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1) ? false : true} style={{ textTransform: "capitalize" }} name="plateNum" />
-                                        <ErrorMessage name="plateNum" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Plate number')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1) ? false : true} name="vin" />
-                                        <ErrorMessage name="vin" className="error-label" component="div" />
-                                        <span className="floating-label">VIN</span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1) ? false : true} name="price" />
-                                        <ErrorMessage name="price" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Price')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    {(this.state.selectedIdx !== -1) ?
-                                        <div className="edit-list department" style={{ display: "flex", flexDirection: "column" }}>
-                                            <p className="text-label">
+                                    return errors;
+                                }}
+                                onSubmit={async (values) => {
+                                    let tmp = {
+                                        plateNum: values.plateNum.toUpperCase(),
+                                        vin: values.vin,
+                                        name: values.name.charAt(0).toUpperCase() + values.name.slice(1),
+                                        price: values.price
+                                    };
+                                    await axios.post("http://localhost:8081/vehicle", tmp)
+                                        .then((res) => {
+                                            if (res.data.success)
+                                                this.setState({ cars: [...this.state.vehicles, tmp] }, () => this.loadPages());
+                                            else
+                                                console.log(res.data.message);
+                                        });
+                                }}
+                            >
+                                {({ isSubmitting }) => (
+                                    <Form>
+                                        <div>
+                                            <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1) ? false : true} style={{ textTransform: "capitalize" }} name="name" />
+                                            <ErrorMessage name="name" className="error-label" component="div" />
+                                            <span className="floating-label">
                                                 <Translation>
                                                     {
-                                                        t => t('Confiscation')
+                                                        t => t('Model')
                                                     }
                                                 </Translation>
-                                                : </p>
-                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                                options={this.state.departments.map(d => (
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="text" disabled={(this.state.selectedIdx === -1) ? false : true} style={{ textTransform: "capitalize" }} name="plateNum" />
+                                            <ErrorMessage name="plateNum" className="error-label" component="div" />
+                                            <span className="floating-label">
+                                                <Translation>
                                                     {
-                                                        value: d.code,
-                                                        label: d.shortTitle
-                                                    })
-                                                )}
-                                                onChange={(e) => { this.setState({ department: e.value }) }}
-                                                value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : null}
-                                                placeholder=
-                                                {<Translation>
-                                                    {
-                                                        t => t('Department')
+                                                        t => t('Plate number')
                                                     }
-                                                </Translation>}
-                                                noOptionsMessage={() =>
+                                                </Translation>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1) ? false : true} name="vin" />
+                                            <ErrorMessage name="vin" className="error-label" component="div" />
+                                            <span className="floating-label">VIN</span>
+                                        </div>
+                                        <div>
+                                            <Field className="text-input" type="number" disabled={(this.state.selectedIdx === -1) ? false : true} name="price" />
+                                            <ErrorMessage name="price" className="error-label" component="div" />
+                                            <span className="floating-label">
+                                                <Translation>
+                                                    {
+                                                        t => t('Form Price')
+                                                    }
+                                                </Translation>
+                                            </span>
+                                        </div>
+                                        {(this.state.selectedIdx !== -1) ?
+                                            <div className="edit-list department" style={{ display: "flex", flexDirection: "column" }}>
+                                                <p className="text-label">
                                                     <Translation>
                                                         {
-                                                            t => t('Not found')
+                                                            t => t('Confiscation')
                                                         }
-                                                    </Translation>} />
-                                            <div>
-                                                <span className="link-button" onClick={(e) => { e.preventDefault(); this.sendDepartment(); }}>
-                                                    <FontAwesomeIcon icon={faSave} />
-                                                </span>
-                                                <span className="link-button" onClick={(e) => { e.preventDefault(); this.deleteDepartment(); }}>
-                                                    <FontAwesomeIcon icon={faTimesCircle} />
-                                                </span>
-                                            </div>
-                                        </div> : ""}
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                </Form>
-                            )}
-                        </Formik>
+                                                    </Translation>
+                                                    : </p>
+                                                <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                    options={this.state.departments.map(d => (
+                                                        {
+                                                            value: d.code,
+                                                            label: d.shortTitle
+                                                        })
+                                                    )}
+                                                    onChange={(e) => { this.setState({ department: e.value }) }}
+                                                    value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : null}
+                                                    placeholder=
+                                                    {<Translation>
+                                                        {
+                                                            t => t('Department')
+                                                        }
+                                                    </Translation>}
+                                                    noOptionsMessage={() =>
+                                                        <Translation>
+                                                            {
+                                                                t => t('Not found')
+                                                            }
+                                                        </Translation>} />
+                                                <div>
+                                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.sendDepartment(); }}>
+                                                        <FontAwesomeIcon icon={faSave} />
+                                                    </span>
+                                                    <span className="link-button" onClick={(e) => { e.preventDefault(); this.deleteDepartment(); }}>
+                                                        <FontAwesomeIcon icon={faTimesCircle} />
+                                                    </span>
+                                                </div>
+                                            </div> : ""}
+                                        <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                    </Form>
+                                )}
+                            </Formik>
+                        </div>
                     </div>
-                </div>
+                }
             </div >
         );
     }

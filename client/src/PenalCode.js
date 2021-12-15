@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import Collapsible from 'react-collapsible';
 import AddChapter from "./ModalWindows/AddChapter";
+import { observer } from "mobx-react";
 import AddLaw from "./ModalWindows/AddLaw";
 
 class PenalCode extends React.Component {
@@ -86,15 +87,15 @@ class PenalCode extends React.Component {
                     <ul>
                         {this.state.chapters.map((ch) =>
                             <li key={ch.number}>
-                                <Collapsible open={true} trigger={<CollapsibleTrigger chapter={ch.number} value={ch.title} remove={() => this.removeChapter(ch.number)} />}>
+                                <Collapsible open={true} trigger={<CollapsibleTrigger chapter={ch.number} value={ch.title} admin={this.props.store.admin} remove={() => this.removeChapter(ch.number)} />}>
                                     <ul>
                                         {ch.subchapters.map(su =>
                                             <li key={su.number}>
-                                                <Collapsible open={true} trigger={<CollapsibleTrigger chapter={ch.number} subchapter={su.number} value={su.title} remove={() => this.removeSubchapter(ch.number, su.number)} />} >
+                                                <Collapsible open={true} trigger={<CollapsibleTrigger chapter={ch.number} subchapter={su.number} value={su.title} admin={this.props.store.admin} remove={() => this.removeSubchapter(ch.number, su.number)} />} >
                                                     <ul>
                                                         {su.laws.map(la =>
                                                             <li key={la.number}>
-                                                                <Collapsible open={true} trigger={<CollapsibleTrigger chapter={ch.number} subchapter={su.number} law={la.number} value={la.text} remove={() => this.removeLaw(ch.number, su.number, la.number)} />} >
+                                                                <Collapsible open={true} trigger={<CollapsibleTrigger chapter={ch.number} subchapter={su.number} law={la.number} value={la.text} admin={this.props.store.admin} remove={() => this.removeLaw(ch.number, su.number, la.number)} />} >
                                                                     <ul>
                                                                         {(la.fine !== 0) ? <li>Max fine: {la.fine}$</li> : ""}
                                                                         {(la.detention !== 0) ? <li>Max detention: {la.detention} min.</li> : ""}
@@ -102,17 +103,17 @@ class PenalCode extends React.Component {
                                                                 </Collapsible>
                                                             </li>
                                                         )}
-                                                        <li className="add"><AddLaw callback={(title, fine, detention) => this.addLaw(ch.number, su.number, title, fine, detention)} /></li>
+                                                        {this.props.store.admin && <li className="add"><AddLaw callback={(title, fine, detention) => this.addLaw(ch.number, su.number, title, fine, detention)} /></li>}
                                                     </ul>
                                                 </Collapsible>
                                             </li>
                                         )}
-                                        <li className="add"><AddChapter callback={(title) => this.addSubchapter(ch.number, title)} /></li>
+                                        {this.props.store.admin && <li className="add"><AddChapter callback={(title) => this.addSubchapter(ch.number, title)} /></li>}
                                     </ul>
                                 </Collapsible>
                             </li>
                         )}
-                        <li className="add"><AddChapter callback={(title) => this.addChapter(title)} /></li>
+                       {this.props.store.admin && <li className="add"><AddChapter callback={(title) => this.addChapter(title)} /></li>}
                     </ul>
                 </div>
             </div>
@@ -120,7 +121,7 @@ class PenalCode extends React.Component {
     }
 }
 
-export default PenalCode;
+export default observer(PenalCode);
 
 class CollapsibleTrigger extends React.Component {
     render() {
@@ -129,7 +130,7 @@ class CollapsibleTrigger extends React.Component {
                 <span className="title">
                     <span className="number">{this.props.chapter}</span>
                     <span className="text">{": " + this.props.value}</span>
-                    <span className="delete"><FontAwesomeIcon icon={faTimesCircle} onClick={() => this.props.remove()} /></span>
+                    {this.props.admin === true ? <span className="delete"><FontAwesomeIcon icon={faTimesCircle} onClick={() => this.props.remove()} /></span> : ""}
                 </span>
             )
         else if (this.props.law === undefined)
@@ -137,14 +138,14 @@ class CollapsibleTrigger extends React.Component {
                 <span className="title">
                     <span className="number">{this.props.chapter + "." + this.props.subchapter}</span>
                     <span className="text">{": " + this.props.value}</span>
-                    <span className="delete"><FontAwesomeIcon icon={faTimesCircle} onClick={() => this.props.remove()} /></span>
+                    {this.props.admin === true ? <span className="delete"><FontAwesomeIcon icon={faTimesCircle} onClick={() => this.props.remove()} /></span> : ""}
                 </span>
             )
         return (
             <span className="title">
                 <span className="number">{this.props.chapter + "." + this.props.subchapter + "." + this.props.law}</span>
                 <span className="text">{": " + this.props.value}</span>
-                <span className="delete"><FontAwesomeIcon icon={faTimesCircle} onClick={() => this.props.remove()} /></span>
+                {this.props.admin === true ? <span className="delete"><FontAwesomeIcon icon={faTimesCircle} onClick={() => this.props.remove()} /></span> : ""}
             </span>
         )
     }
