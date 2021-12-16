@@ -285,211 +285,216 @@ class Employees extends React.Component {
                         </Translation>
                     </div>
                     <div className="table-scroll">
-                        <Formik
-                            initialValues={{ tag: this.state.tag }}
-                            enableReinitialize={true}
-                            validate={async values => {
-                                const errors = {};
+                        <Translation>
+                            {
+                                t =>
+                                    <Formik
+                                        initialValues={{ tag: this.state.tag }}
+                                        enableReinitialize={true}
+                                        validate={async values => {
+                                            const errors = {};
 
-                                if (!this.state.selectedCitizens) {
-                                    errors.selectedCitizens = 'Required';
-                                }
-
-                                if (!this.state.selectedRank) {
-                                    errors.selectedRank = 'Required';
-                                }
-
-                                if (!values.tag) {
-                                    errors.tag = 'Required';
-                                } else if (parseInt(values.tag) < 0) {
-                                    errors.tag = 'Must be positive';
-                                }
-
-                                return errors;
-                            }}
-                            onSubmit={async (values) => {
-                                let tmp = {
-                                    regNum: this.state.selectedCitizens.value,
-                                    rank: this.state.selectedRank.value,
-                                    tag: values.tag,
-                                    department: this.state.department.value
-                                };
-                                await axios.post("http://localhost:8081/employee", tmp)
-                                    .then(res => {
-                                        if (!res.data.success)
-                                            console.log(res.data.message);
-                                        else
-                                            this.loadEmployees();
-                                    });
-                            }}
-                        >
-                            {() => (
-                                <Form>
-                                    <div>
-                                        <Select styles={customStyles}
-                                            options={this.props.citizens.map(c => (
-                                                {
-                                                    value: c.regNum,
-                                                    label: c.regNum + " / " + c.name + " " + c.surname
-                                                })
-                                            )}
-                                            value={this.state.selectedCitizens}
-                                            onChange={(e) => this.setState({ selectedCitizens: e })}
-                                            isDisabled={!((this.props.store.leader) || (this.props.store.admin))}
-                                            placeholder={
-                                                <Translation>
-                                                    {
-                                                        t => t('Citizen')
-                                                    }
-                                                </Translation>
+                                            if (!this.state.selectedCitizens) {
+                                                errors.selectedCitizens = t('Required');
                                             }
-                                            noOptionsMessage={() =>
-                                                <Translation>
-                                                    {
-                                                        t => t('Not found')
-                                                    }
-                                                </Translation>} />
-                                        <span className="floating-label active-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Citizen')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Select styles={customStyles}
-                                            options={filteredRanks.map(r => (
-                                                {
-                                                    value: r.title,
-                                                    label: r.title
-                                                })
-                                            )}
-                                            value={this.state.selectedRank}
-                                            onChange={(e) => this.setState({ selectedRank: e })}
-                                            isDisabled={!((this.props.store.leader) || (this.props.store.admin))}
-                                            placeholder={
-                                                <Translation>
-                                                    {
-                                                        t => t('Rank')
-                                                    }
-                                                </Translation>}
-                                            noOptionsMessage={() =>
-                                                <Translation>
-                                                    {
-                                                        t => t('Not found')
-                                                    }
-                                                </Translation>} />
-                                        <span className="floating-label active-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Rank')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="number" name="tag" onChange={(e) => this.setState({ tag: e.target.value })} />
-                                        <ErrorMessage name="tag" className="error-label" component="div" />
-                                        <span className="floating-label active-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Tag')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
 
-                                    {((this.props.store.employeeId) || (this.props.store.admin)) && this.state.selectedEmployeeId !== 0 &&
-                                        <div className="edit-list licenses">
-                                            <p className="text-label">
-                                                <Translation>
-                                                    {
-                                                        t => t('Qualifications')
-                                                    }
-                                                </Translation>: </p>
-                                            {qualifications.map(q =>
-                                                <Link
-                                                    key={q.id}
-                                                    to={"/licenses"}
-                                                    className="round-link">
-                                                    {q.name}
-                                                    <span className="link-button" onClick={async (e) => {
-                                                        e.preventDefault();
-                                                        await axios.delete("http://localhost:8081/employee/" + this.state.selectedEmployeeId + "/qualification/" + q.id + "/delete").then(_ => {
-                                                            this.loadEmployees()
-                                                            this.clearData();
-                                                        });
-                                                    }}>
-                                                        <FontAwesomeIcon icon={faTimesCircle} />
-                                                    </span>
-                                                </Link>
-                                            )}
-                                            <div className="control">
-                                                <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
-                                                    options={this.state.qualifications.map(q => (
-                                                        {
-                                                            value: q.id,
-                                                            label: q.name
-                                                        })
-                                                    )}
-                                                    value={this.state.qualification}
-                                                    onChange={(e) => { this.setState({ qualification: e }) }}
-                                                    placeholder=
-                                                    {<Translation>
-                                                        {
-                                                            t => t('Qualification')
+                                            if (!this.state.selectedRank) {
+                                                errors.selectedRank = t('Required');
+                                            }
+
+                                            if (!values.tag) {
+                                                errors.tag = t('Required');
+                                            } else if (parseInt(values.tag) < 0) {
+                                                errors.tag = t('Invalid Negative');
+                                            }
+
+                                            return errors;
+                                        }}
+                                        onSubmit={async (values) => {
+                                            let tmp = {
+                                                regNum: this.state.selectedCitizens.value,
+                                                rank: this.state.selectedRank.value,
+                                                tag: values.tag,
+                                                department: this.state.department.value
+                                            };
+                                            await axios.post("http://localhost:8081/employee", tmp)
+                                                .then(res => {
+                                                    if (!res.data.success)
+                                                        console.log(res.data.message);
+                                                    else
+                                                        this.loadEmployees();
+                                                });
+                                        }}
+                                    >
+                                        {() => (
+                                            <Form>
+                                                <div>
+                                                    <Select styles={customStyles}
+                                                        options={this.props.citizens.map(c => (
+                                                            {
+                                                                value: c.regNum,
+                                                                label: c.regNum + " / " + c.name + " " + c.surname
+                                                            })
+                                                        )}
+                                                        value={this.state.selectedCitizens}
+                                                        onChange={(e) => this.setState({ selectedCitizens: e })}
+                                                        isDisabled={!((this.props.store.leader) || (this.props.store.admin))}
+                                                        placeholder={
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Citizen')
+                                                                }
+                                                            </Translation>
                                                         }
-                                                    </Translation>}
-                                                    noOptionsMessage={() =>
+                                                        noOptionsMessage={() =>
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Not found')
+                                                                }
+                                                            </Translation>} />
+                                                    <span className="floating-label active-label">
                                                         <Translation>
                                                             {
-                                                                t => t('Not found')
+                                                                t => t('Citizen')
                                                             }
-                                                        </Translation>} />
-                                                {((this.props.store.elader) || (this.props.store.admin)) &&
-                                                    <span className="link-button" onClick={async (e) => {
-                                                        e.preventDefault();
-                                                        let tmp = {
-                                                            eid: this.state.selectedEmployeeId,
-                                                            qid: this.state.qualification.value
-                                                        };
-                                                        if (!tmp.eid || !tmp.qid)
-                                                            return;
-                                                        await axios.post("http://localhost:8081/employee/" + tmp.eid + "/qualification/" + tmp.qid + "/add").then(_ => {
-                                                            this.loadEmployees()
-                                                            this.clearData();
-                                                        });
-                                                    }}>
-                                                        <FontAwesomeIcon icon={faPlus} />
+                                                        </Translation>
                                                     </span>
-                                                }
-                                            </div>
-                                        </div>
-                                    }
+                                                </div>
+                                                <div>
+                                                    <Select styles={customStyles}
+                                                        options={filteredRanks.map(r => (
+                                                            {
+                                                                value: r.title,
+                                                                label: r.title
+                                                            })
+                                                        )}
+                                                        value={this.state.selectedRank}
+                                                        onChange={(e) => this.setState({ selectedRank: e })}
+                                                        isDisabled={!((this.props.store.leader) || (this.props.store.admin))}
+                                                        placeholder={
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Rank')
+                                                                }
+                                                            </Translation>}
+                                                        noOptionsMessage={() =>
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Not found')
+                                                                }
+                                                            </Translation>} />
+                                                    <span className="floating-label active-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Rank')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <Field className="text-input" type="number" name="tag" onChange={(e) => this.setState({ tag: e.target.value })} />
+                                                    <ErrorMessage name="tag" className="error-label" component="div" />
+                                                    <span className="floating-label active-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Tag')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
 
-                                    {((this.props.store.employeeId) || (this.props.store.admin)) && this.state.selectedEmployeeId !== 0 &&
-                                        <div className="edit-list related-incidents">
-                                            <p className="text-label">
-                                                <Translation>
-                                                    {
-                                                        t => t('Title Incidents')
-                                                    }
-                                                </Translation>: </p>
-                                            {this.state.incidents.map(i =>
-                                                <Link
-                                                    key={i.id}
-                                                    to={"/incidents/" + i.id}
-                                                    className="round-link">
-                                                    #{i.id}
-                                                </Link>
-                                            )}
-                                        </div>
-                                    }
-                                </Form>
-                            )}
-                        </Formik>
+                                                {((this.props.store.employeeId) || (this.props.store.admin)) && this.state.selectedEmployeeId !== 0 &&
+                                                    <div className="edit-list licenses">
+                                                        <p className="text-label">
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Qualifications')
+                                                                }
+                                                            </Translation>: </p>
+                                                        {qualifications.map(q =>
+                                                            <Link
+                                                                key={q.id}
+                                                                to={"/licenses"}
+                                                                className="round-link">
+                                                                {q.name}
+                                                                <span className="link-button" onClick={async (e) => {
+                                                                    e.preventDefault();
+                                                                    await axios.delete("http://localhost:8081/employee/" + this.state.selectedEmployeeId + "/qualification/" + q.id + "/delete").then(_ => {
+                                                                        this.loadEmployees()
+                                                                        this.clearData();
+                                                                    });
+                                                                }}>
+                                                                    <FontAwesomeIcon icon={faTimesCircle} />
+                                                                </span>
+                                                            </Link>
+                                                        )}
+                                                        <div className="control">
+                                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided }) }}
+                                                                options={this.state.qualifications.map(q => (
+                                                                    {
+                                                                        value: q.id,
+                                                                        label: q.name
+                                                                    })
+                                                                )}
+                                                                value={this.state.qualification}
+                                                                onChange={(e) => { this.setState({ qualification: e }) }}
+                                                                placeholder=
+                                                                {<Translation>
+                                                                    {
+                                                                        t => t('Qualification')
+                                                                    }
+                                                                </Translation>}
+                                                                noOptionsMessage={() =>
+                                                                    <Translation>
+                                                                        {
+                                                                            t => t('Not found')
+                                                                        }
+                                                                    </Translation>} />
+                                                            {((this.props.store.leader) || (this.props.store.admin)) &&
+                                                                <span className="link-button" onClick={async (e) => {
+                                                                    e.preventDefault();
+                                                                    let tmp = {
+                                                                        eid: this.state.selectedEmployeeId,
+                                                                        qid: this.state.qualification.value
+                                                                    };
+                                                                    if (!tmp.eid || !tmp.qid)
+                                                                        return;
+                                                                    await axios.post("http://localhost:8081/employee/" + tmp.eid + "/qualification/" + tmp.qid + "/add").then(_ => {
+                                                                        this.loadEmployees()
+                                                                        this.clearData();
+                                                                    });
+                                                                }}>
+                                                                    <FontAwesomeIcon icon={faPlus} />
+                                                                </span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                {((this.props.store.employeeId) || (this.props.store.admin)) && this.state.selectedEmployeeId !== 0 &&
+                                                    <div className="edit-list related-incidents">
+                                                        <p className="text-label">
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Title Incidents')
+                                                                }
+                                                            </Translation>: </p>
+                                                        {this.state.incidents.map(i =>
+                                                            <Link
+                                                                key={i.id}
+                                                                to={"/incidents/" + i.id}
+                                                                className="round-link">
+                                                                #{i.id}
+                                                            </Link>
+                                                        )}
+                                                    </div>
+                                                }
+                                            </Form>
+                                        )}
+                                    </Formik>
+                            }
+                        </Translation>
                     </div>
                 </div>
 

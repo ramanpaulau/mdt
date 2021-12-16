@@ -181,66 +181,71 @@ class Inventory extends React.Component {
                         </Translation>
                     </div>
                     <div className="table-scroll">
-                        <Formik
-                            initialValues={{ description: "", amount: 0 }}
-                            validate={async values => {
-                                const errors = {};
+                        <Translation>
+                            {
+                                t =>
+                                    <Formik
+                                        initialValues={{ description: "", amount: 0 }}
+                                        validate={async values => {
+                                            const errors = {};
 
-                                if (!values.amount) {
-                                    errors.amount = 'Required';
-                                } else if (!/^[1-9][0-9]?$/i.test(values.amount)) {
-                                    errors.amount = '1-99';
-                                }
+                                            if (!values.amount) {
+                                                errors.amount = t('Required');
+                                            } else if (!/^[1-9][0-9]?$/i.test(values.amount)) {
+                                                errors.amount = '1-99';
+                                            }
 
-                                if (!values.description) {
-                                    errors.description = 'Required';
-                                }
+                                            if (!values.description) {
+                                                errors.description = t('Required');
+                                            }
 
-                                return errors;
-                            }}
-                            onSubmit={async (values) => {
-                                if (!this.state.department)
-                                    return;
-                                let tmp = {
-                                    description: values.description,
-                                    amount: values.amount,
-                                    department: this.state.department
-                                }
-                                await axios.post("http://localhost:8081/inventory/record", tmp).then(res => {
-                                    if (!res.data.success)
-                                        console.log(res.data.message);
-                                    else
-                                        this.loadInventory();
-                                });
-                            }}
-                        >
-                            {() => (
-                                <Form>
-                                    <div className="textarea">
-                                        <Field className="text-input" type="text" as="textarea" name="description" />
-                                        <ErrorMessage name="description" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Description')
-                                                }
-                                            </Translation></span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="number" name="amount" />
-                                        <ErrorMessage name="amount" className="error-label" component="div" />
-                                        <span className="floating-label active-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Amount')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                </Form>
-                            )}
-                        </Formik>
+                                            return errors;
+                                        }}
+                                        onSubmit={async (values) => {
+                                            if (!this.state.department)
+                                                return;
+                                            let tmp = {
+                                                description: values.description,
+                                                amount: values.amount,
+                                                department: this.state.department
+                                            }
+                                            await axios.post("http://localhost:8081/inventory/record", tmp).then(res => {
+                                                if (!res.data.success)
+                                                    console.log(res.data.message);
+                                                else
+                                                    this.loadInventory();
+                                            });
+                                        }}
+                                    >
+                                        {() => (
+                                            <Form>
+                                                <div className="textarea">
+                                                    <Field className="text-input" type="text" as="textarea" name="description" />
+                                                    <ErrorMessage name="description" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Description')
+                                                            }
+                                                        </Translation></span>
+                                                </div>
+                                                <div>
+                                                    <Field className="text-input" type="number" name="amount" />
+                                                    <ErrorMessage name="amount" className="error-label" component="div" />
+                                                    <span className="floating-label active-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Amount')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                            </Form>
+                                        )}
+                                    </Formik>
+                            }
+                        </Translation>
                     </div>
                 </div>
                 <div className="block inventory-history">
@@ -306,42 +311,43 @@ class SelectAmount extends React.Component {
         return (
             <li className="amount-input">
                 <FontAwesomeIcon className="green" onClick={() => this.result(true)} icon={faChevronCircleUp} />
-                <Formik
-                    initialValues={{ description: "", amount: 0 }}
-                    validate={async values => {
-                        const errors = {};
+                <Translation>
+                    {
+                        t =>
+                            <Formik
+                                initialValues={{ description: "", amount: 0 }}
+                                validate={async values => {
+                                    const errors = {};
 
-                        if (!values.amount) {
-                            errors.amount = 'Required';
-                        } else if (parseInt(values.amount) < 0) {
-                            errors.amount = 'Negative';
-                        }
+                                    if (!values.amount) {
+                                        errors.amount = t('Required');
+                                    } else if (parseInt(values.amount) < 0) {
+                                        errors.amount = t('Invalid Negative');
+                                    }
 
-                        if (!errors.amount) {
-                            this.setState({ amount: values.amount });
-                        } else {
-                            this.setState({ amount: 0 });
-                        }
+                                    if (!errors.amount) {
+                                        this.setState({ amount: values.amount });
+                                    } else {
+                                        this.setState({ amount: 0 });
+                                    }
 
-                        return errors;
-                    }}
-                >
-                    {() => (
-                        <Form>
-                            <div>
-                                <Field className="text-input" type="number" name="amount" />
-                                <ErrorMessage name="amount" className="error-label" component="div" />
-                                <span className="floating-label active-label">
-                                    <Translation>
-                                        {
-                                            t => t('Form Amount')
-                                        }
-                                    </Translation>
-                                </span>
-                            </div>
-                        </Form>
-                    )}
-                </Formik>
+                                    return errors;
+                                }}
+                            >
+                                {() => (
+                                    <Form>
+                                        <div>
+                                            <Field className="text-input" type="number" name="amount" />
+                                            <ErrorMessage name="amount" className="error-label" component="div" />
+                                            <span className="floating-label active-label">
+                                                {t('Form Amount')}
+                                            </span>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
+                    }
+                </Translation>
                 <FontAwesomeIcon className="red" onClick={() => this.result(false)} icon={faChevronCircleDown} />
             </li>
         )

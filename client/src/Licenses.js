@@ -42,119 +42,124 @@ class Licenses extends React.Component {
                     </Translation>
                     <div className="table-scroll">
                         <ul className="license-add">
-                            <Formik
-                                initialValues={{
-                                    name: '',
-                                    description: '',
-                                    type: '',
-                                }}
-                                enableReinitialize={true}
-                                validate={async values => {
-                                    const errors = {};
+                            <Translation>
+                                {
+                                    t =>
+                                        <Formik
+                                            initialValues={{
+                                                name: '',
+                                                description: '',
+                                                type: '',
+                                            }}
+                                            enableReinitialize={true}
+                                            validate={async values => {
+                                                const errors = {};
 
-                                    if (!values.name) {
-                                        errors.name = 'Required';
-                                    } else if (!/^[A-Za-z ]{2,}$/i.test(values.name)) {
-                                        errors.name = 'Invalid name';
-                                    }
+                                                if (!values.name) {
+                                                    errors.name = t('Required');
+                                                } else if (!/^[A-Za-z ]{2,}$/i.test(values.name)) {
+                                                    errors.name = t('Invalid Format');
+                                                }
 
-                                    if (!values.description) {
-                                        errors.description = 'Required';
-                                    } else if (!/^[A-Za-z ]{2,}$/i.test(values.description)) {
-                                        errors.description = 'Invalid description';
-                                    }
+                                                if (!values.description) {
+                                                    errors.description = t('Required');
+                                                } else if (!/^[A-Za-z ]{2,}$/i.test(values.description)) {
+                                                    errors.description = t('Invalid Format');
+                                                }
 
-                                    if (!values.type) {
-                                        errors.type = 'Required';
-                                    }
+                                                if (!values.type) {
+                                                    errors.type = t('Required');
+                                                }
 
-                                    return errors;
-                                }}
-                                onSubmit={async (values) => {
-                                    let tmp = {
-                                        name: values.name.toUpperCase(),
-                                        description: values.description
-                                    }
-                                    if (values.type === "license") {
-                                        await axios.post("http://localhost:8081/license", tmp).then(res => {
-                                            if (!res.data.success)
-                                                alert(res.data.message);
-                                            else
-                                                this.loadData();
-                                        });
-                                    }
+                                                return errors;
+                                            }}
+                                            onSubmit={async (values) => {
+                                                let tmp = {
+                                                    name: values.name.toUpperCase(),
+                                                    description: values.description
+                                                }
+                                                if (values.type === "license") {
+                                                    await axios.post("http://localhost:8081/license", tmp).then(res => {
+                                                        if (!res.data.success)
+                                                            alert(res.data.message);
+                                                        else
+                                                            this.loadData();
+                                                    });
+                                                }
 
-                                    if (values.type === "qualification") {
-                                        await axios.post("http://localhost:8081/qualification", tmp).then(res => {
-                                            if (!res.data.success)
-                                                alert(res.data.message);
-                                            else
-                                                this.loadData();
-                                        });
-                                    }
-                                }}
-                            >
-                                {({ isSubmitting }) => (
-                                    <Form>
-                                        <li className="name">
-                                            <div>
-                                                <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="name" />
-                                                <ErrorMessage name="name" className="error-label" component="div" />
-                                                <span className="floating-label">
-                                                    <Translation>
-                                                        {
-                                                            t => t('Form Name')
-                                                        }
-                                                    </Translation>
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li className="type">
-                                            <div>
-                                                <label>
-                                                    <Field type="radio" name="type" value="license" />
-                                                    <Translation>
-                                                        {
-                                                            t => t('License')
-                                                        }
-                                                    </Translation>
-                                                </label>
-                                                <label>
-                                                    <Field type="radio" name="type" value="qualification" />
-                                                    <Translation>
-                                                        {
-                                                            t => t('Qualification')
-                                                        }
-                                                    </Translation>
-                                                </label>
-                                            </div>
-                                            <ErrorMessage name="type" className="error-text" component="div" />
-                                        </li>
-                                        <li className="description">
-                                            <div>
-                                                <Field className="text-input" type="text" name="description" />
-                                                <ErrorMessage name="description" className="error-label" component="div" />
-                                                <span className="floating-label active-label">
-                                                    <Translation>
-                                                        {
-                                                            t => t('Form Description')
-                                                        }
-                                                    </Translation>
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li className="button">
-                                            <button ref={this.sendButton} className="round-link" type="submit">
-                                                <Translation>
-                                                    {
-                                                        t => t('Title Send')
-                                                    }
-                                                </Translation>
-                                            </button>
-                                        </li>
-                                    </Form>
-                                )}
-                            </Formik>
+                                                if (values.type === "qualification") {
+                                                    await axios.post("http://localhost:8081/qualification", tmp).then(res => {
+                                                        if (!res.data.success)
+                                                            alert(res.data.message);
+                                                        else
+                                                            this.loadData();
+                                                    });
+                                                }
+                                            }}
+                                        >
+                                            {({ isSubmitting }) => (
+                                                <Form>
+                                                    <li className="name">
+                                                        <div>
+                                                            <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="name" />
+                                                            <ErrorMessage name="name" className="error-label" component="div" />
+                                                            <span className="floating-label">
+                                                                <Translation>
+                                                                    {
+                                                                        t => t('Form Name')
+                                                                    }
+                                                                </Translation>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                    <li className="type">
+                                                        <div>
+                                                            <label>
+                                                                <Field type="radio" name="type" value="license" />
+                                                                <Translation>
+                                                                    {
+                                                                        t => t('License')
+                                                                    }
+                                                                </Translation>
+                                                            </label>
+                                                            <label>
+                                                                <Field type="radio" name="type" value="qualification" />
+                                                                <Translation>
+                                                                    {
+                                                                        t => t('Qualification')
+                                                                    }
+                                                                </Translation>
+                                                            </label>
+                                                        </div>
+                                                        <ErrorMessage name="type" className="error-text" component="div" />
+                                                    </li>
+                                                    <li className="description">
+                                                        <div>
+                                                            <Field className="text-input" type="text" name="description" />
+                                                            <ErrorMessage name="description" className="error-label" component="div" />
+                                                            <span className="floating-label active-label">
+                                                                <Translation>
+                                                                    {
+                                                                        t => t('Form Description')
+                                                                    }
+                                                                </Translation>
+                                                            </span>
+                                                        </div>
+                                                    </li>
+                                                    <li className="button">
+                                                        <button ref={this.sendButton} className="round-link" type="submit">
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Title Send')
+                                                                }
+                                                            </Translation>
+                                                        </button>
+                                                    </li>
+                                                </Form>
+                                            )}
+                                        </Formik>
+                                }
+                            </Translation>
                         </ul>
                         {this.state.data.map((e, i) =>
                             <ul key={i} className="license-item">

@@ -298,101 +298,106 @@ class Incidents extends React.Component {
                         </Translation>
                     </div>
                     <div className="table-scroll">
-                        <Formik
-                            initialValues={(this.state.selectedIdx === -1) ? this.emptyIncident : this.state.incidents[this.state.selectedIdx]}
-                            enableReinitialize={true}
-                            validate={async values => {
-                                const errors = {};
+                        <Translation>
+                            {
+                                t =>
+                                    <Formik
+                                        initialValues={(this.state.selectedIdx === -1) ? this.emptyIncident : this.state.incidents[this.state.selectedIdx]}
+                                        enableReinitialize={true}
+                                        validate={async values => {
+                                            const errors = {};
 
-                                if (!values.title) {
-                                    errors.title = 'Required';
-                                }
+                                            if (!values.title) {
+                                                errors.title = t('Required');
+                                            }
 
-                                if (!values.location) {
-                                    errors.location = 'Required';
-                                }
+                                            if (!values.location) {
+                                                errors.location = t('Required');
+                                            }
 
-                                if (!values.details) {
-                                    errors.details = 'Required';
-                                }
+                                            if (!values.details) {
+                                                errors.details = t('Required');
+                                            }
 
-                                return errors;
-                            }}
+                                            return errors;
+                                        }}
 
-                            onSubmit={async (values) => {
-                                let tmp = {
-                                    id: (this.state.selectedIdx === -1) ? 0 : this.state.incidents[this.state.selectedIdx].id,
-                                    supervisor: this.props.store.employeeId,
-                                    title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
-                                    location: values.location,
-                                    datetime: this.state.datetime.toLocaleString(),
-                                    details: values.details
-                                };
+                                        onSubmit={async (values) => {
+                                            let tmp = {
+                                                id: (this.state.selectedIdx === -1) ? 0 : this.state.incidents[this.state.selectedIdx].id,
+                                                supervisor: this.props.store.employeeId,
+                                                title: values.title.charAt(0).toUpperCase() + values.title.slice(1),
+                                                location: values.location,
+                                                datetime: this.state.datetime.toLocaleString(),
+                                                details: values.details
+                                            };
 
-                                await axios.post("http://localhost:8081/incident", tmp).then(async res => {
-                                    if (!res.data.success)
-                                        console.log(res.data.message);
-                                    else {
-                                        await axios.get("http://localhost:8081/incidents").then(res => {
-                                            this.setState({ incidents: res.data });
-                                            this.getPageData();
-                                        });
-                                    }
-                                });
-                            }}
-                        >
-                            {({ isSubmitting }) => (
-                                <Form>
-                                    <div>
-                                        {(this.state.selectedIdx === -1) ? "" : <p className="incident-id">#{this.state.incidents[this.state.selectedIdx].id}</p>}
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
-                                        <ErrorMessage name="title" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Title')
+                                            await axios.post("http://localhost:8081/incident", tmp).then(async res => {
+                                                if (!res.data.success)
+                                                    console.log(res.data.message);
+                                                else {
+                                                    await axios.get("http://localhost:8081/incidents").then(res => {
+                                                        this.setState({ incidents: res.data });
+                                                        this.getPageData();
+                                                    });
                                                 }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="location" />
-                                        <ErrorMessage name="location" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Location')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div className="textarea">
-                                        <Field className="text-input" type="text" as="textarea" name="details" />
-                                        <ErrorMessage name="details" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Description')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div className="datetime">
-                                        <Datetime inputProps={{ disabled: (this.state.selectedIdx !== -1) }} value={this.state.datetime} onChange={(e) => { this.setState({ datetime: e }) }} />
-                                        <span className="floating-label active-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Time')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                </Form>
-                            )}
-                        </Formik>
+                                            });
+                                        }}
+                                    >
+                                        {({ isSubmitting }) => (
+                                            <Form>
+                                                <div>
+                                                    {(this.state.selectedIdx === -1) ? "" : <p className="incident-id">#{this.state.incidents[this.state.selectedIdx].id}</p>}
+                                                </div>
+                                                <div>
+                                                    <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="title" />
+                                                    <ErrorMessage name="title" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Title')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="location" />
+                                                    <ErrorMessage name="location" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Location')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div className="textarea">
+                                                    <Field className="text-input" type="text" as="textarea" name="details" />
+                                                    <ErrorMessage name="details" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Description')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div className="datetime">
+                                                    <Datetime inputProps={{ disabled: (this.state.selectedIdx !== -1) }} value={this.state.datetime} onChange={(e) => { this.setState({ datetime: e }) }} />
+                                                    <span className="floating-label active-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Time')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                            </Form>
+                                        )}
+                                    </Formik>
+                            }
+                        </Translation>
                     </div>
                 </div>
                 <div className="block incident-info">

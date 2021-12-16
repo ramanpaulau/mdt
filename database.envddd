@@ -1,3 +1,0 @@
-POSTGRES_USER=mdtuser
-POSTGRES_PASSWORD=mdtpassword
-POSTGRES_DB=mdt

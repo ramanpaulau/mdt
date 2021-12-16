@@ -199,135 +199,140 @@ class Indictments extends React.Component {
                         </Translation>
                     </div>
                     <div className="table-scroll">
-                        <Formik
-                            initialValues={{
-                                detention: this.state.detention,
-                                fine: this.state.fine
-                            }}
-                            enableReinitialize={true}
-                            validate={async values => {
-                                const errors = {};
+                        <Translation>
+                            {
+                                t =>
+                                    <Formik
+                                        initialValues={{
+                                            detention: this.state.detention,
+                                            fine: this.state.fine
+                                        }}
+                                        enableReinitialize={true}
+                                        validate={async values => {
+                                            const errors = {};
 
-                                if (values.detention < 0)
-                                    errors.detention = "Value must be > 0";
-                                else
-                                    this.setState({ endTime: new Date(this.state.startTime.getTime() + values.detention * 60000) })
+                                            if (values.detention < 0)
+                                                errors.detention = t('Invalid Negative');
+                                            else
+                                                this.setState({ endTime: new Date(this.state.startTime.getTime() + values.detention * 60000) })
 
-                                if (values.fine < 0)
-                                    errors.fine = "Value must be > 0";
+                                            if (values.fine < 0)
+                                                errors.fine = t('Invalid Negative');
 
-                                if (values.fine <= 0 && values.detention <= 0) {
-                                    errors.detention = "One of values must be positive";
-                                    errors.fine = "One of values must be positive";
-                                }
+                                            if (values.fine <= 0 && values.detention <= 0) {
+                                                errors.detention = t('Invalid Negative');
+                                                errors.fine = t('Invalid Negative');
+                                            }
 
-                                if (this.state.incident === -1)
-                                    errors.incident = "Select value";
+                                            if (this.state.incident === -1)
+                                                errors.incident = "Select value";
 
-                                if (this.state.department === -1)
-                                    errors.department = "Select value";
+                                            if (this.state.department === -1)
+                                                errors.department = "Select value";
 
-                                if (this.state.citizen.length <= 0)
-                                    errors.citizen = "Select value";
+                                            if (this.state.citizen.length <= 0)
+                                                errors.citizen = "Select value";
 
-                                return errors;
-                            }}
-                            onSubmit={async (values) => {
-                                let tmp = {
-                                    citizen: this.state.citizen,
-                                    department: this.state.department,
-                                    incident: this.state.incident,
-                                    startTime: this.state.startTime.toLocaleString(),
-                                    endTime: this.state.endTime.toLocaleString(),
-                                    employee: this.props.store.employeeId,
-                                    laws: this.state.selectedLaws.map(l => l.number).join(',')
-                                };
+                                            return errors;
+                                        }}
+                                        onSubmit={async (values) => {
+                                            let tmp = {
+                                                citizen: this.state.citizen,
+                                                department: this.state.department,
+                                                incident: this.state.incident,
+                                                startTime: this.state.startTime.toLocaleString(),
+                                                endTime: this.state.endTime.toLocaleString(),
+                                                employee: this.props.store.employeeId,
+                                                laws: this.state.selectedLaws.map(l => l.number).join(',')
+                                            };
 
-                                this.props.wsClient.publish({ destination: "/api/call/indictment/add", body: JSON.stringify(tmp) });
-                                this.setState({ indictments: [tmp, ...this.state.indictments] }, () => { this.getPageData() });
+                                            this.props.wsClient.publish({ destination: "/api/call/indictment/add", body: JSON.stringify(tmp) });
+                                            this.setState({ indictments: [tmp, ...this.state.indictments] }, () => { this.getPageData() });
 
-                                if (values.fine > 0)
-                                    await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
-                                        if (!res.data.success)
-                                            console.log(res.data.message);
-                                    });
-                            }}
-                        >
-                            {({ isSubmitting }) => (
-                                <Translation>{t =>
-                                    <Form>
-                                        <div className="edit-list incident">
-                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                                options={this.state.incidents.map(i => (
-                                                    {
-                                                        value: i.id,
-                                                        label: i.id
-                                                    })
-                                                )}
-                                                onChange={(e) => { this.setState({ incident: e.value }) }}
-                                                value={(this.state.incidents.filter(i => i.id === this.state.incident)[0]) ? { value: this.state.incident, label: this.state.incident } : null}
-                                                placeholder={t('Incident')}
-                                                noOptionsMessage={() => t('Not found')} />
-                                        </div>
-                                        <div className="edit-list department">
-                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                                options={this.state.departments.map(d => (
-                                                    {
-                                                        value: d.code,
-                                                        label: d.shortTitle
-                                                    })
-                                                )}
-                                                onChange={(e) => { this.setState({ department: e.value }) }}
-                                                value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : null}
-                                                placeholder={t('Department')}
-                                                noOptionsMessage={() => t('Not found')} />
-                                        </div>
-                                        <div className="edit-list citizen">
-                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                                options={this.props.citizens.map(c => (
-                                                    {
-                                                        value: c.regNum,
-                                                        label: c.regNum
-                                                    })
-                                                )}
-                                                onChange={(e) => { this.setState({ citizen: e.value }) }}
-                                                value={(this.props.citizens.filter(c => c.regNum === this.state.citizen)[0]) ? { value: this.state.citizen, label: this.state.citizen } : null}
-                                                placeholder={t('Citizen')}
-                                                noOptionsMessage={() => t('Not found')} />
-                                        </div>
-                                        <div className="start-date">
-                                            <Datetime value={this.state.startTime} onChange={(e) => { this.setState({ startTime: new Date(e) }) }} />
-                                            <span className="floating-label active-label">{t('Start Time')}</span>
-                                        </div>
-                                        <div className="end-fate">
-                                            <p className="text-label">{t('End Time')}: {this.state.endTime.toLocaleString()}</p>
-                                        </div>
-                                        <div>
-                                            <Field className="text-input" type="number" name="detention" />
-                                            <ErrorMessage name="detention" className="error-label" component="div" />
-                                            <span className="floating-label active-label">{t('Detention')}</span>
-                                        </div>
-                                        <div>
-                                            <Field className="text-input" type="number" name="fine" />
-                                            <ErrorMessage name="fine" className="error-label" component="div" />
-                                            <span className="floating-label active-label">{t('Fine')}</span>
-                                        </div>
-                                        <SelectLaws callback={(laws) => this.saveLaws(laws)} />
-                                        <div>
-                                            <p className="text-label">{t('Form Selected Laws')}: </p>
-                                            <div className="laws">
-                                                {this.state.selectedLaws.map(l =>
-                                                    <Link to="/penalcode" key={l.number} className="round-link" >
-                                                        {l.number}
-                                                    </Link>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                    </Form>
-                                }</Translation>
-                            )}
-                        </Formik>
+                                            if (values.fine > 0)
+                                                await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
+                                                    if (!res.data.success)
+                                                        console.log(res.data.message);
+                                                });
+                                        }}
+                                    >
+                                        {({ isSubmitting }) => (
+                                            <Translation>{t =>
+                                                <Form>
+                                                    <div className="edit-list incident">
+                                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                            options={this.state.incidents.map(i => (
+                                                                {
+                                                                    value: i.id,
+                                                                    label: i.id
+                                                                })
+                                                            )}
+                                                            onChange={(e) => { this.setState({ incident: e.value }) }}
+                                                            value={(this.state.incidents.filter(i => i.id === this.state.incident)[0]) ? { value: this.state.incident, label: this.state.incident } : null}
+                                                            placeholder={t('Incident')}
+                                                            noOptionsMessage={() => t('Not found')} />
+                                                    </div>
+                                                    <div className="edit-list department">
+                                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                            options={this.state.departments.map(d => (
+                                                                {
+                                                                    value: d.code,
+                                                                    label: d.shortTitle
+                                                                })
+                                                            )}
+                                                            onChange={(e) => { this.setState({ department: e.value }) }}
+                                                            value={(this.state.departments.filter(d => d.code === this.state.department)[0]) ? { value: this.state.department, label: this.state.departments.filter(d => d.code === this.state.department)[0].shortTitle } : null}
+                                                            placeholder={t('Department')}
+                                                            noOptionsMessage={() => t('Not found')} />
+                                                    </div>
+                                                    <div className="edit-list citizen">
+                                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                            options={this.props.citizens.map(c => (
+                                                                {
+                                                                    value: c.regNum,
+                                                                    label: c.regNum
+                                                                })
+                                                            )}
+                                                            onChange={(e) => { this.setState({ citizen: e.value }) }}
+                                                            value={(this.props.citizens.filter(c => c.regNum === this.state.citizen)[0]) ? { value: this.state.citizen, label: this.state.citizen } : null}
+                                                            placeholder={t('Citizen')}
+                                                            noOptionsMessage={() => t('Not found')} />
+                                                    </div>
+                                                    <div className="start-date">
+                                                        <Datetime value={this.state.startTime} onChange={(e) => { this.setState({ startTime: new Date(e) }) }} />
+                                                        <span className="floating-label active-label">{t('Start Time')}</span>
+                                                    </div>
+                                                    <div className="end-fate">
+                                                        <p className="text-label">{t('End Time')}: {this.state.endTime.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <Field className="text-input" type="number" name="detention" />
+                                                        <ErrorMessage name="detention" className="error-label" component="div" />
+                                                        <span className="floating-label active-label">{t('Detention')}</span>
+                                                    </div>
+                                                    <div>
+                                                        <Field className="text-input" type="number" name="fine" />
+                                                        <ErrorMessage name="fine" className="error-label" component="div" />
+                                                        <span className="floating-label active-label">{t('Fine')}</span>
+                                                    </div>
+                                                    <SelectLaws callback={(laws) => this.saveLaws(laws)} />
+                                                    <div>
+                                                        <p className="text-label">{t('Form Selected Laws')}: </p>
+                                                        <div className="laws">
+                                                            {this.state.selectedLaws.map(l =>
+                                                                <Link to="/penalcode" key={l.number} className="round-link" >
+                                                                    {l.number}
+                                                                </Link>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                                </Form>
+                                            }</Translation>
+                                        )}
+                                    </Formik>
+                            }
+                        </Translation>
                     </div>
                 </div>
             </div >

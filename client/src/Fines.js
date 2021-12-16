@@ -110,7 +110,7 @@ class Fines extends React.Component {
                                     <State id={o.id} state={o.state} />
                                 </li>
                                 <Link
-                                    to={"/fines/" + (o.person)}
+                                    to={"/citizens/" + (o.person)}
                                     className="edit-button round-link">
                                     {o.person}
                                 </Link>
@@ -164,86 +164,91 @@ class Fines extends React.Component {
                             </Translation>
                         </div>
                         <div className="table-scroll">
-                            <Formik
-                                initialValues={{
-                                    fine: this.state.fine
-                                }}
-                                enableReinitialize={true}
-                                validate={async values => {
-                                    const errors = {};
+                            <Translation>
+                                {
+                                    t =>
+                                        <Formik
+                                            initialValues={{
+                                                fine: this.state.fine
+                                            }}
+                                            enableReinitialize={true}
+                                            validate={async values => {
+                                                const errors = {};
 
-                                    if (values.fine <= 0)
-                                        errors.fine = "Value must be > 0";
+                                                if (values.fine <= 0)
+                                                    errors.fine = t('Invalid Negative');
 
-                                    if (this.state.citizen.length <= 0)
-                                        errors.citizen = "Select value";
+                                                if (this.state.citizen.length <= 0)
+                                                    errors.citizen = "Select value";
 
-                                    return errors;
-                                }}
-                                onSubmit={async (values) => {
-                                    await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
-                                        if (!res.data.success)
-                                            console.log(res.data.message);
-                                    });
-                                }}
-                            >
-                                {({ isSubmitting }) => (
-                                    <Form>
-                                        <div className="edit-list citizen">
-                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
-                                                options={this.props.citizens.map(c => (
-                                                    {
-                                                        value: c.regNum,
-                                                        label: c.regNum
-                                                    })
-                                                )}
-                                                onChange={(e) => { this.setState({ citizen: e.value }) }}
-                                                value={(this.props.citizens.filter(c => c.regNum === this.state.citizen)[0]) ? { value: this.state.citizen, label: this.state.citizen } : null}
-                                                placeholder=
-                                                {<Translation>
-                                                    {
-                                                        t => t('Citizen')
-                                                    }
-                                                </Translation>}
-                                                noOptionsMessage={() =>
-                                                    <Translation>
-                                                        {
-                                                            t => t('Not found')
-                                                        }
-                                                    </Translation>
-                                                } />
-                                        </div>
-                                        <div>
-                                            <Field className="text-input" type="number" name="fine" />
-                                            <ErrorMessage name="fine" className="error-label" component="div" />
-                                            <span className="floating-label active-label">
-                                                <Translation>
-                                                    {
-                                                        t => t('Fine')
-                                                    }
-                                                </Translation>
-                                            </span>
-                                        </div>
-                                        <SelectLaws callback={(laws) => this.saveLaws(laws)} />
-                                        <div>
-                                            <p className="text-label">
-                                                <Translation>
-                                                    {
-                                                        t => t('Form Selected Laws')
-                                                    }
-                                                </Translation>: </p>
-                                            <div className="laws">
-                                                {this.state.selectedLaws.map(l =>
-                                                    <Link to="/penalcode" key={l.number} className="round-link" >
-                                                        {l.number}
-                                                    </Link>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                    </Form>
-                                )}
-                            </Formik>
+                                                return errors;
+                                            }}
+                                            onSubmit={async (values) => {
+                                                await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
+                                                    if (!res.data.success)
+                                                        console.log(res.data.message);
+                                                });
+                                            }}
+                                        >
+                                            {({ isSubmitting }) => (
+                                                <Form>
+                                                    <div className="edit-list citizen">
+                                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, width: "224px" }) }}
+                                                            options={this.props.citizens.map(c => (
+                                                                {
+                                                                    value: c.regNum,
+                                                                    label: c.regNum
+                                                                })
+                                                            )}
+                                                            onChange={(e) => { this.setState({ citizen: e.value }) }}
+                                                            value={(this.props.citizens.filter(c => c.regNum === this.state.citizen)[0]) ? { value: this.state.citizen, label: this.state.citizen } : null}
+                                                            placeholder=
+                                                            {<Translation>
+                                                                {
+                                                                    t => t('Citizen')
+                                                                }
+                                                            </Translation>}
+                                                            noOptionsMessage={() =>
+                                                                <Translation>
+                                                                    {
+                                                                        t => t('Not found')
+                                                                    }
+                                                                </Translation>
+                                                            } />
+                                                    </div>
+                                                    <div>
+                                                        <Field className="text-input" type="number" name="fine" />
+                                                        <ErrorMessage name="fine" className="error-label" component="div" />
+                                                        <span className="floating-label active-label">
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Fine')
+                                                                }
+                                                            </Translation>
+                                                        </span>
+                                                    </div>
+                                                    <SelectLaws callback={(laws) => this.saveLaws(laws)} />
+                                                    <div>
+                                                        <p className="text-label">
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Form Selected Laws')
+                                                                }
+                                                            </Translation>: </p>
+                                                        <div className="laws">
+                                                            {this.state.selectedLaws.map(l =>
+                                                                <Link to="/penalcode" key={l.number} className="round-link" >
+                                                                    {l.number}
+                                                                </Link>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                                </Form>
+                                            )}
+                                        </Formik>
+                                }
+                            </Translation>
                         </div>
                     </div>
                 }

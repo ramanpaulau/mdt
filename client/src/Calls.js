@@ -175,152 +175,157 @@ class Calls extends React.Component {
                         </Translation>
                     </div>
                     <div className="table-scroll">
-                        <Formik
-                            initialValues={(this.state.selectedIdx === -1) ? this.emptyCall : this.props.calls[this.state.selectedIdx]}
-                            enableReinitialize={true}
-                            validate={async values => {
-                                const errors = {};
+                        <Translation>
+                            {
+                                t =>
+                                    <Formik
+                                        initialValues={(this.state.selectedIdx === -1) ? this.emptyCall : this.props.calls[this.state.selectedIdx]}
+                                        enableReinitialize={true}
+                                        validate={async values => {
+                                            const errors = {};
 
-                                if (!values.location) {
-                                    errors.location = 'Required';
-                                }
+                                            if (!values.location) {
+                                                errors.location = t('Required');
+                                            }
 
-                                if (!values.phone) {
-                                    errors.phone = 'Required';
-                                } else if (!/^\d{3}-\d{4}$/i.test(values.phone)) {
-                                    errors.phone = 'Invalid phone number';
-                                }
+                                            if (!values.phone) {
+                                                errors.phone = t('Required');
+                                            } else if (!/^\d{3}-\d{4}$/i.test(values.phone)) {
+                                                errors.phone = t('Invalid Phone');
+                                            }
 
-                                if (!values.text) {
-                                    errors.text = 'Required';
-                                }
+                                            if (!values.text) {
+                                                errors.text = t('Required');
+                                            }
 
-                                return errors;
-                            }}
-                            onSubmit={async (values) => {
-                                let tmp = {
-                                    location: values.location,
-                                    phone: values.phone,
-                                    text: values.text
-                                };
-                                this.props.wsClient.publish({ destination: "/api/calls", body: JSON.stringify(tmp) });
-                            }}
-                        >
-                            {({ isSubmitting }) => (
-                                <Form>
-                                    <div>
-                                        <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="location" />
-                                        <ErrorMessage name="location" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Location')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="text" name="phone" />
-                                        <ErrorMessage name="phone" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Phone')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div className="textarea">
-                                        <Field className="text-input" type="text" as="textarea" name="text" />
-                                        <ErrorMessage name="text" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Text')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-
-
-                                    {(this.state.selectedIdx === -1) ? "" :
-                                        <div className="edit-list officers">
-                                            <p className="text-label">
-                                                <Translation>
-                                                    {
-                                                        t => t('Officers')
-                                                    }
-                                                </Translation>
-                                                : </p>
-                                            {this.props.calls[this.state.selectedIdx].employees.map((e, i) =>
-                                                <Link
-                                                    key={i}
-                                                    className="round-link"
-                                                    to={"/employees/" + e.marking}>
-                                                    {e.marking}
-                                                </Link>
-                                            )}
-                                        </div>
-                                    }
-
-                                    {(this.state.selectedIdx === -1) ? "" :
-                                        <div className="edit-list report">
-                                            <p className="text-label">
-                                                <Translation>
-                                                    {
-                                                        t => t('Title Incidents')
-                                                    }
-                                                </Translation>
-                                                : </p>
-                                            {(incidentId) ?
-                                                <Link
-                                                    to={"/incidents/" + incidentId}
-                                                    className="round-link">
-                                                    #{incidentId}
-                                                    <span className="link-button" onClick={async (e) => {
-                                                        e.preventDefault();
-                                                        let tmp = {
-                                                            cid: this.props.calls[this.state.selectedIdx].id
-                                                        }
-                                                        this.props.wsClient.publish({ destination: "/api/call/incident/delete", body: JSON.stringify(tmp) });
-                                                    }}>
-                                                        <FontAwesomeIcon icon={faTimesCircle} />
+                                            return errors;
+                                        }}
+                                        onSubmit={async (values) => {
+                                            let tmp = {
+                                                location: values.location,
+                                                phone: values.phone,
+                                                text: values.text
+                                            };
+                                            this.props.wsClient.publish({ destination: "/api/calls", body: JSON.stringify(tmp) });
+                                        }}
+                                    >
+                                        {({ isSubmitting }) => (
+                                            <Form>
+                                                <div>
+                                                    <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="location" />
+                                                    <ErrorMessage name="location" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Location')
+                                                            }
+                                                        </Translation>
                                                     </span>
-                                                </Link>
-                                                : ""}
-                                            <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, margin: "0px" }) }}
-                                                options={this.state.reports.map(r => (
-                                                    {
-                                                        value: r,
-                                                        label: r
-                                                    })
-                                                )}
-                                                onChange={(e) => { this.setState({ report: e.value }) }}
-                                                placeholder=
-                                                {<Translation>
-                                                    {
-                                                        t => t('Incident')
-                                                    }
-                                                </Translation>}
-                                                noOptionsMessage={() => "Not found"} />
-                                            <span className="link-button" onClick={async (e) => {
-                                                e.preventDefault();
-                                                if (!this.state.report)
-                                                    return;
-                                                let tmp = {
-                                                    cid: this.props.calls[this.state.selectedIdx].id,
-                                                    iid: this.state.report
+                                                </div>
+                                                <div>
+                                                    <Field className="text-input" type="text" name="phone" />
+                                                    <ErrorMessage name="phone" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Phone')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div className="textarea">
+                                                    <Field className="text-input" type="text" as="textarea" name="text" />
+                                                    <ErrorMessage name="text" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Text')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+
+
+                                                {(this.state.selectedIdx === -1) ? "" :
+                                                    <div className="edit-list officers">
+                                                        <p className="text-label">
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Officers')
+                                                                }
+                                                            </Translation>
+                                                            : </p>
+                                                        {this.props.calls[this.state.selectedIdx].employees.map((e, i) =>
+                                                            <Link
+                                                                key={i}
+                                                                className="round-link"
+                                                                to={"/employees/" + e.marking}>
+                                                                {e.marking}
+                                                            </Link>
+                                                        )}
+                                                    </div>
                                                 }
-                                                this.props.wsClient.publish({ destination: "/api/call/incident/add", body: JSON.stringify(tmp) });
-                                            }}>
-                                                <FontAwesomeIcon icon={faSave} />
-                                            </span>
-                                        </div>
-                                    }
-                                </Form>
-                            )}
-                        </Formik>
+
+                                                {(this.state.selectedIdx === -1) ? "" :
+                                                    <div className="edit-list report">
+                                                        <p className="text-label">
+                                                            <Translation>
+                                                                {
+                                                                    t => t('Title Incidents')
+                                                                }
+                                                            </Translation>
+                                                            : </p>
+                                                        {(incidentId) ?
+                                                            <Link
+                                                                to={"/incidents/" + incidentId}
+                                                                className="round-link">
+                                                                #{incidentId}
+                                                                <span className="link-button" onClick={async (e) => {
+                                                                    e.preventDefault();
+                                                                    let tmp = {
+                                                                        cid: this.props.calls[this.state.selectedIdx].id
+                                                                    }
+                                                                    this.props.wsClient.publish({ destination: "/api/call/incident/delete", body: JSON.stringify(tmp) });
+                                                                }}>
+                                                                    <FontAwesomeIcon icon={faTimesCircle} />
+                                                                </span>
+                                                            </Link>
+                                                            : ""}
+                                                        <Select styles={{ ...customStyles, container: (provided) => ({ ...provided, margin: "0px" }) }}
+                                                            options={this.state.reports.map(r => (
+                                                                {
+                                                                    value: r,
+                                                                    label: r
+                                                                })
+                                                            )}
+                                                            onChange={(e) => { this.setState({ report: e.value }) }}
+                                                            placeholder=
+                                                            {<Translation>
+                                                                {
+                                                                    t => t('Incident')
+                                                                }
+                                                            </Translation>}
+                                                            noOptionsMessage={() => "Not found"} />
+                                                        <span className="link-button" onClick={async (e) => {
+                                                            e.preventDefault();
+                                                            if (!this.state.report)
+                                                                return;
+                                                            let tmp = {
+                                                                cid: this.props.calls[this.state.selectedIdx].id,
+                                                                iid: this.state.report
+                                                            }
+                                                            this.props.wsClient.publish({ destination: "/api/call/incident/add", body: JSON.stringify(tmp) });
+                                                        }}>
+                                                            <FontAwesomeIcon icon={faSave} />
+                                                        </span>
+                                                    </div>
+                                                }
+                                            </Form>
+                                        )}
+                                    </Formik>
+                            }
+                        </Translation>
                     </div>
                 </div>
             </div>

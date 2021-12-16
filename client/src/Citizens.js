@@ -203,9 +203,9 @@ class Citizens extends React.Component {
                     <div className="table-scroll">
                         <Translation>{t =>
                             <input placeholder={t('Input Filter')}
-                                className="text-input" 
-                                type="text" 
-                                value={this.state.filter} 
+                                className="text-input"
+                                type="text"
+                                value={this.state.filter}
                                 onChange={(e) => this.setState({ filter: e.target.value, filteredData: this.props.citizens.filter(c => c.regNum.toLowerCase().includes(e.target.value.toLowerCase()) || (c.name.toLowerCase() + ' ' + c.surname.toLowerCase()).includes(e.target.value.toLowerCase())) }, () => this.loadCitizens())} />
                         }</Translation>
                         {this.state.pageData.map((o, i) =>
@@ -272,133 +272,138 @@ class Citizens extends React.Component {
                         </Translation>
                     </div>
                     <div className="table-scroll">
-                        <Formik
-                            initialValues={(this.state.selectedIdx === -1) ? this.emptyCitizen : this.props.citizens[this.state.selectedIdx]}
-                            enableReinitialize={true}
-                            validate={async values => {
-                                const errors = {};
-                                if (!values.name) {
-                                    errors.name = 'Required';
-                                } else if (!/^[A-Za-z ]{2,}$/i.test(values.name)) {
-                                    errors.name = 'Invalid name';
-                                }
+                        <Translation>
+                            {
+                                t =>
+                                    <Formik
+                                        initialValues={(this.state.selectedIdx === -1) ? this.emptyCitizen : this.props.citizens[this.state.selectedIdx]}
+                                        enableReinitialize={true}
+                                        validate={async values => {
+                                            const errors = {};
+                                            if (!values.name) {
+                                                errors.name = t('Required');
+                                            } else if (!/^[A-Za-z ]{2,}$/i.test(values.name)) {
+                                                errors.name = 'Invalid name';
+                                            }
 
-                                if (!values.surname) {
-                                    errors.surname = 'Required';
-                                } else if (!/^[A-Za-z ]{2,}$/i.test(values.surname)) {
-                                    errors.surname = 'Invalid surname';
-                                }
+                                            if (!values.surname) {
+                                                errors.surname = t('Required');
+                                            } else if (!/^[A-Za-z ]{2,}$/i.test(values.surname)) {
+                                                errors.surname = t('Invalid Surname');
+                                            }
 
-                                if (!values.phoneNumber) {
-                                    errors.phoneNumber = 'Required';
-                                } else if (!/^\d{3}-\d{4}$/i.test(values.phoneNumber)) {
-                                    errors.phoneNumber = 'Format: XXX-XXXX';
-                                }
+                                            if (!values.phoneNumber) {
+                                                errors.phoneNumber = t('Required');
+                                            } else if (!/^\d{3}-\d{4}$/i.test(values.phoneNumber)) {
+                                                errors.phoneNumber = t('Invalid Phone');;
+                                            }
 
-                                if (!values.regNum) {
-                                    errors.regNum = 'Required';
-                                } else if (!/^[A-Z0-9]{4}$/i.test(values.regNum)) {
-                                    errors.regNum = 'Format: XXXX';
-                                } else {
-                                    await axios.get("http://localhost:8081/is_regNum_available/" + values.regNum.toUpperCase()).then((res) => {
-                                        if (!res.data)
-                                            errors.regNum = 'Occupied';
-                                    });
-                                }
+                                            if (!values.regNum) {
+                                                errors.regNum = t('Required');
+                                            } else if (!/^[A-Z0-9]{4}$/i.test(values.regNum)) {
+                                                errors.regNum = t('Invalid RegNum');
+                                            } else {
+                                                await axios.get("http://localhost:8081/is_regNum_available/" + values.regNum.toUpperCase()).then((res) => {
+                                                    if (!res.data)
+                                                        errors.regNum = 'Occupied';
+                                                });
+                                            }
 
-                                if (!values.birthdate) {
-                                    errors.birthdate = 'Required';
-                                }
+                                            if (!values.birthdate) {
+                                                errors.birthdate = t('Required');
+                                            }
 
-                                return errors;
-                            }}
-                            onSubmit={(values) => {
-                                let tmp = {
-                                    regNum: values.regNum.toUpperCase(),
-                                    name: values.name.charAt(0).toUpperCase() + values.name.slice(1),
-                                    surname: values.surname.charAt(0).toUpperCase() + values.surname.slice(1),
-                                    birthdate: new Date(values.birthdate),
-                                    phoneNumber: values.phoneNumber,
-                                    state: 1
-                                };
-                                this.props.wsClient.publish({ destination: "/api/persons", body: JSON.stringify(tmp) });
-                            }}
-                        >
-                            {({ isSubmitting }) => (
-                                <Form>
-                                    <div>
-                                        <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="name" />
-                                        <ErrorMessage name="name" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Name')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="surname" />
-                                        <ErrorMessage name="surname" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Surname')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="text" name="phoneNumber" />
-                                        <ErrorMessage name="phoneNumber" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Phone')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <DatePickerField className="datePicker" name="birthdate" />
-                                        <ErrorMessage name="birthdate" className="error-label" component="div" />
-                                        <span className="floating-label active-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Birth Date')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="regNum" />
-                                        <ErrorMessage name="regNum" className="error-label" component="div" />
-                                        <span className="floating-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Reg. num')
-                                                }
-                                            </Translation>
-                                        </span>
-                                    </div>
-                                    <div className="password-link">
-                                        <input disabled type="text" className="text-input" value={this.state.password} />
-                                        <span className="floating-label active-label">
-                                            <Translation>
-                                                {
-                                                    t => t('Form Get Password Link')
-                                                }
-                                            </Translation>
-                                        </span>
-                                        <span onClick={this.getPassword} className="get-label"><FontAwesomeIcon icon={faDownload} /></span>
-                                        <CopyToClipboard text={this.state.password} onCopy={this.onCopy}>
-                                            <span className="copy-label" ref={this.copyLabel}><FontAwesomeIcon icon={faCopy} /></span>
-                                        </CopyToClipboard>
-                                    </div>
-                                    <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
-                                </Form>
-                            )}
-                        </Formik>
+                                            return errors;
+                                        }}
+                                        onSubmit={(values) => {
+                                            let tmp = {
+                                                regNum: values.regNum.toUpperCase(),
+                                                name: values.name.charAt(0).toUpperCase() + values.name.slice(1),
+                                                surname: values.surname.charAt(0).toUpperCase() + values.surname.slice(1),
+                                                birthdate: new Date(values.birthdate),
+                                                phoneNumber: values.phoneNumber,
+                                                state: 1
+                                            };
+                                            this.props.wsClient.publish({ destination: "/api/persons", body: JSON.stringify(tmp) });
+                                        }}
+                                    >
+                                        {({ isSubmitting }) => (
+                                            <Form>
+                                                <div>
+                                                    <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="name" />
+                                                    <ErrorMessage name="name" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Name')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <Field className="text-input" type="text" style={{ textTransform: "capitalize" }} name="surname" />
+                                                    <ErrorMessage name="surname" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Surname')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <Field className="text-input" type="text" name="phoneNumber" />
+                                                    <ErrorMessage name="phoneNumber" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Phone')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <DatePickerField className="datePicker" name="birthdate" />
+                                                    <ErrorMessage name="birthdate" className="error-label" component="div" />
+                                                    <span className="floating-label active-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Birth Date')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <Field className="text-input" type="text" style={{ textTransform: "uppercase" }} name="regNum" />
+                                                    <ErrorMessage name="regNum" className="error-label" component="div" />
+                                                    <span className="floating-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Reg. num')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                </div>
+                                                <div className="password-link">
+                                                    <input disabled type="text" className="text-input" value={this.state.password} />
+                                                    <span className="floating-label active-label">
+                                                        <Translation>
+                                                            {
+                                                                t => t('Form Get Password Link')
+                                                            }
+                                                        </Translation>
+                                                    </span>
+                                                    <span onClick={this.getPassword} className="get-label"><FontAwesomeIcon icon={faDownload} /></span>
+                                                    <CopyToClipboard text={this.state.password} onCopy={this.onCopy}>
+                                                        <span className="copy-label" ref={this.copyLabel}><FontAwesomeIcon icon={faCopy} /></span>
+                                                    </CopyToClipboard>
+                                                </div>
+                                                <button ref={this.sendButton} type="submit" style={{ display: "none" }}></button>
+                                            </Form>
+                                        )}
+                                    </Formik>
+                            }
+                        </Translation>
                     </div>
                 </div>
                 <div className="block citizen-info">
