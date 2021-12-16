@@ -67,7 +67,6 @@ export class User {
                     }
                     axios.get("http://localhost:8081/get_employee_info/" + res.data.regNum).then(action("getEmployee", res => {
                         if (res.data) {
-                            console.log(res.data);
                             this.employeeId = res.data.id;
                             this.department = res.data.departmentFullTitle;
                             this.departmentId = res.data.department;
