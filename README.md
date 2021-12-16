@@ -1,5 +1,5 @@
 Aplikace byla vyvíjena a testována na následujících verzích:
-- postgres: 14
+- PostgreSQL: 14
 - maven: 3.8.4
 - npm: 6.14.8
 

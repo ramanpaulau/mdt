@@ -3,6 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import axios from "axios";
 import { Translation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from "mobx-react";
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 
 class Licenses extends React.Component {
@@ -33,6 +34,7 @@ class Licenses extends React.Component {
 
     render() {
         return (
+            (this.props.store.leader || this.props.store.admin) &&
             <div className="license">
                 <div className="block license-list">
                     <Translation>
@@ -205,4 +207,4 @@ class Licenses extends React.Component {
     }
 }
 
-export default Licenses;
+export default observer(Licenses);

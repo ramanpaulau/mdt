@@ -5,11 +5,9 @@ import { Translation } from 'react-i18next';
 
 class Bolo extends React.Component {
 
-    componentDidMount = () => {
-    }
-
     render() {
         return (
+            (this.props.store.employeeId !== 0 || this.props.store.admin) &&
             <div className="bolo">
                 <div className="block citizen-list">
                     <Translation>

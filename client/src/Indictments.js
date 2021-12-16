@@ -105,6 +105,7 @@ class Indictments extends React.Component {
 
     render() {
         return (
+            (this.props.store.employeeId !== 0 || this.props.store.admin) &&
             <div className="indictments">
                 <div className="block indictment-list">
                     <Translation>

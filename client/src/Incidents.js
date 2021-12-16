@@ -9,6 +9,7 @@ import axios from 'axios';
 import Datetime from 'react-datetime';
 import "react-datetime/css/react-datetime.css";
 import { customStyles } from "./Employees";
+import { observer } from "mobx-react";
 import { Translation } from 'react-i18next';
 
 const INCIDENTS_ON_PAGE = 3;
@@ -198,6 +199,7 @@ class Incidents extends React.Component {
 
     render() {
         return (
+            (this.props.store.employeeId !== 0 || this.props.store.admin) &&
             <div className="incidents">
                 <div className="block incident-list">
                     <Translation>
@@ -670,4 +672,4 @@ class Incidents extends React.Component {
     }
 }
 
-export default Incidents;
+export default observer(Incidents);

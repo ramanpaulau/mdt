@@ -6,6 +6,7 @@ import { faChevronCircleDown, faChevronCircleUp, faChevronLeft, faChevronRight }
 import ReactPaginate from 'react-paginate';
 import axios from 'axios';
 import { user } from './auth/User';
+import { observer } from "mobx-react";
 import { customStyles } from './Employees';
 import { Translation } from 'react-i18next';
 
@@ -119,6 +120,7 @@ class Inventory extends React.Component {
         let filteredInventory = this.state.inventory.filter(e => e.department === this.state.department);
 
         return (
+            (this.props.store.employeeId !== 0 || this.props.store.admin) &&
             <div className="inventory">
                 <div className="block inventory-list">
                     <div className="title title-select">
@@ -354,4 +356,4 @@ class SelectAmount extends React.Component {
     }
 }
 
-export default Inventory;
+export default observer(Inventory);
