@@ -1,20 +1,21 @@
 @import "colors";
 
-@import "forms.scss";
+@import "auth.scss";
+@import "bolo.scss";
 @import "calls.scss";
-@import "inventory.scss";
-@import "license.scss";
+@import "citizens.scss";
+@import "departments.scss";
+@import "employees.scss";
+@import "fines.scss";
+@import "forms.scss";
+@import "home.scss";
 @import "incidents.scss";
 @import "indictments.scss";
-@import "fines.scss";
-@import "employees.scss";
-@import "home.scss";
-@import "bolo.scss";
-@import "citizens.scss";
-@import "vehicles.scss";
-@import "selectSearch.scss";
-@import "departments.scss";
+@import "inventory.scss";
+@import "license.scss";
 @import "penalcode.scss";
+@import "selectSearch.scss";
+@import "vehicles.scss";
 
 body {
     margin: 0;

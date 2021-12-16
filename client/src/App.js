@@ -24,7 +24,7 @@ import { observer } from "mobx-react";
 import axios from 'axios';
 import { Client } from '@stomp/stompjs';
 
-import './scss/main.scss';
+import './css/main.min.css';
 import Licenses from './Licenses';
 
 class App extends React.Component {

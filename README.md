@@ -1,7 +1,11 @@
 Aplikace byla vyvíjena a testována na následujících verzích:
-- PostgreSQL: 14
+- postgresql: 14
 - maven: 3.8.4
 - npm: 6.14.8
+
+Přihlašovací udaje: 
+- v systému přihlašovací udaje jsou nastevený pro uživatele Admin
+- Registrační značka: 0000, heslo: admin  
 
 Nástavení databáze:
 - api\src\main\resources\application.properties - obsahuje nastavení přípojení k databáze pro api
