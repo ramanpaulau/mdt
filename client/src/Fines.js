@@ -187,6 +187,7 @@ class Fines extends React.Component {
                                                 await axios.post("http://localhost:8081/fine", { citizen: this.state.citizen, amount: values.fine, laws: this.state.selectedLaws.map(l => l.number).join(','), employee: this.props.store.employeeId }).then(res => {
                                                     if (!res.data.success)
                                                         console.log(res.data.message);
+                                                    this.loadFines();
                                                 });
                                             }}
                                         >
